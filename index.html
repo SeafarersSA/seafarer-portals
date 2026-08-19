@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
     <meta name="apple-mobile-web-app-title" content="Seafarer Portal"/>
@@ -2233,28 +2234,35 @@
     }
 
     const SB_URL = 'https://shbjnypgkvxovosjoxyc.supabase.co';
-    const SB_KEY = 'sb_publishable_R6jhd2pB4J_0MDelKPRneQ_ryIwJJlA';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmpueXBna3Z4b3Zvc2pveHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNjM1ODIsImV4cCI6MjEwMjczOTU4Mn0.Wk4S2JS7OGQZpMlGuFvTKikn54bGqQ_vUJaf60fqy-A';
 
     async function sbFetch(path, method='GET', body=null) {
+        const headers = {
+            'apikey': SB_KEY,
+            'Authorization': 'Bearer ' + SB_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation',
+            'X-Client-Info': 'seafarer-portal/1.0'
+        };
         const opts = {
             method,
-            headers: {
-                'apikey': SB_KEY,
-                'Authorization': 'Bearer ' + SB_KEY,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            }
+            headers
         };
         if (body)
             opts.body = JSON.stringify(body);
-        const r = await fetch(SB_URL + '/rest/v1/' + path, opts);
-        if (!r.ok) {
-            const e = await r.text();
-            console.error('SB error:', e);
-            return null;
+        try {
+            const r = await fetch(SB_URL + '/rest/v1/' + path, opts);
+            if (!r.ok) {
+                const e = await r.text();
+                console.error('Supabase error:', r.status, e);
+                return null;
+            }
+            const t = await r.text();
+            return t ? JSON.parse(t) : null;
+        } catch (ex) {
+            console.error('Fetch error:', ex);
+            throw ex;
         }
-        const t = await r.text();
-        return t ? JSON.parse(t) : null;
     }
 
     async function dbGetStudents() {
@@ -2330,13 +2338,32 @@
         const p = document.getElementById('lp').value;
         const err = document.getElementById('lerr');
         const lbtn = document.querySelector('.lbtn');
+        if (!e || !p) {
+            err.textContent = 'Please enter your email and password.';
+            err.style.display = 'block';
+            return;
+        }
         if (lbtn) {
             lbtn.textContent = 'Signing in...';
             lbtn.disabled = true;
         }
+        err.style.display = 'none';
+
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+
         try {
-            const student = await dbGetStudent(e);
-            if (!student || student.password !== p) {
+            const student = await Promise.race([dbGetStudent(e), timeout]);
+            if (!student) {
+                err.textContent = 'Email not found. Please check and try again.';
+                err.style.display = 'block';
+                if (lbtn) {
+                    lbtn.textContent = 'Sign in';
+                    lbtn.disabled = false;
+                }
+                return;
+            }
+            if (student.password !== p) {
+                err.textContent = 'Incorrect password. Please try again.';
                 err.style.display = 'block';
                 if (lbtn) {
                     lbtn.textContent = 'Sign in';
@@ -2351,7 +2378,7 @@
             document.getElementById('portal').style.display = 'flex';
             document.getElementById('unm').textContent = student.name.split(' ')[0];
             document.getElementById('uav').textContent = ini;
-            const isAdmin = student.email === 'bsnyman13@gmail.com' || student.notes === 'Admin';
+            const isAdmin = student.email === ADMIN_EMAIL || student.notes === 'Admin';
             document.getElementById('uav').style.background = isAdmin ? '#1A2B5C' : '#C0392B';
             if (isAdmin) {
                 STUDENTS = await dbGetStudents() || [];
@@ -2361,8 +2388,12 @@
                 rStudentFromDB(student);
             }
         } catch (ex) {
-            console.error(ex);
-            err.textContent = 'Connection error. Check your internet and try again.';
+            console.error('Login error:', ex);
+            if (ex.message === 'timeout') {
+                err.textContent = 'Connection timed out. Check your internet and try again.';
+            } else {
+                err.textContent = 'Could not connect to database. Try again in a moment.';
+            }
             err.style.display = 'block';
             if (lbtn) {
                 lbtn.textContent = 'Sign in';
