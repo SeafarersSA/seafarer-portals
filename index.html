@@ -2337,15 +2337,15 @@
         if (p)
             return {
                 t: `Start with your ${p.name}`,
-                s: `First step in your deckhand roadmap`,
+                s: `First step in your roadmap`,
                 tab: 'book',
                 ic: 'ti-arrow-right'
             };
         return {
-            t: 'You are job ready!',
-            s: 'All courses complete. Time to dockwalk.',
-            tab: '',
-            ic: 'ti-award'
+            t: 'Welcome to Seafarer!',
+            s: 'Check the calendar for upcoming course dates and book your first course.',
+            tab: 'calendar',
+            ic: 'ti-anchor'
         };
     }
 
@@ -2410,7 +2410,7 @@
             icon: 'ti-folder'
         }];
         const done = COURSES.filter(c => c.status === 'done').length,
-            pct = Math.round(done / COURSES.length * 100),
+            pct = COURSES.length ? Math.round(done / COURSES.length * 100) : 0,
             s = _currentUser || STUDENTS[0] || {
                 name: 'Student',
                 visa: 'Not started',
@@ -2426,12 +2426,15 @@
           <div class="shdr">Visa — ${s.visa || "Not started"}</div>
           <div class="card">${vpH(s.visa_stage || s.vs || 0)}<div style="font-size:12px;color:var(--ts);margin-top:8px">Currently <strong>${VSTAGES[s.vs]}</strong>. Brandon will update this as things progress.</div></div>
           <div class="shdr">Next up</div>
-          <div class="card">${COURSES.filter(c => c.status === 'active' || c.status === 'booked').map(c => `<div class="ci"><div class="cicon ${c.status}"><i class="ti ${c.icon}" aria-hidden="true"></i></div><div class="cinf"><div class="cnm">${c.name}</div><div class="cpr">${c.prov}</div>${c.status === 'active' ? `<div class="pb" style="margin-top:5px"><div class="pf" style="width:${c.prog}%"></div></div>` : ''}</div><div class="crt"><span class="bdg bdg-${c.status}">${c.status === 'active' ? 'In progress' : 'Booked'}</span><div class="cdt">${c.date}</div></div></div>`).join('')}</div>
+          <div class="card">${COURSES.filter(c => c.status === 'active' || c.status === 'booked').length ? COURSES.filter(c => c.status === 'active' || c.status === 'booked').map(c => `<div class="ci"><div class="cicon ${c.status}"><i class="ti ${c.icon}" aria-hidden="true"></i></div><div class="cinf"><div class="cnm">${c.name}</div><div class="cpr">${c.prov}</div>${c.status === 'active' ? `<div class="pb" style="margin-top:5px"><div class="pf" style="width:${c.prog}%"></div></div>` : ''}</div><div class="crt"><span class="bdg bdg-${c.status}">${c.status === 'active' ? 'In progress' : 'Booked'}</span><div class="cdt">${c.date}</div></div></div>`).join('') : '<div class="empty" style="padding:16px 0">No active courses yet. Book your first course below!</div>'}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><button class="btn nv" onclick="sw('book')"><i class="ti ti-calendar-plus" style="font-size:14px" aria-hidden="true"></i> Book a course</button><button class="btn nv" onclick="sw('cv')"><i class="ti ti-file-text" style="font-size:14px" aria-hidden="true"></i> Build my CV</button><button class="btn" onclick="sw('quizzes')">Take a quiz</button></div>
         </div>
         <div class="view" id="v-courses">
           <div class="ptitle">My courses</div><div class="psub">Your full certification roadmap</div>
-          <div class="card">${COURSES.map(c => {const sc = c.status === 'done' ? 'done' : c.status === 'active' ? 'active' : c.status === 'booked' ? 'booked' : 'pending',bl = c.status === 'done' ? 'Completed' : c.status === 'active' ? 'In progress' : c.status === 'booked' ? 'Booked' : 'Pending';return `<div class="ci"><div class="cicon ${sc}"><i class="ti ${c.icon}" aria-hidden="true"></i></div><div class="cinf"><div class="cnm">${c.name}</div><div class="cpr">${c.prov}</div>${c.status === 'active' ? `<div class="pb" style="margin-top:5px"><div class="pf" style="width:${c.prog}%"></div></div>` : ''}</div><div class="crt"><span class="bdg bdg-${sc}">${bl}</span><div class="cdt">${c.date}</div></div></div>`;}).join('')}</div>
+          <div class="card">
+          ${COURSES.length ? COURSES.map(c => {const sc = c.status === 'done' ? 'done' : c.status === 'active' ? 'active' : c.status === 'booked' ? 'booked' : 'pending',bl = c.status === 'done' ? 'Completed' : c.status === 'active' ? 'In progress' : c.status === 'booked' ? 'Booked' : 'Pending';return `<div class="ci"><div class="cicon ${sc}"><i class="ti ${c.icon}" aria-hidden="true"></i></div><div class="cinf"><div class="cnm">${c.name}</div><div class="cpr">${c.prov}</div>${c.status === 'active' ? `<div class="pb" style="margin-top:5px"><div class="pf" style="width:${c.prog}%"></div></div>` : ''}</div><div class="crt"><span class="bdg bdg-${sc}">${bl}</span><div class="cdt">${c.date}</div></div></div>`;}).join('') : [{name: 'ENG1 Medical Certificate',prov: 'SAMSA Doctor',icon: 'ti-stethoscope'}, {name: 'STCW Basic Safety Training',prov: 'STC-SA or Black Pearl',icon: 'ti-shield'}, {name: 'Seafarer Awareness Session',prov: 'Seafarer Online (Zoom)',icon: 'ti-device-laptop'}, {name: 'RYA Powerboat Level 2',prov: 'Black Pearl Yachting Academy',icon: 'ti-sailboat'}, {name: 'RYA PWC Licence (Jet Ski)',prov: 'Black Pearl Yachting Academy',icon: 'ti-wave-sine'}, {name: 'VHF Radio Course',prov: 'Sail and Power SA / Black Pearl',icon: 'ti-radio'}, {name: 'Water Sports Instructor',prov: 'Black Pearl Yachting Academy',icon: 'ti-swim'}, ].map(c => `<div class="ci"><div class="cicon pending"><i class="ti ${c.icon}" aria-hidden="true"></i></div><div class="cinf"><div class="cnm">${c.name}</div><div class="cpr">${c.prov}</div></div><div class="crt"><span class="bdg bdg-pending">Pending</span></div></div>`).join('')}
+          </div>
+          <div style="background:var(--ba);border:.5px solid var(--bda);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ta);margin-top:8px"><i class="ti ti-info-circle" style="font-size:14px" aria-hidden="true"></i> Brandon will update your course progress as you complete each one. Check the <strong>Calendar</strong> tab for upcoming course dates.</div>
         </div>
         <div class="view" id="v-quizzes">
           <div id="ql-s"><div class="ptitle">Quizzes</div><div class="psub">Test your knowledge — set by Brandon</div>${QZ.map(q => {const l = q.attempts.length ? q.attempts[q.attempts.length - 1] : null,p2 = l ? Math.round(l.score / l.total * 100) : null,pass = p2 !== null && p2 >= 70;return `<div class="qcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:14px;font-weight:500">${q.title}</div><div style="font-size:11px;color:var(--tm)">${q.topic} · ${q.qs.length} questions</div></div>${l ? `<div style="text-align:right"><div style="font-size:18px;font-weight:600;color:${pass ? 'var(--tsu)' : 'var(--td)'}">${p2}%</div><div style="font-size:11px;color:var(--tm)">${l.score}/${l.total}</div></div>` : ''}</div><div style="display:flex;align-items:center;gap:8px"><button class="btn nv sm" onclick="sQ(${q.id},'s')">${l ? 'Retry' : 'Start quiz'}</button>${l ? `<span class="bdg ${pass ? 'bdg-done' : 'bdg-pending'}">${pass ? 'Passed' : 'Needs review'}</span>` : ''}</div></div>`;}).join('')}</div>
