@@ -1769,242 +1769,7 @@
     };
     const DATES = [];
 
-    const COURSE_EVENTS = [
-    {
-        id: 1,
-        title: 'STCW Basic Safety Training',
-        type: 'stcw',
-        provider: 'STC-SA',
-        location: 'Port of Cape Town',
-        price: 'R8,620',
-        duration: '9 days',
-        date: '2025-09-01',
-        endDate: '2025-09-09',
-        contact: 'info@stc-sa.co.za',
-        notes: 'Full STCW cert including fire, sea survival, first aid and personal safety. Book early — fills fast.'
-    },
-    {
-        id: 2,
-        title: 'STCW Basic Safety Training',
-        type: 'stcw',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R8,620',
-        duration: '9 days',
-        date: '2025-09-08',
-        endDate: '2025-09-16',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'Same content as STC-SA — great if you prefer Gordons Bay.'
-    },
-    {
-        id: 3,
-        title: 'RYA Powerboat Level 2',
-        type: 'rya',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R5,000',
-        duration: '2 days',
-        date: '2025-09-06',
-        endDate: '2025-09-07',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'Essential for any deckhand. Covers boat handling, navigation and safety.'
-    },
-    {
-        id: 4,
-        title: 'RYA PWC Licence (Jet Ski)',
-        type: 'pwc',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R3,800',
-        duration: '1 day',
-        date: '2025-09-13',
-        endDate: '2025-09-13',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'Required to instruct or operate jet skis on a superyacht.'
-    },
-    {
-        id: 5,
-        title: 'VHF Radio Course',
-        type: 'vhf',
-        provider: 'Sail and Power SA',
-        location: 'V&A Waterfront, Cape Town',
-        price: 'R3,450',
-        duration: '1 day',
-        date: '2025-09-20',
-        endDate: '2025-09-20',
-        contact: 'sailandpowersa.co.za',
-        notes: 'Short Range Certificate (SRC). Required on most yachts.'
-    },
-    {
-        id: 6,
-        title: 'VHF Radio Course',
-        type: 'vhf',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R3,450',
-        duration: '1 day',
-        date: '2025-10-04',
-        endDate: '2025-10-04',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'Short Range Certificate (SRC). Required on most yachts.'
-    },
-    {
-        id: 7,
-        title: 'Seafarer Awareness Session',
-        type: 'awareness',
-        provider: 'Seafarer (Online)',
-        location: 'Zoom',
-        price: 'R1,999',
-        duration: '2 days',
-        date: '2025-09-27',
-        endDate: '2025-09-28',
-        contact: 'info@seafarers.co.za',
-        notes: 'Brandon runs this course personally. Perfect starting point for new crew.'
-    },
-    {
-        id: 8,
-        title: 'RYA Powerboat Level 2',
-        type: 'rya',
-        provider: 'Sail and Power SA',
-        location: 'V&A Waterfront, Cape Town',
-        price: 'R5,000',
-        duration: '2 days',
-        date: '2025-10-04',
-        endDate: '2025-10-05',
-        contact: 'sailandpowersa.co.za',
-        notes: 'Cape Town option for Powerboat Level 2.'
-    },
-    {
-        id: 9,
-        title: 'Water Sports Instructor',
-        type: 'water',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R7,500',
-        duration: '2 days',
-        date: '2025-10-11',
-        endDate: '2025-10-12',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'WSI qualification. Highly sought after on luxury charter yachts.'
-    },
-    {
-        id: 10,
-        title: 'STCW Basic Safety Training',
-        type: 'stcw',
-        provider: 'STC-SA',
-        location: 'Port of Cape Town',
-        price: 'R8,620',
-        duration: '9 days',
-        date: '2025-10-06',
-        endDate: '2025-10-14',
-        contact: 'info@stc-sa.co.za',
-        notes: 'October STCW intake. Book at least 2 weeks in advance.'
-    },
-    {
-        id: 11,
-        title: 'RYA PWC Licence (Jet Ski)',
-        type: 'pwc',
-        provider: 'Sail and Power SA',
-        location: 'V&A Waterfront',
-        price: 'R3,800',
-        duration: '1 day',
-        date: '2025-10-18',
-        endDate: '2025-10-18',
-        contact: 'sailandpowersa.co.za',
-        notes: 'Cape Town PWC date.'
-    },
-    {
-        id: 12,
-        title: 'Deckhand Course (in-person)',
-        type: 'rya',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R6,000',
-        duration: '3 days',
-        date: '2025-10-22',
-        endDate: '2025-10-24',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'Practical hands-on deckhand training with Black Pearl. Excellent course.'
-    },
-    {
-        id: 13,
-        title: 'Seafarer Awareness Session',
-        type: 'awareness',
-        provider: 'Seafarer (Online)',
-        location: 'Zoom',
-        price: 'R1,999',
-        duration: '2 days',
-        date: '2025-10-25',
-        endDate: '2025-10-26',
-        contact: 'info@seafarers.co.za',
-        notes: 'October session. Limited to 15 students.'
-    },
-    {
-        id: 14,
-        title: 'VHF Radio Course',
-        type: 'vhf',
-        provider: 'Sail and Power SA',
-        location: 'V&A Waterfront, Cape Town',
-        price: 'R3,450',
-        duration: '1 day',
-        date: '2025-11-01',
-        endDate: '2025-11-01',
-        contact: 'sailandpowersa.co.za',
-        notes: 'November VHF date.'
-    },
-    {
-        id: 15,
-        title: 'STCW Basic Safety Training',
-        type: 'stcw',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R8,620',
-        duration: '9 days',
-        date: '2025-11-03',
-        endDate: '2025-11-11',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'November STCW intake at Black Pearl.'
-    },
-    {
-        id: 16,
-        title: 'RYA Powerboat Level 2',
-        type: 'rya',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R5,000',
-        duration: '2 days',
-        date: '2025-11-08',
-        endDate: '2025-11-09',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'November Powerboat Level 2.'
-    },
-    {
-        id: 17,
-        title: 'Water Sports Instructor',
-        type: 'water',
-        provider: 'Black Pearl Yachting Academy',
-        location: 'Gordons Bay',
-        price: 'R7,500',
-        duration: '2 days',
-        date: '2025-11-15',
-        endDate: '2025-11-16',
-        contact: 'lauren@blackpearlyachtingacademy.com',
-        notes: 'November WSI course.'
-    },
-    {
-        id: 18,
-        title: 'Seafarer Awareness Session',
-        type: 'awareness',
-        provider: 'Seafarer (Online)',
-        location: 'Zoom',
-        price: 'R1,999',
-        duration: '2 days',
-        date: '2025-11-22',
-        endDate: '2025-11-23',
-        contact: 'info@seafarers.co.za',
-        notes: 'November session — great timing before December holidays.'
-    },
-    ];
+    const COURSE_EVENTS = [];
 
     const EVT_COLORS = {
         stcw: 'evt-stcw',
@@ -2034,9 +1799,29 @@
         selEvt = null,
         showAddEvt = false;
 
-    function calInit() {
+    async function calInit() {
         calYear = new Date().getFullYear();
         calMonth = new Date().getMonth();
+        try {
+            const r = await fetch(SB_URL + '/rest/v1/course_events?select=*&order=date.asc', {
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY
+                }
+            });
+            const dbEvents = await r.json();
+            if (dbEvents && dbEvents.length) {
+                dbEvents.forEach(e => {
+                    e.endDate = e.end_date || e.date;
+                    if (!COURSE_EVENTS.find(x => x.id === e.id)) {
+                        COURSE_EVENTS.push(e);
+                    }
+                });
+            }
+        } catch (ex) {
+            console.error('Load events error:', ex);
+        }
+        rCalendar();
     }
 
     function calPrev() {
@@ -2205,7 +1990,7 @@
         el.classList.toggle('hide');
     }
 
-    function adminSaveEvt() {
+    async function adminSaveEvt() {
         const title = document.getElementById('ae-title')?.value.trim();
         const type = document.getElementById('ae-type')?.value;
         const prov = document.getElementById('ae-prov')?.value.trim();
@@ -2219,30 +2004,60 @@
             alert('Please fill in course name and start date.');
             return;
         }
-        COURSE_EVENTS.push({
-            id: Date.now(),
-            title,
-            type: type || 'rya',
-            provider: prov || '',
-            location: loc || '',
-            price: price || '',
-            duration: dur || '',
-            date,
-            endDate: endDate || date,
-            contact: '',
-            notes: notes || ''
-        });
-        document.getElementById('admin-add-evt')?.classList.add('hide');
-        ['ae-title', 'ae-prov', 'ae-loc', 'ae-price', 'ae-dur', 'ae-date', 'ae-enddate', 'ae-notes'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el)
-                el.value = '';
-        });
-        rCalendar();
-        const msg = document.getElementById('cal-saved');
-        if (msg) {
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 2000);
+        const saveBtn = document.querySelector('#admin-add-evt .btn.nv');
+        if (saveBtn) {
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+        }
+        try {
+            const r = await fetch(SB_URL + '/rest/v1/course_events', {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    title,
+                    type: type || 'rya',
+                    provider: prov || '',
+                    location: loc || '',
+                    price: price || '',
+                    duration: dur || '',
+                    date,
+                    end_date: endDate || date,
+                    contact: '',
+                    notes: notes || ''
+                })
+            });
+            const data = await r.json();
+            const newEvt = Array.isArray(data) ? data[0] : data;
+            newEvt.endDate = newEvt.end_date || newEvt.date;
+            COURSE_EVENTS.push(newEvt);
+            document.getElementById('admin-add-evt')?.classList.add('hide');
+            ['ae-title', 'ae-prov', 'ae-loc', 'ae-price', 'ae-dur', 'ae-date', 'ae-enddate', 'ae-notes'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el)
+                    el.value = '';
+            });
+            if (saveBtn) {
+                saveBtn.textContent = 'Save course date';
+                saveBtn.disabled = false;
+            }
+            rCalendar();
+            const msg = document.getElementById('cal-saved');
+            if (msg) {
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 2000);
+            }
+        } catch (ex) {
+            console.error('Save event error:', ex);
+            alert('Could not save. Check your connection and try again.');
+            if (saveBtn) {
+                saveBtn.textContent = 'Save course date';
+                saveBtn.disabled = false;
+            }
         }
     }
 
@@ -2250,13 +2065,12 @@
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmpueXBna3Z4b3Zvc2pveHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNjM1ODIsImV4cCI6MjEwMjczOTU4Mn0.Wk4S2JS7OGQZpMlGuFvTKikn54bGqQ_vUJaf60fqy-A';
 
     async function sbFetch(path, method='GET', body=null) {
-        console.log('Fetching:', SB_URL + '/rest/v1/' + path);
+        const url = SB_URL + '/rest/v1/' + path;
         const headers = {
             'apikey': SB_KEY,
             'Authorization': 'Bearer ' + SB_KEY,
             'Content-Type': 'application/json',
-            'Prefer': 'return=representation',
-            'X-Client-Info': 'seafarer-portal/1.0'
+            'Prefer': 'return=representation'
         };
         const opts = {
             method,
@@ -2264,19 +2078,13 @@
         };
         if (body)
             opts.body = JSON.stringify(body);
-        try {
-            const r = await fetch(SB_URL + '/rest/v1/' + path, opts);
-            if (!r.ok) {
-                const e = await r.text();
-                console.error('Supabase error:', r.status, e);
-                return null;
-            }
-            const t = await r.text();
-            return t ? JSON.parse(t) : null;
-        } catch (ex) {
-            console.error('Fetch error:', ex);
-            throw ex;
+        const r = await fetch(url, opts);
+        if (!r.ok) {
+            console.error('SB error:', r.status);
+            return null;
         }
+        const t = await r.text();
+        return t ? JSON.parse(t) : null;
     }
 
     async function dbGetStudents() {
@@ -2311,13 +2119,44 @@
         return await sbFetch('referrals?id=eq.' + id, 'PATCH', data);
     }
     async function dbGetDocs(studentId) {
-        return await sbFetch('documents?student_id=eq.' + studentId + '&select=*');
+        const r = await fetch(SB_URL + '/rest/v1/documents?student_id=eq.' + studentId + '&select=*', {
+            headers: {
+                'apikey': SB_KEY,
+                'Authorization': 'Bearer ' + SB_KEY
+            }
+        });
+        return r.ok ? await r.json() : [];
     }
     async function dbAddDoc(d) {
-        return await sbFetch('documents', 'POST', d);
+        const r = await fetch(SB_URL + '/rest/v1/documents', {
+            method: 'POST',
+            headers: {
+                'apikey': SB_KEY,
+                'Authorization': 'Bearer ' + SB_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(d)
+        });
+        return r.ok ? await r.json() : null;
     }
     async function dbDeleteDoc(id) {
-        return await sbFetch('documents?id=eq.' + id, 'DELETE');
+        await fetch(SB_URL + '/rest/v1/documents?id=eq.' + id, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SB_KEY,
+                'Authorization': 'Bearer ' + SB_KEY
+            }
+        });
+    }
+    async function dbGetEvents() {
+        return await sbFetch('course_events?select=*&order=date.asc');
+    }
+    async function dbAddEvent(e) {
+        return await sbFetch('course_events', 'POST', e);
+    }
+    async function dbDeleteEvent(id) {
+        return await sbFetch('course_events?id=eq.' + id, 'DELETE');
     }
 
     let _role = 'student',
@@ -2351,44 +2190,48 @@
         const e = document.getElementById('le').value.trim().toLowerCase();
         const p = document.getElementById('lp').value;
         const err = document.getElementById('lerr');
-        const lbtn = document.getElementById('login-btn');
+        const btn = document.getElementById('login-btn');
         if (!e || !p) {
             err.textContent = 'Please enter your email and password.';
             err.style.display = 'block';
             return;
         }
         err.style.display = 'none';
-        if (lbtn) {
-            lbtn.textContent = 'Signing in...';
-            lbtn.disabled = true;
+        if (btn) {
+            btn.textContent = 'Signing in...';
+            btn.disabled = true;
         }
-
         try {
-            const student = await dbGetStudent(e);
-            if (!student) {
+            const url = SB_URL + '/rest/v1/students?email=eq.' + encodeURIComponent(e) + '&select=*';
+            const r = await fetch(url, {
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await r.json();
+            if (!data || !data.length) {
                 err.textContent = 'Email not found. Please check and try again.';
                 err.style.display = 'block';
-                if (lbtn) {
-                    lbtn.textContent = 'Sign in';
-                    lbtn.disabled = false;
+                if (btn) {
+                    btn.textContent = 'Sign in';
+                    btn.disabled = false;
                 }
                 return;
             }
+            const student = data[0];
             if (student.password !== p) {
                 err.textContent = 'Incorrect password. Please try again.';
                 err.style.display = 'block';
-                if (lbtn) {
-                    lbtn.textContent = 'Sign in';
-                    lbtn.disabled = false;
+                if (btn) {
+                    btn.textContent = 'Sign in';
+                    btn.disabled = false;
                 }
                 return;
             }
-            err.style.display = 'none';
             _currentUser = student;
             const ini = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-            const loadEl = document.getElementById('login-loading');
-            if (loadEl)
-                loadEl.style.display = 'none';
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('portal').style.display = 'flex';
             document.getElementById('unm').textContent = student.name.split(' ')[0];
@@ -2404,11 +2247,11 @@
             }
         } catch (ex) {
             console.error('Login error:', ex);
-            err.textContent = 'Could not connect. Check your internet and try again.';
+            err.textContent = 'Could not connect. Try again.';
             err.style.display = 'block';
-            if (lbtn) {
-                lbtn.textContent = 'Sign in';
-                lbtn.disabled = false;
+            if (btn) {
+                btn.textContent = 'Sign in';
+                btn.disabled = false;
             }
         }
     }
@@ -2680,14 +2523,18 @@
         cvAE();
         setNav(tabs, 'dash');
         calInit();
-        setTimeout(rCalendar, 50);
         if (_currentUser && _currentUser.id) {
-            dbGetDocs(_currentUser.id).then(docs => {
+            fetch(SB_URL + '/rest/v1/documents?student_id=eq.' + _currentUser.id + '&select=*', {
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY
+                }
+            }).then(r => r.json()).then(docs => {
                 _DOCS = docs || [];
                 const dl = document.getElementById('dl');
                 if (dl)
                     dl.innerHTML = rDL(_DOCS);
-            });
+            }).catch(ex => console.error('Load docs error:', ex));
         }
     }
 
@@ -2723,12 +2570,18 @@
     }
     async function dDoc(id) {
         _DOCS = _DOCS.filter(d => d.id !== id);
-        try {
-            await dbDeleteDoc(id);
-        } catch (e) {
-            console.error(e);
-        }
         document.getElementById('dl').innerHTML = rDL(_DOCS);
+        try {
+            await fetch(SB_URL + '/rest/v1/documents?id=eq.' + id, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY
+                }
+            });
+        } catch (ex) {
+            console.error(ex);
+        }
     }
 
     function rCL() {
@@ -2806,14 +2659,11 @@
             document.getElementById('pe').style.display = 'block';
             return;
         }
-        const sbtn = document.querySelector('#bk-p .btn.nv.full');
-        if (sbtn) {
-            sbtn.textContent = 'Submitting...';
-            sbtn.disabled = true;
-        }
+        _bs = 4;
+        rBF();
         try {
             const booking = {
-                student_name: _bd.name || (_currentUser ? _currentUser.name : ''),
+                student_name: _currentUser ? _currentUser.name : (_bd.name || ''),
                 course: _sc.name,
                 provider: _sc.prov,
                 price: _sc.price,
@@ -2824,12 +2674,19 @@
             };
             if (_currentUser && _currentUser.id)
                 booking.student_id = _currentUser.id;
-            await dbAddBooking(booking);
+            await fetch(SB_URL + '/rest/v1/bookings', {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(booking)
+            });
         } catch (ex) {
             console.error('Booking save error:', ex);
         }
-        _bs = 4;
-        rBF();
     }
     function bkBk() {
         document.getElementById('bk-m').classList.remove('hide');
@@ -3117,7 +2974,7 @@
               <i class="ti ti-info-circle" style="font-size:13px" aria-hidden="true"></i> After saving, share the portal link and their login details with the student on WhatsApp.
             </div>
             <div style="display:flex;gap:8px">
-              <button class="btn nv" style="flex:1;padding:12px" onclick="saveNewStudent()"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i> Save student</button>
+              <button class="btn nv" id="save-student-btn" style="flex:1;padding:12px" onclick="saveNewStudent()"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i> Save student</button>
               <button class="btn" style="padding:12px 16px" onclick="hideAddStudent()">Cancel</button>
             </div>
             <div id="ns-saved" style="font-size:12px;color:var(--tsu);margin-top:8px;display:none;text-align:center"><i class="ti ti-circle-check" aria-hidden="true"></i> Student added! Send them their login details.</div>
@@ -3193,7 +3050,6 @@
         </div>`;
         setNav(tabs, 'dash');
         calInit();
-        setTimeout(rCalendar, 50);
     }
 
     function rRefList() {
@@ -3202,10 +3058,22 @@
     async function tRef(i) {
         const newStatus = REFS[i].status === 'paid' ? 'pending' : 'paid';
         REFS[i].status = newStatus;
-        if (REFS[i].id) {
-            await dbUpdateReferral(REFS[i].id, {
-                status: newStatus
-            });
+        try {
+            if (REFS[i].id) {
+                await fetch(SB_URL + '/rest/v1/referrals?id=eq.' + REFS[i].id, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
         }
         document.getElementById('rl').innerHTML = rRefList();
     }
@@ -3234,64 +3102,67 @@
         const track = document.getElementById('ns-track').value;
         const visa = document.getElementById('ns-visa').value.trim() || 'Not started';
         const errEl = document.getElementById('ns-err');
-
         if (!name || !email || !phone || !pass) {
+            errEl.textContent = 'Please fill in all fields.';
             errEl.style.display = 'block';
             return;
         }
         errEl.style.display = 'none';
-
-        const ini = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-
-        STUDENTS.unshift({
-            name,
-            email,
-            track,
-            done: 0,
-            active: 0,
-            pending: 7,
-            total: 7,
-            visa,
-            vs: 0,
-            phone,
-            notes: '',
-            pops: 0,
-            docs: [],
-            ini
-        });
-
-        USERS[email] = {
-            pass,
-            role: 'student',
-            name,
-            ini,
-            phone
-        };
-
-        const saved = document.getElementById('ns-saved');
-        saved.style.display = 'block';
-
-        const waMsg = `Hi ${name.split(' ')[0]}! Your Seafarer Portal account is ready ⚓
-
-        Login here: https://seafarerssa.github.io/seafarer-portals
-
-        Email: ${email}
-        Password: ${pass}
-
-        Add it to your phone home screen so it works like an app!
-
-        — Brandon @ Seafarer Maritime`;
-
-        setTimeout(() => {
+        const btn = document.getElementById('save-student-btn');
+        if (btn) {
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+        }
+        try {
+            const r = await fetch(SB_URL + '/rest/v1/students', {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password: pass,
+                    phone,
+                    track,
+                    visa,
+                    visa_stage: 0,
+                    notes: ''
+                })
+            });
+            const data = await r.json();
+            if (!r.ok) {
+                errEl.textContent = JSON.stringify(data).includes('unique') ? 'This email is already registered.' : 'Error saving. Try again.';
+                errEl.style.display = 'block';
+                if (btn) {
+                    btn.textContent = 'Save student';
+                    btn.disabled = false;
+                }
+                return;
+            }
+            const newStudent = Array.isArray(data) ? data[0] : data;
+            STUDENTS.unshift(newStudent);
+            hideAddStudent();
             document.getElementById('s-list').innerHTML = rSL();
             const lbl = document.getElementById('student-count-lbl');
             if (lbl)
                 lbl.textContent = STUDENTS.length + ' active students';
-            hideAddStudent();
-            const waBtn = document.createElement('div');
-            waBtn.innerHTML = `<div class="card" style="border-left:4px solid #25D366;margin-bottom:10px"><div style="font-size:13px;font-weight:500;margin-bottom:6px"><i class="ti ti-circle-check" style="color:var(--tsu)" aria-hidden="true"></i> ${name} added successfully!</div><div style="font-size:12px;color:var(--ts);margin-bottom:10px">Send login details to ${phone} on WhatsApp now:</div><a href="${wa(phone, waMsg)}" target="_blank" class="btn gn full" style="padding:11px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none"><i class="ti ti-brand-whatsapp" style="font-size:14px" aria-hidden="true"></i> Send login details via WhatsApp</a></div>`;
-            document.getElementById('s-list').insertBefore(waBtn.firstChild, document.getElementById('s-list').firstChild);
-        }, 1000);
+            const waMsg = 'Hi ' + name.split(' ')[0] + '! Your Seafarer Portal account is ready \u2693\n\nLogin here: https://seafarerssa.github.io/seafarer-portals\n\nEmail: ' + email + '\nPassword: ' + pass + '\n\nSave it to your phone home screen so it works like an app!\n\n\u2014 Brandon @ Seafarer Maritime';
+            const waDiv = document.createElement('div');
+            waDiv.innerHTML = '<div class="card" style="border-left:4px solid #25D366;margin-bottom:10px"><div style="font-size:14px;font-weight:500;margin-bottom:8px">\u2705 ' + name + ' added successfully!</div><a href="' + wa(phone, waMsg) + '" target="_blank" class="btn gn full" style="padding:11px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none"><i class="ti ti-brand-whatsapp" style="font-size:14px" aria-hidden="true"></i> Send login details via WhatsApp</a></div>';
+            document.getElementById('s-list').insertBefore(waDiv.firstChild, document.getElementById('s-list').firstChild);
+        } catch (ex) {
+            console.error('Save student error:', ex);
+            errEl.textContent = 'Connection error. Try again.';
+            errEl.style.display = 'block';
+            if (btn) {
+                btn.textContent = 'Save student';
+                btn.disabled = false;
+            }
+        }
     }
 
     function rSL() {
@@ -3345,24 +3216,50 @@
     async function upV(idx, stage) {
         STUDENTS[idx].vs = stage;
         STUDENTS[idx].visa_stage = stage;
-        if (STUDENTS[idx].id) {
-            await dbUpdateStudent(STUDENTS[idx].id, {
-                visa_stage: stage
-            });
+        try {
+            if (STUDENTS[idx].id) {
+                await fetch(SB_URL + '/rest/v1/students?id=eq.' + STUDENTS[idx].id, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        visa_stage: stage
+                    })
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
         }
         opS(idx);
     }
     async function svN(idx) {
         const notes = document.getElementById('nt-' + idx).value;
         STUDENTS[idx].notes = notes;
-        if (STUDENTS[idx].id) {
-            await dbUpdateStudent(STUDENTS[idx].id, {
-                notes
-            });
+        try {
+            if (STUDENTS[idx].id) {
+                await fetch(SB_URL + '/rest/v1/students?id=eq.' + STUDENTS[idx].id, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        notes
+                    })
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
         }
         const e = document.getElementById('sv-' + idx);
-        e.style.display = 'block';
-        setTimeout(() => e.style.display = 'none', 2000);
+        if (e) {
+            e.style.display = 'block';
+            setTimeout(() => e.style.display = 'none', 2000);
+        }
     }
 
     function rQL() {
