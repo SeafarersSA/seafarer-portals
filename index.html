@@ -2778,6 +2778,16 @@
             icon: 'ti-calendar-plus'
         },
         {
+            id: 'logbook',
+            lbl: 'Logbook',
+            icon: 'ti-notebook'
+        },
+        {
+            id: 'tools',
+            lbl: 'Tools',
+            icon: 'ti-tool'
+        },
+        {
             id: 'cv',
             lbl: 'My CV',
             icon: 'ti-file-text'
@@ -2919,6 +2929,74 @@
               </div>
               <div class="shdr">Stored documents</div>
               <div class="card" id="dl">${rDL(_DOCS)}</div>
+            </div>
+
+            <div id="sv-logbook" style="display:none">
+              <div class="ptitle">Sea logbook</div>
+              <div class="psub">Record your hours on the water</div>
+              <div class="card" style="margin-bottom:12px">
+                <div class="shdr" style="margin-top:0">Add a log entry</div>
+                <div class="fg"><label>Date</label><input type="date" id="lb-date"/></div>
+                <div class="fg"><label>Vessel name</label><input id="lb-vessel" placeholder="e.g. Black Pearl RIB / MV Serenity"/></div>
+                <div class="fg"><label>Vessel type</label><select id="lb-type" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:14px;font-family:var(--font-sans)"><option>RIB / Powerboat</option><option>Sailing yacht</option><option>Motor yacht</option><option>Superyacht</option><option>Commercial vessel</option><option>Other</option></select></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div class="fg"><label>Hours underway</label><input type="number" id="lb-hours" placeholder="2.5" step="0.5"/></div>
+                  <div class="fg"><label>Your role</label><select id="lb-role" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:14px;font-family:var(--font-sans)"><option>Trainee crew</option><option>Deckhand</option><option>Helmsman</option><option>Instructor</option><option>Observer</option></select></div>
+                </div>
+                <div class="fg"><label>Area sailed</label><input id="lb-area" placeholder="e.g. Gordon's Bay, False Bay"/></div>
+                <div class="fg"><label>Conditions</label><select id="lb-cond" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:14px;font-family:var(--font-sans)"><option>Calm - 0-1 Beaufort</option><option>Light breeze - 2-3 Beaufort</option><option>Moderate - 4 Beaufort</option><option>Fresh - 5 Beaufort</option><option>Strong - 6+ Beaufort</option></select></div>
+                <div class="fg"><label>Notes (optional)</label><textarea id="lb-notes" rows="2" placeholder="e.g. MOB drill, practised berthing..."></textarea></div>
+                <div id="lb-err" style="font-size:12px;color:var(--td);margin-bottom:8px;display:none">Please fill in date, vessel and hours.</div>
+                <button class="btn nv full" style="padding:12px" onclick="addLogEntry()"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i> Add to logbook</button>
+              </div>
+              <div class="shdr" id="lb-total-lbl">Total sea time: 0 hours</div>
+              <div id="lb-list"><div class="empty">No log entries yet.</div></div>
+            </div>
+
+            <div id="sv-tools" style="display:none">
+              <div class="ptitle">Marine tools</div>
+              <div class="psub">Quick calculators for the water</div>
+              <div class="card" style="margin-bottom:10px">
+                <div class="shdr" style="margin-top:0"><i class="ti ti-clock" style="font-size:13px" aria-hidden="true"></i> Distance - Speed - Time</div>
+                <div style="font-size:12px;color:var(--ts);margin-bottom:10px">Fill in any two values to calculate the third.</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+                  <div class="fg" style="margin:0"><label>Distance (nm)</label><input type="number" id="t-dist" placeholder="0" step="0.1" oninput="calcDST()"/></div>
+                  <div class="fg" style="margin:0"><label>Speed (knots)</label><input type="number" id="t-speed" placeholder="0" step="0.1" oninput="calcDST()"/></div>
+                  <div class="fg" style="margin:0"><label>Time (hrs)</label><input type="number" id="t-time" placeholder="0" step="0.1" oninput="calcDST()"/></div>
+                </div>
+                <div id="dst-result" style="background:var(--ba);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ta);display:none"></div>
+                <button class="btn sm" style="margin-top:8px" onclick="document.getElementById('t-dist').value='';document.getElementById('t-speed').value='';document.getElementById('t-time').value='';document.getElementById('dst-result').style.display='none'">Clear</button>
+              </div>
+              <div class="card" style="margin-bottom:10px">
+                <div class="shdr" style="margin-top:0"><i class="ti ti-waves" style="font-size:13px" aria-hidden="true"></i> Rule of Twelfths</div>
+                <div style="font-size:12px;color:var(--ts);margin-bottom:10px">Tidal flow per hour of a 6-hour cycle.</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                  <div class="fg" style="margin:0"><label>Tidal range (m)</label><input type="number" id="t-range" placeholder="1.8" step="0.1" oninput="calcTwelfths()"/></div>
+                  <div class="fg" style="margin:0"><label>Starts at</label><select id="t-start" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans)" onchange="calcTwelfths()"><option value="lw">Low Water</option><option value="hw">High Water</option></select></div>
+                </div>
+                <div id="twelfths-result"></div>
+              </div>
+              <div class="card" style="margin-bottom:10px">
+                <div class="shdr" style="margin-top:0"><i class="ti ti-compass" style="font-size:13px" aria-hidden="true"></i> Compass to True</div>
+                <div style="font-size:12px;color:var(--ts);margin-bottom:10px">Cape Town variation: -26 degrees West</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                  <div class="fg" style="margin:0"><label>Variation (W = negative)</label><input type="number" id="t-var" value="-26" step="0.1"/></div>
+                  <div class="fg" style="margin:0"><label>Deviation</label><input type="number" id="t-dev" value="0" step="0.1"/></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                  <div class="fg" style="margin:0"><label>Compass bearing</label><input type="number" id="t-comp" placeholder="045" oninput="compToTrue()"/></div>
+                  <div class="fg" style="margin:0"><label>True bearing</label><input type="number" id="t-true" placeholder="019" oninput="trueToComp()"/></div>
+                </div>
+                <div style="font-size:11px;color:var(--tm)">TVMDC - Timid Virgins Make Dull Company</div>
+              </div>
+              <div class="card" style="margin-bottom:10px">
+                <div class="shdr" style="margin-top:0"><i class="ti ti-phone" style="font-size:13px" aria-hidden="true"></i> Emergency contacts</div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--s0)"><div style="width:36px;height:36px;border-radius:9px;background:#fde8e8;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-lifebuoy" style="font-size:16px;color:#C0392B" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">NSRI Emergency</div><div style="font-size:12px;color:var(--ts)">087 094 9774</div></div><a href="tel:0870949774" style="background:#C0392B;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--s0)"><div style="width:36px;height:36px;border-radius:9px;background:#fde8e8;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sos" style="font-size:16px;color:#C0392B" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">National Emergency (MRCC)</div><div style="font-size:12px;color:var(--ts)">112</div></div><a href="tel:112" style="background:#C0392B;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--s0)"><div style="width:36px;height:36px;border-radius:9px;background:#eef2fb;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-anchor" style="font-size:16px;color:#1A2B5C" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Cape Town Port Control</div><div style="font-size:12px;color:var(--ts)">+27 21 408 6136</div></div><a href="tel:+27214086136" style="background:#1A2B5C;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--s0)"><div style="width:36px;height:36px;border-radius:9px;background:#eef2fb;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-radio" style="font-size:16px;color:#1A2B5C" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">MRCC Cape Town</div><div style="font-size:12px;color:var(--ts)">+27 21 938 3300</div></div><a href="tel:+27219383300" style="background:#1A2B5C;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0"><div style="width:36px;height:36px;border-radius:9px;background:#eef2fb;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-user" style="font-size:16px;color:#1A2B5C" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Brandon - Seafarer</div><div style="font-size:12px;color:var(--ts)">063 379 8192</div></div><a href="tel:0633798192" style="background:#1A2B5C;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
+              </div>
             </div>`;
 
         // Init booking and CV - use setTimeout to ensure DOM is ready
@@ -2931,6 +3009,7 @@
             else if (s.track === 'Stew')
                 cvT('stew');
             calInit();
+            loadLogbook();
         }, 100);
 
         // Load docs
@@ -2950,7 +3029,7 @@
     }
 
     function sTab(id) {
-        const ids = ['home', 'courses', 'calendar', 'book', 'cv', 'docs'];
+        const ids = ['home', 'courses', 'calendar', 'book', 'logbook', 'tools', 'cv', 'docs'];
         ids.forEach(tid => {
             const el = document.getElementById('sv-' + tid);
             if (el)
@@ -2963,6 +3042,8 @@
             setTimeout(rCalendar, 50);
         if (id === 'book')
             rCL();
+        if (id === 'tools')
+            initTools();
     }
 
     function rStudentForUser(user) {
@@ -3266,6 +3347,197 @@
         });
         document.getElementById('aq-area').innerHTML = '';
         document.getElementById('ql-a').innerHTML = rQL();
+    }
+
+    // ── LOGBOOK ─────────────────────────────────────────────────
+    let _logEntries = [];
+
+    function addLogEntry() {
+        const date = document.getElementById('lb-date')?.value;
+        const vessel = document.getElementById('lb-vessel')?.value.trim();
+        const hours = parseFloat(document.getElementById('lb-hours')?.value);
+        const err = document.getElementById('lb-err');
+        if (!date || !vessel || !hours) {
+            if (err)
+                err.style.display = 'block';
+            return;
+        }
+        if (err)
+            err.style.display = 'none';
+        const entry = {
+            id: Date.now(),
+            date,
+            vessel,
+            type: document.getElementById('lb-type')?.value || '',
+            hours,
+            role: document.getElementById('lb-role')?.value || '',
+            area: document.getElementById('lb-area')?.value.trim() || '',
+            conditions: document.getElementById('lb-cond')?.value || '',
+            notes: document.getElementById('lb-notes')?.value.trim() || ''
+        };
+        _logEntries.unshift(entry);
+        saveLogbook();
+        renderLogbook();
+        // Clear form
+        ['lb-date', 'lb-vessel', 'lb-hours', 'lb-area', 'lb-notes'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el)
+                el.value = '';
+        });
+    }
+
+    function saveLogbook() {
+        try {
+            localStorage.setItem('seafarer_logbook_' + (_currentUser?.id || 'guest'), JSON.stringify(_logEntries));
+        }
+        catch (e) {}
+    }
+
+    function loadLogbook() {
+        try {
+            const saved = localStorage.getItem('seafarer_logbook_' + (_currentUser?.id || 'guest'));
+            if (saved)
+                _logEntries = JSON.parse(saved);
+        } catch (e) {
+            _logEntries = [];
+        }
+        renderLogbook();
+    }
+
+    function delLogEntry(id) {
+        _logEntries = _logEntries.filter(e => e.id !== id);
+        saveLogbook();
+        renderLogbook();
+    }
+
+    function renderLogbook() {
+        const list = document.getElementById('lb-list');
+        const totalEl = document.getElementById('lb-total-lbl');
+        if (!list)
+            return;
+        const total = _logEntries.reduce((s, e) => s + (e.hours || 0), 0);
+        if (totalEl)
+            totalEl.textContent = 'Total sea time: ' + total.toFixed(1) + ' hours';
+        if (!_logEntries.length) {
+            list.innerHTML = '<div class="empty">No log entries yet. Add your first entry above.</div>';
+            return;
+        }
+        list.innerHTML = _logEntries.map(e => `
+            <div class="card" style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">${e.vessel}</div>
+                  <div style="font-size:11px;color:var(--tm)">${e.type} &nbsp;·&nbsp; ${e.role}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div style="font-size:16px;font-weight:700;color:var(--fa)">${e.hours}h</div>
+                  <div style="font-size:10px;color:var(--tm)">${new Date(e.date).toLocaleDateString('en-ZA', {day: 'numeric',month: 'short',year: 'numeric'})}</div>
+                </div>
+              </div>
+              ${e.area ? `<div style="font-size:12px;color:var(--ts);margin-bottom:3px"><i class="ti ti-map-pin" style="font-size:11px" aria-hidden="true"></i> ${e.area}</div>` : ''}
+              ${e.conditions ? `<div style="font-size:12px;color:var(--ts);margin-bottom:3px"><i class="ti ti-wind" style="font-size:11px" aria-hidden="true"></i> ${e.conditions}</div>` : ''}
+              ${e.notes ? `<div style="font-size:12px;color:var(--ts);background:var(--s0);border-radius:6px;padding:6px 8px;margin-top:6px">${e.notes}</div>` : ''}
+              <div style="display:flex;justify-content:flex-end;margin-top:8px">
+                <button class="btn sm" style="color:var(--td);border-color:var(--bdd);font-size:11px" onclick="delLogEntry(${e.id})"><i class="ti ti-trash" style="font-size:11px" aria-hidden="true"></i> Remove</button>
+              </div>
+            </div>`).join('');
+    }
+
+    // ── TOOLS ───────────────────────────────────────────────────
+    function initTools() {
+        calcTwelfths();
+    }
+
+    function calcDST() {
+        const d = parseFloat(document.getElementById('t-dist')?.value);
+        const s = parseFloat(document.getElementById('t-speed')?.value);
+        const t = parseFloat(document.getElementById('t-time')?.value);
+        const res = document.getElementById('dst-result');
+        if (!res)
+            return;
+        let msg = '';
+        const count = [!isNaN(d) && d > 0, !isNaN(s) && s > 0, !isNaN(t) && t > 0].filter(Boolean).length;
+        if (count < 2) {
+            res.style.display = 'none';
+            return;
+        }
+        if (!isNaN(d) && d > 0 && !isNaN(s) && s > 0) {
+            const time = d / s;
+            const hrs = Math.floor(time);
+            const mins = Math.round((time - hrs) * 60);
+            msg = `Time = ${hrs}h ${mins}min`;
+            const el = document.getElementById('t-time');
+            if (el)
+                el.value = time.toFixed(2);
+        } else if (!isNaN(d) && d > 0 && !isNaN(t) && t > 0) {
+            const spd = d / t;
+            msg = `Speed = ${spd.toFixed(1)} knots`;
+            const el = document.getElementById('t-speed');
+            if (el)
+                el.value = spd.toFixed(1);
+        } else if (!isNaN(s) && s > 0 && !isNaN(t) && t > 0) {
+            const dist = s * t;
+            msg = `Distance = ${dist.toFixed(1)} nautical miles`;
+            const el = document.getElementById('t-dist');
+            if (el)
+                el.value = dist.toFixed(1);
+        }
+        if (msg) {
+            res.style.display = 'block';
+            res.textContent = msg;
+        }
+    }
+
+    function calcTwelfths() {
+        const range = parseFloat(document.getElementById('t-range')?.value);
+        const start = document.getElementById('t-start')?.value;
+        const res = document.getElementById('twelfths-result');
+        if (!res || isNaN(range) || range <= 0) {
+            if (res)
+                res.innerHTML = '';
+            return;
+        }
+        const twelfths = [1, 2, 3, 3, 2, 1];
+        const rising = start === 'lw';
+        let cumulative = rising ? 0 : range;
+        const rows = twelfths.map((t, i) => {
+            const change = (t / 12) * range * (rising ? 1 : -1);
+            const from = cumulative;
+            cumulative += change;
+            const label = rising ? `Hour ${i + 1} — Rising` : `Hour ${i + 1} — Falling`;
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid var(--s0);font-size:12px">
+                  <span style="color:var(--ts)">${label}</span>
+                  <span><strong>${Math.abs(change).toFixed(2)}m</strong> <span style="color:var(--tm)">(${from.toFixed(2)}m → ${cumulative.toFixed(2)}m)</span></span>
+                </div>`;
+        }).join('');
+        res.innerHTML = `<div style="background:var(--s0);border-radius:8px;padding:10px 12px">${rows}<div style="font-size:11px;color:var(--tm);margin-top:8px">Pattern: 1/12 — 2/12 — 3/12 — 3/12 — 2/12 — 1/12 of total range per hour</div></div>`;
+    }
+
+    let _lastCompInput = 'comp';
+    function compToTrue() {
+        _lastCompInput = 'comp';
+        const c = parseFloat(document.getElementById('t-comp')?.value);
+        const v = parseFloat(document.getElementById('t-var')?.value) || 0;
+        const d = parseFloat(document.getElementById('t-dev')?.value) || 0;
+        if (isNaN(c))
+            return;
+        let t = ((c + v + d) % 360 + 360) % 360;
+        const el = document.getElementById('t-true');
+        if (el)
+            el.value = t.toFixed(0);
+    }
+    function trueToComp() {
+        if (_lastCompInput === 'comp')
+            return;
+        const t = parseFloat(document.getElementById('t-true')?.value);
+        const v = parseFloat(document.getElementById('t-var')?.value) || 0;
+        const d = parseFloat(document.getElementById('t-dev')?.value) || 0;
+        if (isNaN(t))
+            return;
+        let c = ((t - v - d) % 360 + 360) % 360;
+        const el = document.getElementById('t-comp');
+        if (el)
+            el.value = c.toFixed(0);
     }
 
     document.addEventListener('keydown', e => {
@@ -3896,6 +4168,8 @@
         document.getElementById('le').value = '';
         document.getElementById('lp').value = '';
     }
+
+    // ── LOGBOOK ─────────────────────────────────────────────────
     document.addEventListener('keydown', e => {
         if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none')
             doLogin();
