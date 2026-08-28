@@ -2463,6 +2463,33 @@
     }
     function clS(){document.getElementById('s-list').classList.remove('hide');document.getElementById('s-det').classList.add('hide');}
 
+    async function loadStudentQuizResults(studentId,idx){
+      const el=document.getElementById('student-quiz-results-'+idx);
+      if(!el)return;
+      try{
+        const r=await fetch(SB_URL+'/rest/v1/quiz_attempts?student_id=eq.'+studentId+'&select=*&order=attempted_at.desc',{
+          headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+        });
+        const data=await r.json();
+        if(!data||!data.length){
+          el.innerHTML='<div class="empty">No quiz attempts yet.</div>';
+          return;
+        }
+        el.innerHTML=data.map(a=>{
+          const pass=a.pct>=70;
+          return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:.5px solid var(--s0)">'
+            +'<div><div style="font-size:13px;font-weight:500">'+a.quiz_title+'</div>'
+            +'<div style="font-size:11px;color:var(--tm)">'+(a.attempted_at?new Date(a.attempted_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'')+'</div></div>'
+            +'<div style="text-align:right"><div style="font-size:16px;font-weight:700;color:'+(pass?'var(--fsu)':'var(--td)')+'">'+a.pct+'%</div>'
+            +'<div style="font-size:11px;color:var(--tm)">'+a.score+'/'+a.total+'</div></div>'
+            +'</div>';
+        }).join('');
+      }catch(ex){
+        console.error(ex);
+        if(el)el.innerHTML='<div class="empty">Could not load quiz results.</div>';
+      }
+    }
+
     let _studentCourses={};
 
     function updCourse(studentIdx,courseIdx,field,value){
@@ -2830,7 +2857,32 @@
     function rQ(r){const le=document.getElementById('ql-'+r),ae=document.getElementById('qa-'+r);if(!le||!ae)return;le.classList.add('hide');ae.classList.remove('hide');if(_qs.fin){const p=Math.round(_qs.sc/_aq.qs.length*100),pass=p>=70;ae.innerHTML=`<div style="text-align:center;padding:20px 0"><div style="font-size:48px;font-weight:700;color:${pass?'var(--fsu)':'#E24B4A'};margin-bottom:8px">${p}%</div><div style="font-size:14px;color:var(--ts);margin-bottom:14px">${_qs.sc} of ${_aq.qs.length} correct</div><div style="background:${pass?'var(--bsu)':'var(--bd)'};color:${pass?'var(--tsu)':'var(--td)'};border-radius:10px;padding:12px;font-size:13px;font-weight:500;margin-bottom:16px">${pass?'Passed! Well done.':'Keep studying - aim for 70%.'}</div><div style="display:flex;gap:8px;justify-content:center"><button class="btn nv" onclick="sQ(${_aq.id},'${r}')">Try again</button><button class="btn" onclick="exQ('${r}')">Back</button></div></div>`;return;}const q=_aq.qs[_qs.qi],tot=_aq.qs.length;ae.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div class="ptitle" style="font-size:15px">${_aq.title}</div><div style="font-size:12px;color:var(--ts)">Question ${_qs.qi+1} of ${tot}</div></div><button class="btn sm" onclick="exQ('${r}')">Exit</button></div><div class="pb" style="height:6px;margin-bottom:16px"><div class="pf" style="width:${Math.round(_qs.qi/tot*100)}%"></div></div><div class="qcard"><div style="font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.5">${q.q}</div>${q.opts.map((o,i)=>{let cls='qopt',dc='';if(_qs.ans){if(i===q.ans){cls+=' correct';dc='<i class="ti ti-check" style="font-size:10px" aria-hidden="true"></i>';}else if(i===_qs.sel){cls+=' wrong';dc='<i class="ti ti-x" style="font-size:10px" aria-hidden="true"></i>';}}else if(i===_qs.sel)cls+=' sel';return`<div class="${cls}" onclick="qSO(${i},'${r}')"><div class="ocircle">${dc}</div>${o}</div>`;}).join('')}${_qs.ans?`<div style="background:${_qs.sel===q.ans?'var(--bsu)':'var(--bd)'};color:${_qs.sel===q.ans?'var(--tsu)':'var(--td)'};border-radius:10px;padding:10px;font-size:13px;margin-top:10px">${_qs.sel===q.ans?'Correct!':'Incorrect - answer: '+q.opts[q.ans]}</div><button class="btn nv full" style="padding:12px;margin-top:10px" onclick="qNx('${r}')">${_qs.qi+1<tot?'Next':'See result'}</button>`:`<div class="errmsg" id="qerr" style="margin-top:6px">Select an answer first.</div><button class="btn nv full" style="padding:12px;margin-top:10px" onclick="qSub('${r}')">Submit</button>`}</div>`;}
     function qSO(i,r){if(_qs.ans)return;_qs.sel=i;rQ(r);}
     function qSub(r){const e=document.getElementById('qerr');if(_qs.sel===null){if(e)e.style.display='block';return;}_qs.ans=true;if(_qs.sel===_aq.qs[_qs.qi].ans)_qs.sc++;rQ(r);}
-    function qNx(r){_qs.qi++;_qs.ans=false;_qs.sel=null;if(_qs.qi>=_aq.qs.length){_qs.fin=true;_aq.attempts.push({score:_qs.sc,total:_aq.qs.length,date:td()});}rQ(r);}
+    async function qNx(r){
+      _qs.qi++;_qs.ans=false;_qs.sel=null;
+      if(_qs.qi>=_aq.qs.length){
+        _qs.fin=true;
+        const attempt={score:_qs.sc,total:_aq.qs.length,date:td()};
+        _aq.attempts.push(attempt);
+        // Save to Supabase if student is logged in
+        if(_currentUser&&_currentUser.id&&r==='s'){
+          try{
+            await fetch(SB_URL+'/rest/v1/quiz_attempts',{
+              method:'POST',
+              headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+              body:JSON.stringify({
+                student_id:_currentUser.id,
+                student_name:_currentUser.name,
+                quiz_title:_aq.title,
+                score:_qs.sc,
+                total:_aq.qs.length,
+                pct:Math.round(_qs.sc/_aq.qs.length*100)
+              })
+            });
+          }catch(ex){console.error('Save quiz attempt:',ex);}
+        }
+      }
+      rQ(r);
+    }
     function exQ(r){const ae=document.getElementById('qa-'+r),le=document.getElementById('ql-'+r);if(ae)ae.classList.add('hide');if(le)le.classList.remove('hide');_aq=null;}
     function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('portal').style.display='none';document.getElementById('le').value='';document.getElementById('lp').value='';}
 
