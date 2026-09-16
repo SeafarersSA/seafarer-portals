@@ -3652,20 +3652,20 @@
             doLogin();
     });
 
-    function viewDoc(id) {
-        var doc = _DOCS.find(function(d) {
-            return String(d.id) === String(id);
-        });
+    function viewDoc(btn) {
+        var idx = parseInt(btn.getAttribute('data-i'));
+        var doc = _DOCS[idx];
         if (!doc || !doc.file_data) {
-            alert('File not available. Re-upload to enable viewing.');
+            alert('File not available to preview. Please re-upload this file.');
             return;
         }
-        var w = window.open('', '_blank');
-        if (doc.type === 'pdf') {
-            w.document.write('<html><body style="margin:0"><embed src="' + doc.file_data + '" width="100%" height="100%" type="application/pdf"/></body></html>');
-        } else {
-            w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + doc.file_data + '" style="max-width:100%;max-height:100vh;object-fit:contain"/></body></html>');
-        }
+        var a = document.createElement('a');
+        a.href = doc.file_data;
+        a.download = doc.name || 'document';
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
     function rDL(docs) {
         if (!docs || !docs.length)
@@ -3673,16 +3673,18 @@
         return docs.map(function(d, i) {
             var dateStr = d.uploaded_at ? new Date(d.uploaded_at).toLocaleDateString('en-ZA') : '';
             var canView = !!d.file_data;
+            var idx = i;
             return '<div class="ditem">'
             + '<div class="dicon"><i class="ti ' + (d.type === 'pdf' ? 'ti-file-type-pdf' : 'ti-photo') + '" aria-hidden="true"></i></div>'
             + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">' + d.name + '</div>'
             + '<div style="font-size:11px;color:var(--tm)">' + dateStr + '</div></div>'
             + '<div style="display:flex;gap:6px;flex-shrink:0">'
-            + (canView ? '<button class="btn sm" onclick="viewDoc(' + JSON.stringify(String(d.id)) + ')" ><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button>' : '')
-            + '<button class="btn sm" style="color:var(--td);border-color:var(--bdd)" onclick="dDoc(' + JSON.stringify(String(d.id)) + ')" ><i class="ti ti-trash" style="font-size:12px" aria-hidden="true"></i></button>'
+            + (canView ? '<button class="btn sm" onclick="viewDoc(this)" data-i="' + idx + '"><i class="ti ti-eye" style="font-size:12px" aria-hidden="true"></i></button>' : '')
+            + '<button class="btn sm" style="color:var(--td);border-color:var(--bdd)" onclick="dDoc(this)" data-i="' + idx + '"><i class="ti ti-trash" style="font-size:12px" aria-hidden="true"></i></button>'
             + '</div></div>';
         }).join('');
     }
+
 
     async function hDoc(input) {
         if (!input.files || !input.files[0])
@@ -3758,13 +3760,18 @@
         };
         reader.readAsDataURL(f);
     }
-    async function dDoc(id) {
-        _DOCS = _DOCS.filter(d => d.id !== id);
-        const dl = document.getElementById('dl');
+    async function dDoc(btn) {
+        var idx = parseInt(btn.getAttribute('data-i'));
+        var doc = _DOCS[idx];
+        if (!doc)
+            return;
+        var docId = doc.id;
+        _DOCS.splice(idx, 1);
+        var dl = document.getElementById('dl');
         if (dl)
             dl.innerHTML = rDL(_DOCS);
         try {
-            await fetch(SB_URL + '/rest/v1/documents?id=eq.' + id, {
+            await fetch(SB_URL + '/rest/v1/documents?id=eq.' + docId, {
                 method: 'DELETE',
                 headers: {
                     'apikey': SB_KEY,
