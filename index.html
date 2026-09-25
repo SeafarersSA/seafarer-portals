@@ -2753,6 +2753,9 @@
         }
         if (id === 'tools')
             setTimeout(() => initTools('at'), 50);
+        if (id === 'visas') {
+            loadVisaApps();
+        }
         if (id === 'calendar')
             calInit();
     }
@@ -2896,7 +2899,7 @@
         {
             id: 'visa',
             lbl: 'Visa',
-            icon: 'ti-passport'
+            icon: 'ti-plane'
         },
         {
             id: 'cv',
@@ -3298,6 +3301,7 @@
 
     let _studentCourses = {};
     let _editRef = -1;
+    let VISA_APPS = [];
 
     function updCourse(studentIdx, courseIdx, field, value) {
         const s = STUDENTS[studentIdx];
@@ -4155,6 +4159,10 @@
             lbl: 'Referrals',
             icon: 'ti-coin'
         }, {
+            id: 'visas',
+            lbl: 'Visas',
+            icon: 'ti-plane'
+        }, {
             id: 'tools',
             lbl: 'Tools',
             icon: 'ti-tool'
@@ -4243,6 +4251,45 @@
             <div id="ref-err" style="font-size:12px;color:var(--td);display:none;margin-bottom:6px">Fill in student and course first.</div>
             <button class="btn nv sm" onclick="addRef()"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Add referral</button>
           </div>
+        </div>
+        <div class="view" id="v-visas">
+          <div class="ptitle">Visa tracker</div>
+          <div class="psub">Track student visa applications &amp; your commission from Excite2Go Travel</div>
+
+          <div class="card" style="margin-bottom:12px">
+            <div class="shdr" style="margin-top:0"><i class="ti ti-plus" style="font-size:13px" aria-hidden="true"></i> Add visa application</div>
+            <div class="fg"><label>Student name</label><input id="av-student" placeholder="Full name"/></div>
+            <div class="fg"><label>Visa type</label>
+              <select id="av-type" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:14px;font-family:var(--font-sans)">
+                <option value="Schengen">Schengen Visa</option>
+                <option value="B1/B2">B1/B2 USA Visa</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="fg" style="margin:0"><label>Status</label>
+                <select id="av-status" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:14px;font-family:var(--font-sans)">
+                  <option value="enquiry">Enquiry sent</option>
+                  <option value="docs">Docs submitted</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="declined">Declined</option>
+                </select>
+              </div>
+              <div class="fg" style="margin:0"><label>My commission (R)</label><input type="number" id="av-comm" placeholder="0" step="50"/></div>
+            </div>
+            <div class="fg"><label>Notes</label><input id="av-notes" placeholder="e.g. Waiting for bank statements"/></div>
+            <button class="btn nv full" style="padding:12px;margin-top:4px" onclick="addVisaApp()"><i class="ti ti-plus" style="font-size:13px" aria-hidden="true"></i> Add application</button>
+          </div>
+
+          <div class="sgrid" style="margin-bottom:12px">
+            <div class="sc"><div class="slbl">Total applications</div><div class="sval b" id="va-total">0</div></div>
+            <div class="sc"><div class="slbl">Commission earned</div><div class="sval g" id="va-comm">R0</div></div>
+            <div class="sc"><div class="slbl">Pending</div><div class="sval a" id="va-pending">0</div></div>
+            <div class="sc"><div class="slbl">Approved</div><div class="sval b" id="va-approved">0</div></div>
+          </div>
+
+          <div id="va-list"><div class="empty">No visa applications yet.</div></div>
         </div>
         <div class="view" id="v-tools">
           <div class="ptitle">Marine tools</div>
@@ -4342,6 +4389,168 @@
         }
         document.getElementById('rl').innerHTML = rRefList();
     }
+    async function loadVisaApps() {
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/visa_applications?select=*&order=created_at.desc', {
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY
+                }
+            });
+            var data = await r.json();
+            if (Array.isArray(data))
+                VISA_APPS = data;
+        } catch (ex) {
+            console.error(ex);
+        }
+        renderVisaList();
+    }
+
+    function renderVisaList() {
+        var list = document.getElementById('va-list');
+        if (!list)
+            return;
+        var total = document.getElementById('va-total');
+        var commEl = document.getElementById('va-comm');
+        var pendingEl = document.getElementById('va-pending');
+        var approvedEl = document.getElementById('va-approved');
+        var totalComm = VISA_APPS.reduce(function(s, v) {
+            return s + (v.commission || 0);
+        }, 0);
+        var pending = VISA_APPS.filter(function(v) {
+            return v.status !== 'approved' && v.status !== 'declined';
+        }).length;
+        var approved = VISA_APPS.filter(function(v) {
+            return v.status === 'approved';
+        }).length;
+        if (total)
+            total.textContent = VISA_APPS.length;
+        if (commEl)
+            commEl.textContent = 'R' + totalComm.toLocaleString();
+        if (pendingEl)
+            pendingEl.textContent = pending;
+        if (approvedEl)
+            approvedEl.textContent = approved;
+        if (!VISA_APPS.length) {
+            list.innerHTML = '<div class="empty">No visa applications yet.</div>';
+            return;
+        }
+        var statusColors = {
+            enquiry: 'bdg-pending',
+            docs: 'bdg-booked',
+            processing: 'bdg-active',
+            approved: 'bdg-done',
+            declined: 'bdg-td'
+        };
+        var statusLabels = {
+            enquiry: 'Enquiry sent',
+            docs: 'Docs submitted',
+            processing: 'Processing',
+            approved: 'Approved',
+            declined: 'Declined'
+        };
+        list.innerHTML = VISA_APPS.map(function(v, i) {
+            return '<div class="rrow" style="flex-wrap:wrap;gap:8px">'
+            + '<div style="flex:1;min-width:150px"><div style="font-size:13px;font-weight:500">' + v.student_name + '</div>'
+            + '<div style="font-size:11px;color:var(--tm)">' + v.visa_type + (v.notes ? '  ·  ' + v.notes : '') + '</div></div>'
+            + '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">'
+            + '<span style="font-size:13px;font-weight:600;color:var(--fsu)">R' + (v.commission || 0).toLocaleString() + '</span>'
+            + '<select onchange="updateVisaStatus(' + i + ',this.value)" style="font-size:11px;padding:4px 8px;border-radius:7px;border:1px solid var(--bdr);background:#fff;font-family:var(--font-sans)">'
+            + '<option value="enquiry"' + (v.status === 'enquiry' ? ' selected' : '') + '>Enquiry sent</option>'
+            + '<option value="docs"' + (v.status === 'docs' ? ' selected' : '') + '>Docs submitted</option>'
+            + '<option value="processing"' + (v.status === 'processing' ? ' selected' : '') + '>Processing</option>'
+            + '<option value="approved"' + (v.status === 'approved' ? ' selected' : '') + '>Approved</option>'
+            + '<option value="declined"' + (v.status === 'declined' ? ' selected' : '') + '>Declined</option>'
+            + '</select>'
+            + '<button class="btn sm" style="color:var(--td);border-color:var(--bdd)" onclick="deleteVisaApp(' + i + ')"><i class="ti ti-trash" style="font-size:11px" aria-hidden="true"></i></button>'
+            + '</div></div>';
+        }).join('');
+    }
+
+    async function addVisaApp() {
+        var student = document.getElementById('av-student')?.value.trim();
+        var type = document.getElementById('av-type')?.value;
+        var status = document.getElementById('av-status')?.value;
+        var comm = parseInt(document.getElementById('av-comm')?.value) || 0;
+        var notes = document.getElementById('av-notes')?.value.trim();
+        if (!student) {
+            alert('Please enter a student name.');
+            return;
+        }
+        var app = {
+            student_name: student,
+            visa_type: type,
+            status: status,
+            commission: comm,
+            notes: notes
+        };
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/visa_applications', {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(app)
+            });
+            var saved = await r.json();
+            VISA_APPS.unshift(Array.isArray(saved) ? saved[0] : saved);
+        } catch (ex) {
+            VISA_APPS.unshift({
+                ...app,
+                id: Date.now()
+            });
+        }
+        document.getElementById('av-student').value = '';
+        document.getElementById('av-comm').value = '';
+        document.getElementById('av-notes').value = '';
+        renderVisaList();
+    }
+
+    async function updateVisaStatus(i, status) {
+        VISA_APPS[i].status = status;
+        try {
+            if (VISA_APPS[i].id) {
+                await fetch(SB_URL + '/rest/v1/visa_applications?id=eq.' + VISA_APPS[i].id, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status
+                    })
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
+        }
+        renderVisaList();
+    }
+
+    async function deleteVisaApp(i) {
+        if (!confirm('Delete this visa application?'))
+            return;
+        var app = VISA_APPS[i];
+        VISA_APPS.splice(i, 1);
+        renderVisaList();
+        try {
+            if (app.id)
+                await fetch(SB_URL + '/rest/v1/visa_applications?id=eq.' + app.id, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY
+                    }
+                });
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
+
     function editRef(i) {
         _editRef = i;
         document.getElementById('rl').innerHTML = rRefList();
