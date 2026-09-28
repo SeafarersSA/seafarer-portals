@@ -2566,6 +2566,7 @@
         calView = v;
         document.getElementById('vt-month')?.classList.toggle('active', v === 'month');
         document.getElementById('vt-list')?.classList.toggle('active', v === 'list');
+        document.getElementById('vt-weeks')?.classList.toggle('active', v === 'weeks');
         rCalendar();
     }
 
@@ -2604,6 +2605,74 @@
         if (!calBody)
             return;
         var today = new Date();
+
+        if (calView === 'weeks') {
+            // Weeks view: group events into course weeks (Mon-Fri blocks)
+            var upcoming = COURSE_EVENTS.filter(function(e) {
+                return new Date(e.date) >= new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            }).sort(function(a, b) {
+                return new Date(a.date) - new Date(b.date);
+            });
+            var weeksHTML = '<div style="display:flex;flex-direction:column;gap:10px">';
+            if (!upcoming.length) {
+                weeksHTML += '<div class="empty">No upcoming courses found.</div>';
+            }
+            upcoming.forEach(function(e) {
+                var startD = new Date(e.date);
+                var endD = e.endDate ? new Date(e.endDate) : new Date(e.date);
+                var totalDays = Math.round((endD - startD) / 86400000) + 1;
+                var daysArr = [];
+                for (var i = 0; i < totalDays; i++) {
+                    var d = new Date(startD);
+                    d.setDate(startD.getDate() + i);
+                    if (d.getDay() !== 0 && d.getDay() !== 6)
+                        daysArr.push(d);
+                }
+                var startStr = startD.toLocaleDateString('en-ZA', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short'
+                });
+                var endStr = endD.toDateString() !== startD.toDateString() ? endD.toLocaleDateString('en-ZA', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short'
+                }) : '';
+                var colorClass = EVT_COLORS[e.type] || 'evt-rya';
+                weeksHTML += '<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--bdr)">';
+                weeksHTML += '<div style="background:var(--navy);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">';
+                weeksHTML += '<div><div style="font-size:14px;font-weight:600">' + e.title + '</div>';
+                weeksHTML += '<div style="font-size:11px;opacity:.8">' + e.provider + (e.location ? ' · ' + e.location : '') + '</div></div>';
+                weeksHTML += '<span class="bdg ' + colorClass + '" style="font-size:10px">' + totalDays + ' day' + (totalDays !== 1 ? 's' : '') + '</span>';
+                weeksHTML += '</div>';
+                weeksHTML += '<div style="padding:10px 14px">';
+                weeksHTML += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">';
+                daysArr.forEach(function(d, i) {
+                    var lbl = d.toLocaleDateString('en-ZA', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short'
+                    });
+                    weeksHTML += '<span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--s0);border:1px solid var(--bdr);color:var(--tp)"><b>Day ' + (i + 1) + '</b> ' + lbl + '</span>';
+                });
+                weeksHTML += '</div>';
+                var meta = [];
+                if (e.price)
+                    meta.push('💰 ' + e.price);
+                if (e.duration)
+                    meta.push('⏱ ' + e.duration);
+                if (e.contact)
+                    meta.push('📞 ' + e.contact);
+                if (meta.length)
+                    weeksHTML += '<div style="font-size:11px;color:var(--tm);display:flex;gap:10px;flex-wrap:wrap">' + meta.join(' · ') + '</div>';
+                if (e.notes)
+                    weeksHTML += '<div style="font-size:11px;color:var(--tm);margin-top:4px">' + e.notes + '</div>';
+                weeksHTML += '</div></div>';
+            });
+            weeksHTML += '</div>';
+            calBody.innerHTML = weeksHTML;
+            return;
+        }
 
         if (calView === 'list') {
             var upcoming = COURSE_EVENTS.filter(function(e) {
@@ -3506,6 +3575,7 @@
         + '<button class="ltab" id="ct-deck" onclick="setCourseTrackDeck()"><i class="ti ti-anchor" style="font-size:13px" aria-hidden="true"></i> Deckhand</button>'
         + '<button class="ltab" id="ct-stew" onclick="setCourseTrackStew()"><i class="ti ti-wine" style="font-size:13px" aria-hidden="true"></i> Stew/Interior</button>'
         + '</div>'
+        + '<div id="student-pkg-section"></div>'
         + '<div id="student-courses-list" class="card"></div>'
         + '</div>'
         + '<div id="sv-calendar" style="display:none"><div class="ptitle">Course calendar</div><div class="psub">Upcoming courses</div><div class="view-toggle" style="display:flex;gap:6px;margin-bottom:12px"><button class="vt-btn active" id="vt-month" onclick="calViewMonth()"><i class="ti ti-calendar-event" style="font-size:13px" aria-hidden="true"></i> Month</button><button class="vt-btn" id="vt-list" onclick="calViewList()"><i class="ti ti-list" style="font-size:13px" aria-hidden="true"></i> List</button></div><div class="cal-wrap"><div class="cal-hdr"><div class="cal-nav"><button onclick="calPrev()"><i class="ti ti-chevron-left" aria-hidden="true"></i></button><button onclick="calNext()"><i class="ti ti-chevron-right" aria-hidden="true"></i></button></div><div class="cal-title" id="cal-month-label">Loading...</div><button class="cal-today" onclick="calToday()">Today</button></div><div id="cal-body"></div></div><div style="background:var(--ba);border:.5px solid var(--bda);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ta)"><i class="ti ti-info-circle" style="font-size:14px" aria-hidden="true"></i> Tap any date to see details. WhatsApp Brandon on 063 379 8192.</div></div><div id="sv-book" style="display:none"><div id="bk-m"><div class="ptitle">Book a course</div><div class="psub">Browse, pay via EFT and upload proof of payment</div><div class="shdr">Select location</div><div class="ltabs2"><button class="ltab active" id="loc-cpt" onclick="swLcpt()"><i class="ti ti-map-pin" style="font-size:13px" aria-hidden="true"></i> Cape Town</button><button class="ltab" id="loc-gb" onclick="swLgb()"><i class="ti ti-map-pin" style="font-size:13px" aria-hidden="true"></i> Gordons Bay</button></div><div id="cl"></div></div><div id="bk-p" class="hide"></div></div>'
@@ -3593,6 +3663,78 @@
         var el = document.getElementById('student-courses-list');
         if (!el)
             return;
+        // Render Quick Packages section
+        var pkgEl = document.getElementById('student-pkg-section');
+        if (pkgEl) {
+            var track = _courseTrackView || (_currentUser && _currentUser.track) || 'Deckhand';
+            var sCourses = [];
+            try {
+                if (_currentUser && _currentUser.courses_data)
+                    sCourses = JSON.parse(_currentUser.courses_data);
+            } catch (e) {}
+            var pkgHtml = '<div style="margin-bottom:14px">';
+            pkgHtml += '<div class="shdr" style="margin-top:0"><i class="ti ti-package" style="font-size:13px" aria-hidden="true"></i> Course packages</div>';
+            if (track === 'Stew') {
+                var hasBasic = sCourses.some(function(c) {
+                    return c.name && (c.name.includes('STCW') || c.name.includes('stcw'));
+                })
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('stew');
+                })
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('food safety');
+                });
+                var hasFull = hasBasic
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('vhf');
+                })
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('barista');
+                });
+                // Basic Stew Package
+                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasBasic ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                pkgHtml += '<div><div style="font-size:13px;font-weight:600">🎀 Basic Stew Package</div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R23,340</div></div>';
+                pkgHtml += (hasBasic
+                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                : '<div style="font-size:11px;color:var(--tm)">The essential starting package for interior crew</div>');
+                pkgHtml += '</div>';
+                // Full Stew Package
+                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasFull ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                pkgHtml += '<div><div style="font-size:13px;font-weight:600">💎 Full Stew Package</div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">Basic + VHF · 3 Day Barista</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R34,466</div></div>';
+                pkgHtml += (hasFull
+                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                : '<div style="font-size:11px;color:var(--tm)">Everything you need to launch your yachting career</div>');
+                pkgHtml += '</div>';
+            } else {
+                var hasDeck = sCourses.some(function(c) {
+                    return c.name && c.name.includes('STCW');
+                })
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('vhf');
+                })
+                && sCourses.some(function(c) {
+                    return c.name && c.name.toLowerCase().includes('deckhand');
+                });
+                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasDeck ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                pkgHtml += '<div><div style="font-size:13px;font-weight:600">⚓ Deckhand Starter</div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">STCW+DSD · VHF · Deckhand 4 Day</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R22,449</div></div>';
+                pkgHtml += (hasDeck
+                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                : '<div style="font-size:11px;color:var(--tm)">The core package to get you working on yachts</div>');
+                pkgHtml += '</div>';
+            }
+            pkgHtml += '<div style="font-size:11px;color:var(--tm);text-align:center;padding:6px 0"><i class="ti ti-info-circle" style="font-size:12px" aria-hidden="true"></i> Packages are assigned by Brandon. WhatsApp him to get started.</div>';
+            pkgHtml += '</div>';
+            pkgEl.innerHTML = pkgHtml;
+        }
         // Default to student's own track on first load
         var track = _courseTrackView || (_currentUser && _currentUser.track) || 'Deckhand';
         if (!_courseTrackView) {
@@ -3958,10 +4100,70 @@
                 return sc.name === c.name;
             });
         });
-        html += '<div class="shdr">Assigned courses (' + sCourses.length + ')</div>';
+        html += '<div class="shdr" style="display:flex;justify-content:space-between;align-items:center"><span>Assigned courses (' + sCourses.length + ')</span>' + (sCourses.length ? '<button onclick="clearAllCourses(' + idx + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--bdd);background:transparent;color:var(--td);cursor:pointer;font-family:var(--font-sans)"><i class="ti ti-trash" style="font-size:10px" aria-hidden="true"></i> Clear all</button>' : '') + '</div>';
         html += '<div class="card" style="margin-bottom:10px">';
+        // Package quick-assign (only show if no courses yet, or always for flexibility)
+        html += '<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--bdr)">';
+        html += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-package" style="font-size:12px" aria-hidden="true"></i> Quick packages</div>';
+        html += '<div style="display:flex;flex-direction:column;gap:6px">';
+        // Basic Stew package
+        if (s.track === 'Stew') {
+            var hasBasicPkg = sCourses.some(function(c) {
+                return c.name === 'STCW Basic Safety Training' || c.name === 'STCW + DSD';
+            }) && sCourses.some(function(c) {
+                return c.name.includes('Stew');
+            }) && sCourses.some(function(c) {
+                return c.name.includes('Food Safety');
+            });
+            html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+            html += '<div><div style="font-size:12px;font-weight:600">🎀 Basic Stew Package</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R23,340</div>';
+            html += '</div>';
+            html += (hasBasicPkg
+            ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
+            : '<button class="btn nv sm" style="width:100%;padding:8px" onclick="assignPkg(' + idx + ',\'stew-basic\')"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Assign basic package</button>');
+            html += '</div>';
+            // Full Stew package  
+            var hasFullPkg = hasBasicPkg && sCourses.some(function(c) {
+                return c.name.includes('VHF');
+            }) && sCourses.some(function(c) {
+                return c.name.includes('Barista');
+            });
+            html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+            html += '<div><div style="font-size:12px;font-weight:600">💎 Full Stew Package</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">Basic + VHF · 3 Day Barista</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R34,466</div>';
+            html += '</div>';
+            html += (hasFullPkg
+            ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
+            : '<button class="btn nv sm" style="width:100%;padding:8px" onclick="assignPkg(' + idx + ',\'stew-full\')"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Assign full package</button>');
+            html += '</div>';
+        } else {
+            // Deckhand basic package
+            var hasDeckPkg = sCourses.some(function(c) {
+                return c.name.includes('STCW');
+            }) && sCourses.some(function(c) {
+                return c.name.includes('VHF');
+            }) && sCourses.some(function(c) {
+                return c.name.includes('Deckhand');
+            });
+            html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+            html += '<div><div style="font-size:12px;font-weight:600">⚓ Deckhand Starter</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">STCW+DSD · VHF · Deckhand 4 Day</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R22,449</div>';
+            html += '</div>';
+            html += (hasDeckPkg
+            ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
+            : '<button class="btn nv sm" style="width:100%;padding:8px" onclick="assignPkg(' + idx + ',\'deck-basic\')"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Assign starter package</button>');
+            html += '</div>';
+        }
+        html += '</div></div>';
         html += '<select id="cpick-' + idx + '" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans);margin-bottom:8px">';
-        html += '<option value="">-- Add a course --</option>';
+        html += '<option value="">-- Add individual course --</option>';
         availC.forEach(function(c) {
             html += '<option value="' + c.id + '">' + c.name + ' (' + c.provider + ')</option>';
         });
@@ -4979,6 +5181,7 @@
           <div style="display:flex;gap:6px;margin-bottom:12px">
             <button class="vt-btn active" id="vt-month" onclick="calSetView('month')"><i class="ti ti-calendar-event" style="font-size:13px" aria-hidden="true"></i> Month</button>
             <button class="vt-btn" id="vt-list" onclick="calSetView('list')"><i class="ti ti-list" style="font-size:13px" aria-hidden="true"></i> List</button>
+            <button class="vt-btn" id="vt-weeks" onclick="calSetView('weeks')"><i class="ti ti-layout-rows" style="font-size:13px" aria-hidden="true"></i> Weeks</button>
           </div>
           <div class="cal-wrap"><div class="cal-hdr"><div class="cal-nav"><button onclick="calPrev()"><i class="ti ti-chevron-left" aria-hidden="true"></i></button><button onclick="calNext()"><i class="ti ti-chevron-right" aria-hidden="true"></i></button></div><div class="cal-title" id="cal-month-label">Loading...</div><button class="cal-today" onclick="calToday()">Today</button></div><div id="cal-body"></div></div>
           <button class="btn nv" style="width:100%;padding:11px;margin-bottom:10px" onclick="showAdminAddEvt()"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i> Add course date</button>
@@ -5374,6 +5577,125 @@
             a.textContent = 'R' + (tC - pC).toLocaleString();
     }
 
+    function clearAllCourses(idx) {
+        if (!confirm('Remove all courses for this student?'))
+            return;
+        var s = STUDENTS[idx];
+        s.courses_data = JSON.stringify([]);
+        s.done = 0;
+        STUDENTS[idx] = s;
+        saveCourses(s.id, []);
+        opS(idx);
+    }
+
+    function assignPkg(idx, pkg) {
+        var s = STUDENTS[idx];
+        var courses = [];
+        try {
+            if (s.courses_data)
+                courses = JSON.parse(s.courses_data);
+        } catch (e) {}
+        var toAdd = [];
+        if (pkg === 'stew-basic') {
+            toAdd = [
+            {
+                name: 'STCW Basic Safety Training',
+                provider: 'STC-SA, Cape Town',
+                icon: 'ti-shield',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'Superyacht Stew Course',
+                provider: 'Cape Town',
+                icon: 'ti-wine',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'Food Safety Level 2',
+                provider: 'Cape Town',
+                icon: 'ti-tools-kitchen-2',
+                status: 'pending',
+                date: 'TBC'
+            },
+            ];
+        } else if (pkg === 'stew-full') {
+            toAdd = [
+            {
+                name: 'STCW Basic Safety Training',
+                provider: 'STC-SA, Cape Town',
+                icon: 'ti-shield',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'Superyacht Stew Course',
+                provider: 'Cape Town',
+                icon: 'ti-wine',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'Food Safety Level 2',
+                provider: 'Cape Town',
+                icon: 'ti-tools-kitchen-2',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'VHF Radio Course',
+                provider: 'Cape Town',
+                icon: 'ti-radio',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: '3 Day Barista',
+                provider: 'Cape Town',
+                icon: 'ti-coffee',
+                status: 'pending',
+                date: 'TBC'
+            },
+            ];
+        } else if (pkg === 'deck-basic') {
+            toAdd = [
+            {
+                name: 'STCW Basic Safety Training',
+                provider: 'STC-SA, Cape Town',
+                icon: 'ti-shield',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'VHF Radio Course',
+                provider: 'Cape Town',
+                icon: 'ti-radio',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
+                name: 'Deckhand 4 Day Course',
+                provider: 'Cape Town',
+                icon: 'ti-anchor',
+                status: 'pending',
+                date: 'TBC'
+            },
+            ];
+        }
+        toAdd.forEach(function(c) {
+            if (!courses.some(function(ec) {
+                return ec.name === c.name;
+            })) {
+                courses.push(c);
+            }
+        });
+        s.courses_data = JSON.stringify(courses);
+        STUDENTS[idx] = s;
+        saveCourses(s.id, courses);
+        opS(idx);
+    }
+
     function addCourseToStudent(idx) {
         var s = STUDENTS[idx];
         var sel = document.getElementById('cpick-' + idx);
@@ -5508,7 +5830,8 @@
         s.done = courses.filter(function(c) {
             return c.status === 'done';
         }).length;
-        saveCourses(s.id, courses);
+        STUDENTS[idx] = s;
+        await saveCourses(s.id, courses);
         try {
             await fetch(SB_URL + '/rest/v1/students?id=eq.' + s.id, {
                 method: 'PATCH',
@@ -5524,6 +5847,7 @@
         } catch (e) {
             console.error(e);
         }
+        opS(idx);
     }
     async function loadStudentDocs(studentId, idx) {
         var el = document.getElementById('student-docs-' + idx);
