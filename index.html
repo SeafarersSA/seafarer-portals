@@ -3406,9 +3406,395 @@
         if (id === 'visas') {
             loadVisaApps();
         }
+        if (id === 'pricing') {
+            rPricing();
+        }
         if (id === 'calendar')
             calInit();
     }
+    // All courses reference for admin pricing tab
+    const ALL_COURSES_PRICING = [// Cape Town Deckhand
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'STCW + DSD',
+        price: 10000,
+        dur: '11 days',
+        prov: 'STC-SA'
+    },
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'VHF Radio Course',
+        price: 4150,
+        dur: '1 day',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'Deckhand 4 Day Course',
+        price: 8299,
+        dur: '4 days',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'PWI (Jetski Instructors)',
+        price: 10990,
+        dur: '',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'Tender Ops',
+        price: 6040,
+        dur: '',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Deckhand – Cape Town',
+        name: 'PADI Open Water Dive',
+        price: 8762,
+        dur: '',
+        prov: 'Cape Town'
+    }, // Gordons Bay Deckhand
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'RYA Powerboat Level 2',
+        price: 5000,
+        dur: '2 days',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'RYA PWC Licence (Jet Ski)',
+        price: 3800,
+        dur: '1 day',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'VHF Radio Course',
+        price: 3450,
+        dur: '1 day',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'Water Sports Instructor',
+        price: 7500,
+        dur: '2 days',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'Deckhand Course (3 Day)',
+        price: 6000,
+        dur: '3 days',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'STCW Basic Safety Training',
+        price: 11500,
+        dur: '11 days',
+        prov: 'Black Pearl Yachting Academy'
+    },
+    {
+        cat: 'Deckhand – Gordons Bay (Black Pearl)',
+        name: 'Pelagic Offshore Fishing',
+        price: 9500,
+        dur: '2 days',
+        prov: 'Black Pearl Yachting Academy'
+    }, // Cape Town Stew
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'STCW + DSD',
+        price: 10000,
+        dur: '11 days',
+        prov: 'STC-SA'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'Superyacht Stew Course',
+        price: 10000,
+        dur: '5 days',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'Food Safety Level 2',
+        price: 3340,
+        dur: '1 day',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'VHF Radio Course',
+        price: 4150,
+        dur: '1 day',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: '3 Day Barista',
+        price: 6976,
+        dur: '3 days',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: '5 Day Barista',
+        price: 11800,
+        dur: '5 days',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'International Bartenders / Mixology',
+        price: 12700,
+        dur: '',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'Basic Beauty Therapist',
+        price: 10900,
+        dur: '',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'Advanced Beauty Therapist',
+        price: 16300,
+        dur: '',
+        prov: 'Cape Town'
+    },
+    {
+        cat: 'Stew – Cape Town (SYNC)',
+        name: 'Basic Massage Therapist',
+        price: 10900,
+        dur: '',
+        prov: 'Cape Town'
+    }, // Gordons Bay Stew
+    {
+        cat: 'Stew – Gordons Bay (White Pearl)',
+        name: 'Superyacht Stew Course',
+        price: 9900,
+        dur: '2 days',
+        prov: 'White Pearl Academy'
+    }, // Medical
+    {
+        cat: 'Medical / Other',
+        name: 'ENG1 Medical Certificate',
+        price: 1800,
+        dur: '',
+        prov: 'SAMSA Doctor'
+    },
+    {
+        cat: 'Medical / Other',
+        name: 'Seafarer Awareness Session',
+        price: 0,
+        dur: 'Online',
+        prov: 'Online (Zoom)'
+    },
+    ];
+
+    var _calcItems = [];
+
+    function rPricing() {
+        var el = document.getElementById('pricing-content');
+        if (!el)
+            return;
+        var cats = {};
+        ALL_COURSES_PRICING.forEach(function(c) {
+            if (!cats[c.cat])
+                cats[c.cat] = [];
+            cats[c.cat].push(c);
+        });
+        var catColors = {
+            'Deckhand - Cape Town': '#1A2B5C',
+            'Deckhand - Gordons Bay (Black Pearl)': '#2E6DA4',
+            'Stew - Cape Town (SYNC)': '#E91E8C',
+            'Stew - Gordons Bay (White Pearl)': '#C2185B',
+            'Medical / Other': '#607D8B'
+        };
+        var html = '';
+        html += '<div style="display:flex;gap:8px;margin-bottom:14px">';
+        html += '<input id="price-search" oninput="filterPricing()" placeholder="Search courses..." style="flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--s0);font-size:13px;font-family:var(--font-sans)">';
+        html += '<button id="calc-toggle-btn" class="btn nv" style="padding:10px 14px;white-space:nowrap;gap:6px" onclick="toggleCalc()"><i class="ti ti-calculator" style="font-size:14px" aria-hidden="true"></i> Quote</button>';
+        html += '</div>';
+        html += '<div id="calc-panel" style="display:none;background:var(--s0);border-radius:14px;border:2px solid var(--navy);padding:16px;margin-bottom:16px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px"><i class="ti ti-calculator" style="font-size:15px" aria-hidden="true"></i> Quote calculator</div>';
+        html += '<div id="calc-items" style="margin-bottom:12px"><div style="font-size:12px;color:var(--tm);text-align:center;padding:10px 0">Tap <b>+</b> on any course below to add it</div></div>';
+        html += '<div style="border-top:2px solid var(--navy);padding-top:12px;margin-bottom:12px">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700">Total</span><span id="calc-total" style="font-size:18px;font-weight:800;color:var(--navy)">R0</span></div>';
+        html += '</div>';
+        html += '<div style="display:flex;gap:8px">';
+        html += '<button class="btn" style="flex:1;padding:11px" onclick="clearCalc()"><i class="ti ti-trash" style="font-size:13px" aria-hidden="true"></i> Clear</button>';
+        html += '<button class="btn nv" style="flex:2;padding:11px" onclick="copyQuote()"><i class="ti ti-copy" style="font-size:13px" aria-hidden="true"></i> Copy quote</button>';
+        html += '</div></div>';
+        html += '<div id="price-list">';
+        Object.keys(cats).forEach(function(cat) {
+            var col = catColors[cat] || '#1A2B5C';
+            html += '<div class="price-cat-block" data-cat="' + cat + '">';
+            html += '<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px">';
+            html += '<div style="width:4px;height:18px;border-radius:2px;background:' + col + ';flex-shrink:0"></div>';
+            html += '<div style="font-size:12px;font-weight:700;color:' + col + ';text-transform:uppercase;letter-spacing:.5px">' + cat + '</div>';
+            html += '</div>';
+            html += '<div class="card" style="padding:0;overflow:hidden">';
+            cats[cat].forEach(function(c, i) {
+                var priceStr = c.price > 0 ? 'R' + c.price.toLocaleString() : 'Free';
+                var last = i === cats[cat].length - 1;
+                var rowIdx = ALL_COURSES_PRICING.indexOf(c);
+                html += '<div class="price-row" data-name="' + c.name + '" data-cat="' + cat + '" style="display:flex;align-items:center;padding:11px 14px;' + (last ? '' : 'border-bottom:.5px solid var(--s0)') + '">';
+                html += '<div style="flex:1;min-width:0;margin-right:10px">';
+                html += '<div style="font-size:13px;font-weight:500">' + c.name + '</div>';
+                html += '<div style="font-size:11px;color:var(--tm)">' + (c.dur ? c.dur + ' &nbsp;&middot;&nbsp; ' : '') + c.prov + '</div>';
+                html += '</div>';
+                html += '<div style="font-size:14px;font-weight:700;color:var(--navy);min-width:68px;text-align:right;margin-right:10px">' + priceStr + '</div>';
+                html += '<button onclick="addToCalcByIdx(' + rowIdx + ')" title="Add to quote" style="width:34px;height:34px;border-radius:8px;border:none;background:var(--navy);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-plus" style="font-size:15px" aria-hidden="true"></i></button>';
+                html += '</div>';
+            });
+            html += '</div></div>';
+        });
+        html += '</div>';
+        el.innerHTML = html;
+        _calcItems = [];
+    }
+
+    function toggleCalc() {
+        var p = document.getElementById('calc-panel');
+        if (!p)
+            return;
+        var open = p.style.display !== 'none';
+        p.style.display = open ? 'none' : 'block';
+        if (!open && p.scrollIntoView) {
+            setTimeout(function() {
+                p.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 50);
+        }
+    }
+
+
+    function filterPricing() {
+        var q = (document.getElementById('price-search').value || '').toLowerCase();
+        var rows = document.querySelectorAll('.price-row');
+        var blocks = document.querySelectorAll('.price-cat-block');
+        rows.forEach(function(r) {
+            var name = (r.getAttribute('data-name') || '').toLowerCase();
+            var cat = (r.getAttribute('data-cat') || '').toLowerCase();
+            r.style.display = (!q || name.includes(q) || cat.includes(q)) ? '' : 'none';
+        });
+        blocks.forEach(function(b) {
+            var visible = Array.from(b.querySelectorAll('.price-row')).some(function(r) {
+                return r.style.display !== 'none';
+            });
+            b.style.display = visible ? '' : 'none';
+        });
+    }
+
+    function openCalc() {
+        var p = document.getElementById('calc-panel');
+        if (p)
+            p.style.display = 'block';
+    }
+
+    function closeCalc() {
+        var p = document.getElementById('calc-panel');
+        if (p)
+            p.style.display = 'none';
+    }
+
+    function addToCalcByIdx(i) {
+        var c = ALL_COURSES_PRICING[i];
+        if (c)
+            addToCalc(c.name, c.price);
+    }
+
+    function addToCalc(name, price) {
+        _calcItems.push({
+            name: name,
+            price: price
+        });
+        renderCalcItems();
+        openCalc();
+    }
+
+    function removeCalcItem(i) {
+        _calcItems.splice(i, 1);
+        renderCalcItems();
+    }
+
+    function clearCalc() {
+        _calcItems = [];
+        renderCalcItems();
+    }
+
+    function renderCalcItems() {
+        var el = document.getElementById('calc-items');
+        var totEl = document.getElementById('calc-total');
+        if (!el)
+            return;
+        if (!_calcItems.length) {
+            el.innerHTML = '<div class="empty" style="font-size:12px">Tap + Add on any course to build your quote</div>';
+            if (totEl)
+                totEl.textContent = 'R0';
+            return;
+        }
+        var total = 0;
+        var html = '';
+        _calcItems.forEach(function(item, i) {
+            total += item.price;
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:.5px solid var(--s0)">';
+            html += '<div style="font-size:12px;flex:1;min-width:0">' + item.name + '</div>';
+            html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">';
+            html += '<div style="font-size:13px;font-weight:600">R' + item.price.toLocaleString() + '</div>';
+            html += '<button onclick="removeCalcItem(' + i + ')" style="font-size:11px;padding:3px 7px;border-radius:6px;border:1px solid var(--bdd);background:transparent;color:var(--td);cursor:pointer;font-family:var(--font-sans)"><i class="ti ti-x" style="font-size:10px" aria-hidden="true"></i></button>';
+            html += '</div></div>';
+        });
+        el.innerHTML = html;
+        if (totEl)
+            totEl.textContent = 'R' + total.toLocaleString();
+    }
+
+    function copyQuote() {
+        if (!_calcItems.length) {
+            alert('Add courses to the calculator first.');
+            return;
+        }
+        var total = 0;
+        var lines = 'Seafarer Maritime Career Consultancy\nCourse Quote\n\n';
+        _calcItems.forEach(function(item) {
+            lines += item.name + ': R' + item.price.toLocaleString() + '\n';
+            total += item.price;
+        });
+        lines += '\nTotal: R' + total.toLocaleString();
+        lines += '\n\nIf you are happy with this quote I will send a proper invoice with bank details. A 50% deposit is due to save your spot.';
+        lines += '\n\nContact: info@seafarers.co.za';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(lines).then(function() {
+                var btn = document.querySelector('#calc-panel .btn.nv');
+                if (btn) {
+                    var o = btn.innerHTML;
+                    btn.innerHTML = '<i class="ti ti-check" style="font-size:13px" aria-hidden="true"></i> Copied!';
+                    setTimeout(function() {
+                        btn.innerHTML = o;
+                    }, 2000);
+                }
+            });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = lines;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            alert('Quote copied to clipboard!');
+        }
+    }
+
     function gv(id) {
         const e = document.getElementById(id);
         return e ? e.value.trim() : '';
@@ -3505,6 +3891,7 @@
         var _nxtSub = _act ? (_act.date && _act.date !== 'TBC' ? 'Date: ' + _act.date : 'Confirm date with Brandon') : (_nxt ? 'Check the calendar for upcoming dates' : 'Time to dockwalk!');
 
         // Build nav
+        var isDeck = s.track === 'Deckhand';
         var tabs = [
         {
             id: 'home',
@@ -3531,11 +3918,11 @@
             lbl: 'Quizzes',
             icon: 'ti-help-circle'
         },
-        {
+        ].concat(isDeck ? [{
             id: 'logbook',
             lbl: 'Logbook',
             icon: 'ti-notebook'
-        },
+        }] : []).concat([
         {
             id: 'tools',
             lbl: 'Tools',
@@ -3561,7 +3948,7 @@
             lbl: 'Docs',
             icon: 'ti-folder'
         },
-        ];
+        ]);
         nav.innerHTML = tabs.map(function(t) {
             return '<button class="nbtn' + (t.id === 'home' ? ' active' : '') + '" id="snav-' + t.id + '" onclick="sTab(\'' + t.id + '\')"><i class="ti ' + t.icon + '" aria-hidden="true"></i>' + t.lbl + '</button>';
         }).join('');
@@ -3602,6 +3989,18 @@
             + '<div class="pb" style="margin-bottom:12px"><div class="pf g" style="width:' + _pct + '%"></div></div>'
             + '<div class="sgrid"><div class="sc"><div class="slbl">Track</div><div class="sval b" style="font-size:16px">' + s.track + '</div></div>'
             + '<div class="sc"><div class="slbl">Visa</div><div class="sval b" style="font-size:14px">' + s.visa + '</div></div></div>'
+            + '<div class="shdr">My details</div>'
+            + '<div class="card" style="margin-bottom:12px;padding:12px 14px">'
+            + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+            + '<div style="width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (s.name || '').split(' ').map(function(w) {
+                return w[0];
+            }).join('').slice(0, 2).toUpperCase() + '</div>'
+            + '<div><div style="font-size:14px;font-weight:600">' + s.name + '</div>'
+            + '<div style="font-size:12px;color:var(--tm)">' + s.track + ' track</div></div></div>'
+            + '<div style="font-size:12px;color:var(--tm);margin-bottom:3px"><i class="ti ti-mail" style="font-size:12px" aria-hidden="true"></i> ' + s.email + '</div>'
+            + (s.phone ? '<div style="font-size:12px;color:var(--tm)"><i class="ti ti-phone" style="font-size:12px" aria-hidden="true"></i> ' + s.phone + '</div>' : '')
+            + '<div style="font-size:11px;color:var(--tm);margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr)">If any details are wrong, WhatsApp Brandon to update them.</div>'
+            + '</div>'
             + '<div class="shdr">Quick actions</div>'
             + '<div style="display:flex;flex-direction:column;gap:8px">'
             + '<button class="btn nv full" style="padding:12px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="sTab(\'book\')"><i class="ti ti-calendar-plus" style="font-size:14px" aria-hidden="true"></i> Book a course</button>'
@@ -3731,7 +4130,8 @@
                 : '<div style="font-size:11px;color:var(--tm)">The core package to get you working on yachts</div>');
                 pkgHtml += '</div>';
             }
-            pkgHtml += '<div style="font-size:11px;color:var(--tm);text-align:center;padding:6px 0"><i class="ti ti-info-circle" style="font-size:12px" aria-hidden="true"></i> Packages are assigned by Brandon. WhatsApp him to get started.</div>';
+            var waBrandon = 'https://wa.me/27633798192?text=' + encodeURIComponent('Hi Brandon! I want to find out more about the course packages for my ' + track + ' track. My name is ' + ((_currentUser && _currentUser.name) || '') + '.');
+            pkgHtml += '<a href="' + waBrandon + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;margin-top:4px"><i class="ti ti-brand-whatsapp" style="font-size:15px" aria-hidden="true"></i> WhatsApp Brandon to get started</a>';
             pkgHtml += '</div>';
             pkgEl.innerHTML = pkgHtml;
         }
@@ -3951,12 +4351,29 @@
         det.classList.remove('hide');
 
         var html = '<button class="bbtn" onclick="clS()"><i class="ti ti-arrow-left" style="font-size:16px" aria-hidden="true"></i> All students</button>';
-        html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">';
+        html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">';
         html += '<div style="width:42px;height:42px;border-radius:50%;background:#1A2B5C;color:#fff;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (s.name || '').split(' ').map(function(w) {
             return w[0] || '';
         }).join('').slice(0, 2).toUpperCase() + '</div>';
-        html += '<div><div style="font-size:17px;font-weight:600">' + s.name + '</div>';
-        html += '<div style="font-size:12px;color:var(--ts)">' + s.email + ' &nbsp;·&nbsp; ' + s.phone + '</div></div></div>';
+        html += '<div style="flex:1;min-width:0"><div style="font-size:17px;font-weight:600">' + s.name + '</div>';
+        html += '<div style="font-size:12px;color:var(--ts)">' + s.email + '</div>';
+        html += '<div style="font-size:12px;color:var(--ts)">' + s.phone + ' &nbsp;·&nbsp; ' + s.track + '</div></div>';
+        html += '<button onclick="toggleEditStudent(' + idx + ')" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--bdr);background:var(--s0);color:var(--tp);cursor:pointer;font-family:var(--font-sans);flex-shrink:0"><i class="ti ti-edit" style="font-size:12px" aria-hidden="true"></i> Edit</button>';
+        html += '</div>';
+        // Edit panel (hidden by default)
+        html += '<div id="edit-student-panel-' + idx + '" style="display:none;background:var(--s0);border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--bdr)">';
+        html += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Edit student details</div>';
+        html += '<div class="fg"><label>Full name</label><input id="es-name-' + idx + '" value="' + s.name + '" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans)"/></div>';
+        html += '<div class="fg"><label>WhatsApp number</label><input id="es-phone-' + idx + '" value="' + s.phone + '" placeholder="071 000 0000" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans)"/></div>';
+        html += '<div class="fg"><label>Track</label><select id="es-track-' + idx + '" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans)">';
+        html += '<option value="Deckhand"' + (s.track === 'Deckhand' ? ' selected' : '') + '>Deckhand</option>';
+        html += '<option value="Stew"' + (s.track === 'Stew' ? ' selected' : '') + '>Stew / Interior</option>';
+        html += '</select></div>';
+        html += '<div class="fg"><label>New password <span style="font-weight:400;color:var(--tm)">(leave blank to keep current)</span></label><input id="es-pass-' + idx + '" placeholder="Leave blank to keep current" autocomplete="off" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans)"/></div>';
+        html += '<div style="display:flex;gap:8px">';
+        html += '<button class="btn nv" style="flex:1;padding:10px" onclick="saveStudentEdit(' + idx + ')"><i class="ti ti-check" style="font-size:13px" aria-hidden="true"></i> Save changes</button>';
+        html += '<button class="btn" style="padding:10px 14px" onclick="toggleEditStudent(' + idx + ')">Cancel</button>';
+        html += '</div></div>';
 
         // Progress
         html += '<div class="card" style="margin-bottom:10px">';
@@ -3972,6 +4389,12 @@
         }).length + '</span>';
         html += '</div></div>';
 
+        // Admin notes
+        html += '<div class="shdr">Notes</div>';
+        html += '<div class="card" style="margin-bottom:10px">';
+        html += '<textarea id="student-notes-' + idx + '" placeholder="Add private notes about this student..." style="width:100%;min-height:72px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-family:var(--font-sans);resize:vertical;box-sizing:border-box">' + s.notes + '</textarea>';
+        html += '<button class="btn nv sm" style="margin-top:8px" onclick="saveStudentNotes(' + idx + ')"><i class="ti ti-device-floppy" style="font-size:12px" aria-hidden="true"></i> Save notes</button>';
+        html += '</div>';
         // Course roadmap
         html += '<div class="shdr">Course roadmap</div>';
         html += '<div class="card" style="margin-bottom:10px">';
@@ -5138,6 +5561,10 @@
             lbl: 'Visas',
             icon: 'ti-plane'
         }, {
+            id: 'pricing',
+            lbl: 'Pricing',
+            icon: 'ti-tag'
+        }, {
             id: 'tools',
             lbl: 'Tools',
             icon: 'ti-tool'
@@ -5310,6 +5737,12 @@
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--s0)"><div style="width:36px;height:36px;border-radius:9px;background:#eef2fb;display:flex;align-items:center;justify-content:center"><i class="ti ti-anchor" style="font-size:16px;color:#1A2B5C" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Cape Town Port Control</div><div style="font-size:12px;color:var(--ts)">+27 21 408 6136</div></div><a href="tel:+27214086136" style="background:#1A2B5C;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0"><div style="width:36px;height:36px;border-radius:9px;background:#eef2fb;display:flex;align-items:center;justify-content:center"><i class="ti ti-radio" style="font-size:16px;color:#1A2B5C" aria-hidden="true"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:500">MRCC Cape Town</div><div style="font-size:12px;color:var(--ts)">+27 21 938 3300</div></div><a href="tel:+27219383300" style="background:#1A2B5C;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">Call</a></div>
           </div>
+        </div>
+
+        <div class="view" id="v-pricing">
+          <div class="ptitle">Course pricing</div>
+          <div class="psub">All course prices at a glance</div>
+          <div id="pricing-content"></div>
         </div>
         `;
         setNav(tabs, 'dash');
@@ -5575,6 +6008,88 @@
         const a = document.querySelector('#v-referrals .sval.a');
         if (a)
             a.textContent = 'R' + (tC - pC).toLocaleString();
+    }
+
+    function toggleEditStudent(idx) {
+        var panel = document.getElementById('edit-student-panel-' + idx);
+        if (panel)
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function saveStudentEdit(idx) {
+        var s = STUDENTS[idx];
+        var nameEl = document.getElementById('es-name-' + idx);
+        var phoneEl = document.getElementById('es-phone-' + idx);
+        var trackEl = document.getElementById('es-track-' + idx);
+        var passEl = document.getElementById('es-pass-' + idx);
+        var newName = (nameEl && nameEl.value.trim()) || s.name;
+        var newPhone = (phoneEl && phoneEl.value.trim()) || s.phone;
+        var newTrack = (trackEl && trackEl.value) || s.track;
+        var newPass = passEl && passEl.value.trim();
+        var updates = {
+            name: newName,
+            phone: newPhone,
+            track: newTrack
+        };
+        if (newPass)
+            updates.password = newPass;
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/students?id=eq.' + s.id, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updates)
+            });
+            if (r.ok) {
+                STUDENTS[idx] = Object.assign(s, updates);
+                opS(idx);
+            } else {
+                alert('Could not save. Please try again.');
+            }
+        } catch (ex) {
+            console.error(ex);
+            alert('Connection error. Please try again.');
+        }
+    }
+
+    async function saveStudentNotes(idx) {
+        var s = STUDENTS[idx];
+        var el = document.getElementById('student-notes-' + idx);
+        if (!el)
+            return;
+        var notes = el.value;
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/students?id=eq.' + s.id, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    notes: notes
+                })
+            });
+            if (r.ok) {
+                STUDENTS[idx].notes = notes;
+                var btn = el.nextElementSibling;
+                if (btn) {
+                    var orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i> Saved';
+                    setTimeout(function() {
+                        btn.innerHTML = orig;
+                    }, 2000);
+                }
+            } else {
+                alert('Could not save notes.');
+            }
+        } catch (ex) {
+            console.error(ex);
+            alert('Connection error.');
+        }
     }
 
     function clearAllCourses(idx) {
