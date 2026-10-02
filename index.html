@@ -1708,7 +1708,7 @@
     const DEFAULT_COURSES = [
     {
         id: 1,
-        name: 'ENG1 Medical Certificate',
+        name: 'SAMSA Medical',
         provider: 'SAMSA Doctor',
         icon: 'ti-stethoscope',
         status: 'pending',
@@ -1783,7 +1783,7 @@
     const DEFAULT_STEW_COURSES = [
     {
         id: 1,
-        name: 'ENG1 Medical Certificate',
+        name: 'SAMSA Medical',
         provider: 'SAMSA Doctor',
         icon: 'ti-stethoscope',
         status: 'pending',
@@ -1862,7 +1862,7 @@
     }
     const COURSES = [{
         id: 1,
-        name: 'ENG1 Medical Certificate',
+        name: 'SAMSA Medical',
         prov: 'SAMSA Doctor',
         status: 'pending',
         date: 'TBC',
@@ -2490,7 +2490,7 @@
         awareness: 'Awareness',
         pwc: 'PWC',
         water: 'Water Sports',
-        eng1: 'ENG1',
+        eng1: 'SAMSA Medical',
         stew: 'Stew/Interior'
     };
     const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -2604,11 +2604,20 @@
             calBody = el.querySelector('#cal-body');
         if (!calBody)
             return;
+        // Admin sees all events; student sees public events + their own booked ones
+        var isAdmin = !_currentUser || _currentUser.email === ADMIN_EMAIL;
+        var VISIBLE_EVENTS = VISIBLE_EVENTS.filter(function(e) {
+            if (isAdmin)
+                return true;
+            if (!e.student_id)
+                return true;
+            return String(e.student_id) === String(_currentUser && _currentUser.id);
+        });
         var today = new Date();
 
         if (calView === 'weeks') {
             // Weeks view: group events into course weeks (Mon-Fri blocks)
-            var upcoming = COURSE_EVENTS.filter(function(e) {
+            var upcoming = VISIBLE_EVENTS.filter(function(e) {
                 return new Date(e.date) >= new Date(today.getFullYear(), today.getMonth() - 1, 1);
             }).sort(function(a, b) {
                 return new Date(a.date) - new Date(b.date);
@@ -2675,7 +2684,7 @@
         }
 
         if (calView === 'list') {
-            var upcoming = COURSE_EVENTS.filter(function(e) {
+            var upcoming = VISIBLE_EVENTS.filter(function(e) {
                 return new Date(e.date) >= new Date(today.getFullYear(), today.getMonth(), 1);
             }).sort(function(a, b) {
                 return new Date(a.date) - new Date(b.date);
@@ -3584,8 +3593,8 @@
     }, // Medical
     {
         cat: 'Medical / Other',
-        name: 'ENG1 Medical Certificate',
-        price: 1800,
+        name: 'SAMSA Medical',
+        price: 1700,
         dur: '',
         prov: 'SAMSA Doctor'
     },
@@ -3806,7 +3815,13 @@
         return p >= 70 ? 'var(--bsu)' : p >= 40 ? 'var(--bw)' : 'var(--bd)';
     }
     function wa(ph, msg) {
-        return `https://wa.me/27${ph.replace(/^0/, '').replace(/\s/g, '')}?text=${encodeURIComponent(msg)}`;
+        var num = '27' + ph.replace(/^0/, '').replace(/[^0-9]/g, '');
+        var txt = encodeURIComponent(msg);
+        var isAndroid = /android/i.test(navigator.userAgent);
+        if (isAndroid) {
+            return 'intent://send?phone=' + num + '&text=' + txt + '#Intent;package=com.whatsapp.w4b;scheme=whatsapp;end';
+        }
+        return 'https://wa.me/' + num + '?text=' + txt;
     }
     function cpT(t, btn) {
         navigator.clipboard.writeText(t).then(() => {
@@ -4094,8 +4109,8 @@
                 pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasBasic ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
                 pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
                 pkgHtml += '<div><div style="font-size:13px;font-weight:600">🎀 Basic Stew Package</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R23,340</div></div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R25,040</div></div>';
                 pkgHtml += (hasBasic
                 ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
                 : '<div style="font-size:11px;color:var(--tm)">The essential starting package for interior crew</div>');
@@ -4104,8 +4119,8 @@
                 pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasFull ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
                 pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
                 pkgHtml += '<div><div style="font-size:13px;font-weight:600">💎 Full Stew Package</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">Basic + VHF · 3 Day Barista</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R34,466</div></div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course · Food Safety · VHF · Barista</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R36,166</div></div>';
                 pkgHtml += (hasFull
                 ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
                 : '<div style="font-size:11px;color:var(--tm)">Everything you need to launch your yachting career</div>');
@@ -4123,8 +4138,8 @@
                 pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasDeck ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
                 pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
                 pkgHtml += '<div><div style="font-size:13px;font-weight:600">⚓ Deckhand Starter</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">STCW+DSD · VHF · Deckhand 4 Day</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R22,449</div></div>';
+                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · VHF · Deckhand 4 Day</div></div>';
+                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R24,149</div></div>';
                 pkgHtml += (hasDeck
                 ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
                 : '<div style="font-size:11px;color:var(--tm)">The core package to get you working on yachts</div>');
@@ -4541,8 +4556,8 @@
             html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
             html += '<div><div style="font-size:12px;font-weight:600">🎀 Basic Stew Package</div>';
-            html += '<div style="font-size:10px;color:var(--tm)">STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
-            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R23,340</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R25,040</div>';
             html += '</div>';
             html += (hasBasicPkg
             ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
@@ -4557,8 +4572,8 @@
             html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
             html += '<div><div style="font-size:12px;font-weight:600">💎 Full Stew Package</div>';
-            html += '<div style="font-size:10px;color:var(--tm)">Basic + VHF · 3 Day Barista</div></div>';
-            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R34,466</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course · Food Safety · VHF · Barista</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R36,166</div>';
             html += '</div>';
             html += (hasFullPkg
             ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
@@ -4576,8 +4591,8 @@
             html += '<div style="background:var(--s0);border-radius:10px;padding:10px;border:1px solid var(--bdr)">';
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
             html += '<div><div style="font-size:12px;font-weight:600">⚓ Deckhand Starter</div>';
-            html += '<div style="font-size:10px;color:var(--tm)">STCW+DSD · VHF · Deckhand 4 Day</div></div>';
-            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R22,449</div>';
+            html += '<div style="font-size:10px;color:var(--tm)">SAMSA Medical · STCW+DSD · VHF · Deckhand 4 Day</div></div>';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--navy)">R24,149</div>';
             html += '</div>';
             html += (hasDeckPkg
             ? '<div style="font-size:11px;color:var(--fsu)"><i class="ti ti-circle-check" aria-hidden="true"></i> Already assigned</div>'
@@ -4721,6 +4736,12 @@
                 alert('Could not save: ' + (errData.message || 'Check Supabase has courses_data column'));
                 return;
             }
+            // Auto-add booked courses with dates to calendar
+            courses.forEach(function(c) {
+                if (c.status === 'booked' && c.date && c.date !== 'TBC') {
+                    autoCreateCalEvent(s, c);
+                }
+            });
             // Show saved confirmation
             const btns = document.querySelectorAll('#s-det button');
             btns.forEach(b => {
@@ -5614,7 +5635,7 @@
           <button class="btn nv" style="width:100%;padding:11px;margin-bottom:10px" onclick="showAdminAddEvt()"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i> Add course date</button>
           <div class="add-evt-form hide" id="admin-add-evt">
             <div class="fg"><label>Course name *</label><input id="ae-title" placeholder="e.g. RYA Powerboat Level 2"/></div>
-            <div class="fg"><label>Type</label><select id="ae-type"><option value="rya">RYA</option><option value="stcw">STCW</option><option value="vhf">VHF</option><option value="pwc">PWC</option><option value="awareness">Awareness</option><option value="water">Water Sports</option><option value="eng1">ENG1</option><option value="stew">Stew/Interior</option></select></div>
+            <div class="fg"><label>Type</label><select id="ae-type"><option value="rya">RYA</option><option value="stcw">STCW</option><option value="vhf">VHF</option><option value="pwc">PWC</option><option value="awareness">Awareness</option><option value="water">Water Sports</option><option value="eng1">SAMSA Medical</option><option value="stew">Stew/Interior</option></select></div>
             <div class="fg"><label>Provider</label><input id="ae-prov" placeholder="e.g. Black Pearl Yachting Academy"/></div>
             <div class="fg"><label>Location</label><input id="ae-loc" placeholder="e.g. Gordons Bay"/></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fg"><label>Price</label><input id="ae-price" placeholder="R5,000"/></div><div class="fg"><label>Duration</label><input id="ae-dur" placeholder="2 days"/></div></div>
@@ -6114,6 +6135,13 @@
         if (pkg === 'stew-basic') {
             toAdd = [
             {
+                name: 'SAMSA Medical',
+                provider: 'SAMSA Doctor',
+                icon: 'ti-stethoscope',
+                status: 'pending',
+                date: 'TBC'
+            },
+            {
                 name: 'STCW Basic Safety Training',
                 provider: 'STC-SA, Cape Town',
                 icon: 'ti-shield',
@@ -6175,6 +6203,13 @@
             ];
         } else if (pkg === 'deck-basic') {
             toAdd = [
+            {
+                name: 'SAMSA Medical',
+                provider: 'SAMSA Doctor',
+                icon: 'ti-stethoscope',
+                status: 'pending',
+                date: 'TBC'
+            },
             {
                 name: 'STCW Basic Safety Training',
                 provider: 'STC-SA, Cape Town',
@@ -6332,6 +6367,51 @@
         saveCourses(s.id, courses);
         opS(idx);
     }
+    async function autoCreateCalEvent(s, course) {
+        if (!course.date || course.date === 'TBC' || !course.name)
+            return;
+        // Check if an event for this student+course already exists
+        var exists = COURSE_EVENTS.some(function(e) {
+            return e.title === course.name && e.student_id === s.id;
+        });
+        if (exists)
+            return;
+        var evtType = (s.track === 'Stew') ? 'stew' : 'rya';
+        var evtData = {
+            title: course.name,
+            type: evtType,
+            provider: course.provider || '',
+            location: '',
+            price: '',
+            duration: course.dur || '',
+            date: course.date,
+            end_date: course.endDate || course.date,
+            contact: 'info@seafarers.co.za',
+            notes: 'Booked for ' + s.name,
+            student_id: s.id
+        };
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/course_events', {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(evtData)
+            });
+            var data = await r.json();
+            var newEvt = Array.isArray(data) ? data[0] : data;
+            if (newEvt && newEvt.id) {
+                newEvt.endDate = newEvt.end_date || newEvt.date;
+                COURSE_EVENTS.push(newEvt);
+            }
+        } catch (ex) {
+            console.error('Auto cal event error:', ex);
+        }
+    }
+
     async function updCourseStatus(idx, ci, status) {
         var s = STUDENTS[idx];
         var courses = [];
@@ -6361,6 +6441,10 @@
             });
         } catch (e) {
             console.error(e);
+        }
+        // Auto-add to calendar when marked as booked and date is set
+        if (status === 'booked' && courses[ci]) {
+            await autoCreateCalEvent(s, courses[ci]);
         }
         opS(idx);
     }
