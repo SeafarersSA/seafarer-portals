@@ -3690,7 +3690,7 @@
             html += '<input type="checkbox" id="fc-' + fi + '"' + (stored ? '' : ' disabled') + ' style="width:16px;height:16px"> ' + form.label + (stored ? '' : ' (upload first)') + '</label>';
         });
         html += '</div>';
-        html += '<button class="btn nv" style="width:100%;padding:11px" onclick="sendFormsToStudent()"><i class="ti ti-brand-whatsapp" style="font-size:13px" aria-hidden="true"></i> Send selected forms to student</button>';
+        html += '<div style="display:flex;gap:8px"><button class="btn nv" style="flex:1;padding:11px" onclick="sendFormsWA()"><i class="ti ti-brand-whatsapp" style="font-size:13px" aria-hidden="true"></i> WhatsApp student</button><button onclick="sendFormsEmail()" style="flex:1;padding:11px;background:#E91E8C;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-sans)"><i class="ti ti-mail" style="font-size:13px" aria-hidden="true"></i> Email + attach PDFs</button></div>';
         html += '</div>';
         el.innerHTML = html;
     }
@@ -3758,17 +3758,17 @@
         window.open(url, '_blank');
     }
 
-    function sendFormsToStudent() {
+    function getSelectedFormsData() {
         var sel = document.getElementById('form-student-sel');
         if (!sel || !sel.value) {
             alert('Please select a student.');
-            return;
+            return null;
         }
         var idx = parseInt(sel.value);
         var s = STUDENTS[idx];
         if (!s) {
             alert('Student not found.');
-            return;
+            return null;
         }
         var selected = ADMIN_FORMS.filter(function(form, fi) {
             var cb = document.getElementById('fc-' + fi);
@@ -3776,14 +3776,74 @@
         });
         if (!selected.length) {
             alert('Please select at least one form to send.');
-            return;
+            return null;
         }
+        return {
+            student: s,
+            forms: selected
+        };
+    }
+
+    function sendFormsWA() {
+        var d = getSelectedFormsData();
+        if (!d)
+            return;
+        var s = d.student;
+        var selected = d.forms;
         var formList = selected.map(function(f) {
-            return '• ' + f.label;
+            return '\u2022 ' + f.label;
         }).join('\n');
-        var msg = 'Hi ' + s.name.split(' ')[0] + '! \u2693 Before your course with Seafarer Maritime, please fill in and return the following form' + (selected.length > 1 ? 's' : '') + ': \n\n' + formList + '\n\nReply to this message or email: info@seafarers.co.za';
+        var msg = 'Hi ' + s.name.split(' ')[0] + '! \u2693 Before your course with Seafarer Maritime, please fill in and return the following form' + (selected.length > 1 ? 's' : '') + ': \n\n' + formList + '\n\nPlease email your completed forms to: info@seafarers.co.za';
         var url = wa(s.phone || '0633798192', msg);
         window.open(url, '_blank');
+    }
+
+    function sendFormsEmail() {
+        var d = getSelectedFormsData();
+        if (!d)
+            return;
+        var s = d.student;
+        var selected = d.forms;
+        if (!s.email) {
+            alert('This student has no email address on file.');
+            return;
+        }
+        // Build email with forms attached as data URIs via mailto
+        var subject = 'Seafarer Maritime - Course Forms';
+        var firstName = s.name.split(' ')[0];
+        var formNames = selected.map(function(f) {
+            return '\u2022 ' + f.label;
+        }).join('\n');
+        var body = 'Hi ' + firstName + '!\n\nBefore your course with Seafarer Maritime, please fill in and return the following form' + (selected.length > 1 ? 's' : '') + ' attached to this email:\n\n' + formNames + '\n\nOnce completed, please reply to this email with the signed form' + (selected.length > 1 ? 's' : '') + ' attached.\n\nIf you have any questions, WhatsApp Brandon on 063 379 8192.\n\nKind regards,\nBrandon Snyman\nSeafarer Maritime Career Consultancy\ninfo@seafarers.co.za';
+        // Open mailto — note: mailto cannot attach files programmatically (browser security)
+        // So we open each PDF for the admin to manually attach, then open the email
+        selected.forEach(function(form) {
+            var data = null;
+            try {
+                data = localStorage.getItem('seaform_' + form.id);
+            } catch (e) {}
+            if (data) {
+                var a = document.createElement('a');
+                a.href = data;
+                a.download = form.label + '.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        });
+        // Small delay then open email client
+        setTimeout(function() {
+            var mailUrl = 'mailto:' + encodeURIComponent(s.email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            window.location.href = mailUrl;
+            // Show instruction
+            setTimeout(function() {
+                alert('The form PDF' + (selected.length > 1 ? 's have' : ' has') + ' been downloaded to your device. Please attach ' + (selected.length > 1 ? 'them' : 'it') + ' to the email that just opened, then send.');
+            }, 500);
+        }, 800);
+    }
+
+    function sendFormsToStudent() {
+        sendFormsWA();
     }
 
     function rPricing() {
