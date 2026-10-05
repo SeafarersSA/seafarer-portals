@@ -2606,7 +2606,7 @@
             return;
         // Admin sees all events; student sees public events + their own booked ones
         var isAdmin = !_currentUser || _currentUser.email === ADMIN_EMAIL;
-        var VISIBLE_EVENTS = VISIBLE_EVENTS.filter(function(e) {
+        var VISIBLE_EVENTS = COURSE_EVENTS.filter(function(e) {
             if (isAdmin)
                 return true;
             if (!e.student_id)
@@ -3418,6 +3418,9 @@
         if (id === 'pricing') {
             rPricing();
         }
+        if (id === 'forms') {
+            rForms();
+        }
         if (id === 'calendar')
             calInit();
     }
@@ -3608,6 +3611,179 @@
     ];
 
     var _calcItems = [];
+
+    // Admin forms storage
+    var ADMIN_FORMS = [
+    {
+        id: 'enrollment',
+        label: 'Enrollment Form',
+        icon: 'ti-file-plus',
+        desc: 'Student enrollment and personal details'
+    },
+    {
+        id: 'indemnity',
+        label: 'Indemnity Form',
+        icon: 'ti-file-alert',
+        desc: 'Liability waiver and indemnity agreement'
+    },
+    {
+        id: 'medical',
+        label: 'Medical Screening Form',
+        icon: 'ti-stethoscope',
+        desc: 'Pre-course medical questionnaire'
+    },
+    ];
+
+    function rForms() {
+        var el = document.getElementById('forms-content');
+        if (!el)
+            return;
+        var html = '';
+        html += '<div class="card" style="margin-bottom:14px;border-left:4px solid var(--navy);padding:12px 14px">';
+        html += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px"><i class="ti ti-info-circle" style="font-size:13px" aria-hidden="true"></i> How forms work</div>';
+        html += '<div style="font-size:12px;color:var(--tm)">Upload each PDF once. Then send the WhatsApp link to any student so they can fill in and return to you.</div>';
+        html += '</div>';
+        ADMIN_FORMS.forEach(function(form, fi) {
+            var stored = null;
+            try {
+                stored = localStorage.getItem('seaform_' + form.id);
+            } catch (e) {}
+            html += '<div class="card" style="margin-bottom:10px;padding:14px">';
+            html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">';
+            html += '<div style="width:40px;height:40px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ' + form.icon + '" style="font-size:18px" aria-hidden="true"></i></div>';
+            html += '<div style="flex:1"><div style="font-size:14px;font-weight:600">' + form.label + '</div>';
+            html += '<div style="font-size:11px;color:var(--tm)">' + form.desc + '</div></div>';
+            html += '<span style="font-size:10px;padding:3px 8px;border-radius:20px;background:' + (stored ? '#e8f8ee' : 'var(--s0)') + ';color:' + (stored ? '#27ae60' : 'var(--tm)') + ';border:1px solid ' + (stored ? '#27ae60' : 'var(--bdr)') + ';">' + (stored ? 'Uploaded' : 'Not uploaded') + '</span>';
+            html += '</div>';
+            if (stored) {
+                html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+                html += '<button class="btn nv sm" style="flex:1" onclick="downloadForm(' + fi + ')"><i class="ti ti-download" style="font-size:12px" aria-hidden="true"></i> Download</button>';
+                html += '<button class="btn sm" style="flex:1" onclick="sendFormWA(' + fi + ')"><i class="ti ti-brand-whatsapp" style="font-size:12px" aria-hidden="true"></i> Send WA</button>';
+                html += '<button class="btn sm" style="flex:1" onclick="replaceForm(' + fi + ')"><i class="ti ti-refresh" style="font-size:12px" aria-hidden="true"></i> Replace</button>';
+                html += '</div>';
+            } else {
+                html += '<label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:var(--s0);border:2px dashed var(--bdr);border-radius:10px;cursor:pointer;font-size:13px;color:var(--ts)">';
+                html += '<i class="ti ti-upload" style="font-size:15px" aria-hidden="true"></i> Upload PDF';
+                html += '<input type="file" accept=".pdf" style="display:none" onchange="uploadForm(' + fi + ',this)">';
+                html += '</label>';
+            }
+            html += '<input type="file" accept=".pdf" id="replace-input-' + fi + '" style="display:none" onchange="uploadForm(' + fi + ',this)">';
+            html += '</div>';
+        });
+        html += '<div class="shdr" style="margin-top:4px">Send forms to a student</div>';
+        html += '<div class="card" style="padding:14px">';
+        html += '<div style="font-size:12px;color:var(--tm);margin-bottom:10px">Select a student and which forms to send via WhatsApp</div>';
+        html += '<select id="form-student-sel" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--s0);font-size:13px;font-family:var(--font-sans);margin-bottom:10px">';
+        html += '<option value="">-- Select student --</option>';
+        STUDENTS.forEach(function(s, i) {
+            html += '<option value="' + i + '">' + s.name + ' (' + s.track + ')</option>';
+        });
+        html += '</select>';
+        html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">';
+        ADMIN_FORMS.forEach(function(form, fi) {
+            var stored = null;
+            try {
+                stored = localStorage.getItem('seaform_' + form.id);
+            } catch (e) {}
+            html += '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;opacity:' + (stored ? '1' : '0.4') + '">';
+            html += '<input type="checkbox" id="fc-' + fi + '"' + (stored ? '' : ' disabled') + ' style="width:16px;height:16px"> ' + form.label + (stored ? '' : ' (upload first)') + '</label>';
+        });
+        html += '</div>';
+        html += '<button class="btn nv" style="width:100%;padding:11px" onclick="sendFormsToStudent()"><i class="ti ti-brand-whatsapp" style="font-size:13px" aria-hidden="true"></i> Send selected forms to student</button>';
+        html += '</div>';
+        el.innerHTML = html;
+    }
+
+    function uploadForm(fi, input) {
+        var form = ADMIN_FORMS[fi];
+        if (!form)
+            return;
+        var file = input.files[0];
+        if (!file)
+            return;
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File too large. Max 5MB.');
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                localStorage.setItem('seaform_' + form.id, e.target.result);
+                rForms();
+            } catch (err) {
+                alert('Could not save form. Storage may be full.');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function replaceForm(fi) {
+        var el = document.getElementById('replace-input-' + fi);
+        if (el)
+            el.click();
+    }
+
+    function downloadForm(fi) {
+        var form = ADMIN_FORMS[fi];
+        if (!form) {
+            alert('Form not found.');
+            return;
+        }
+        var data = null;
+        try {
+            data = localStorage.getItem('seaform_' + form.id);
+        } catch (e) {}
+        if (!data) {
+            alert('Form not uploaded yet.');
+            return;
+        }
+        var a = document.createElement('a');
+        a.href = data;
+        a.download = form.label + '.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function sendFormWA(fi) {
+        var form = ADMIN_FORMS[fi];
+        if (!form) {
+            alert('Form not found.');
+            return;
+        }
+        var label = form.label;
+        var msg = 'Hi! Please fill in and return the ' + label + ' from Seafarer Maritime Career Consultancy to info@seafarers.co.za before your course. ⚓ - Brandon @ Seafarer Maritime';
+        var url = wa('0633798192', msg);
+        window.open(url, '_blank');
+    }
+
+    function sendFormsToStudent() {
+        var sel = document.getElementById('form-student-sel');
+        if (!sel || !sel.value) {
+            alert('Please select a student.');
+            return;
+        }
+        var idx = parseInt(sel.value);
+        var s = STUDENTS[idx];
+        if (!s) {
+            alert('Student not found.');
+            return;
+        }
+        var selected = ADMIN_FORMS.filter(function(form, fi) {
+            var cb = document.getElementById('fc-' + fi);
+            return cb && cb.checked;
+        });
+        if (!selected.length) {
+            alert('Please select at least one form to send.');
+            return;
+        }
+        var formList = selected.map(function(f) {
+            return '• ' + f.label;
+        }).join('\n');
+        var msg = 'Hi ' + s.name.split(' ')[0] + '! \u2693 Before your course with Seafarer Maritime, please fill in and return the following form' + (selected.length > 1 ? 's' : '') + ': \n\n' + formList + '\n\nReply to this message or email: info@seafarers.co.za';
+        var url = wa(s.phone || '0633798192', msg);
+        window.open(url, '_blank');
+    }
 
     function rPricing() {
         var el = document.getElementById('pricing-content');
@@ -4346,7 +4522,8 @@
             const p = Math.round(s.done / s.total * 100);
             return '<div class="srow"><div class="sav">' + s.name.split(' ').map(function(w) {
                 return w[0] || '';
-            }).join('').slice(0, 2) + '</div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div style="font-size:13px;font-weight:500">' + s.name + '</div><span class="ppill" style="background:' + pcB(p) + ';color:' + pcC(p) + '">' + p + '%</span></div><div style="font-size:11px;color:var(--tm)">' + s.track + ' · ' + s.done + '/' + s.total + ' courses · ' + (s.docs ? s.docs.length : 0) + ' docs</div><div class="pb" style="margin-top:5px;height:5px"><div class="pf" style="width:' + p + '%;background:' + pcC(p) + '"></div></div><div style="margin-top:5px;display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--tm)">Visa:</span><span class="bdg bdg-active">' + VSTAGES[s.vs || 0] + '</span></div></div><button class="btn sm" onclick="opS(' + i + ')">View ↗</button></div>';
+            }).join('').slice(0, 2) + '</div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div style="font-size:13px;font-weight:500">' + s.name + '</div><span class="ppill" style="background:' + pcB(p) + ';color:' + pcC(p) + '">' + p + '%</span></div><div style="font-size:11px;color:var(--tm)">' + s.track + ' · ' + s.done + '/' + s.total + ' courses' + (s.deposit_paid ? ' · <span style="color:#27ae60;font-weight:600">✓ Deposit</span>' : '')
+            + '</div><div class="pb" style="margin-top:5px;height:5px"><div class="pf" style="width:' + p + '%;background:' + pcC(p) + '"></div></div><div style="margin-top:5px;display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--tm)">Visa:</span><span class="bdg bdg-active">' + VSTAGES[s.vs || 0] + '</span></div></div><button class="btn sm" onclick="opS(' + i + ')">View ↗</button></div>';
         }).join('');
     }
 
@@ -4389,6 +4566,13 @@
         html += '<button class="btn nv" style="flex:1;padding:10px" onclick="saveStudentEdit(' + idx + ')"><i class="ti ti-check" style="font-size:13px" aria-hidden="true"></i> Save changes</button>';
         html += '<button class="btn" style="padding:10px 14px" onclick="toggleEditStudent(' + idx + ')">Cancel</button>';
         html += '</div></div>';
+        // Deposit paid toggle
+        var depPaid = s.deposit_paid ? true : false;
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:' + (depPaid ? '#e8f8ee' : 'var(--s0)') + ';border-radius:12px;margin-bottom:10px;border:1.5px solid ' + (depPaid ? '#27ae60' : 'var(--bdr)') + '">';
+        html += '<div><div style="font-size:13px;font-weight:600;color:' + (depPaid ? '#27ae60' : 'var(--tp)') + '"><i class="ti ti-' + (depPaid ? 'circle-check' : 'circle') + '" style="font-size:14px" aria-hidden="true"></i> Deposit ' + (depPaid ? 'paid' : 'not paid') + '</div>';
+        html += '<div style="font-size:11px;color:var(--tm)">50% deposit to save student&#39;s spot</div></div>';
+        html += '<button onclick="toggleDeposit(' + idx + ')" class="btn ' + (depPaid ? '' : 'nv') + '" style="padding:8px 14px;font-size:12px">' + (depPaid ? 'Mark unpaid' : 'Mark paid') + '</button>';
+        html += '</div>';
 
         // Progress
         html += '<div class="card" style="margin-bottom:10px">';
@@ -5586,6 +5770,10 @@
             lbl: 'Pricing',
             icon: 'ti-tag'
         }, {
+            id: 'forms',
+            lbl: 'Forms',
+            icon: 'ti-file-description'
+        }, {
             id: 'tools',
             lbl: 'Tools',
             icon: 'ti-tool'
@@ -5764,6 +5952,12 @@
           <div class="ptitle">Course pricing</div>
           <div class="psub">All course prices at a glance</div>
           <div id="pricing-content"></div>
+        </div>
+
+        <div class="view" id="v-forms">
+          <div class="ptitle">Forms &amp; documents</div>
+          <div class="psub">Enrollment, indemnity and medical forms</div>
+          <div id="forms-content"></div>
         </div>
         `;
         setNav(tabs, 'dash');
@@ -6029,6 +6223,40 @@
         const a = document.querySelector('#v-referrals .sval.a');
         if (a)
             a.textContent = 'R' + (tC - pC).toLocaleString();
+    }
+
+    async function toggleDeposit(idx) {
+        var s = STUDENTS[idx];
+        var newVal = s.deposit_paid ? false : true;
+        try {
+            var r = await fetch(SB_URL + '/rest/v1/students?id=eq.' + s.id, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': 'Bearer ' + SB_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    deposit_paid: newVal
+                })
+            });
+            if (r.ok) {
+                STUDENTS[idx].deposit_paid = newVal;
+                // Send WhatsApp confirmation if paid
+                if (newVal) {
+                    var msg = 'Hi ' + s.name.split(' ')[0] + '! Your deposit has been received ✅ Your spot is saved. We will be in touch with your course dates. ⚓ Seafarer Maritime';
+                    var waUrl = wa(s.phone || '0633798192', msg);
+                    document.getElementById('dep-wa-' + idx).style.display = 'block';
+                    document.getElementById('dep-wa-link-' + idx).href = waUrl;
+                }
+                opS(idx);
+            } else {
+                alert('Could not save. Try again.');
+            }
+        } catch (ex) {
+            console.error(ex);
+            alert('Connection error.');
+        }
     }
 
     function toggleEditStudent(idx) {
