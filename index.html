@@ -2531,6 +2531,45 @@
         } catch (ex) {
             console.error('Load events error:', ex);
         }
+        // If student is logged in, inject their booked courses directly from courses_data
+        if (_currentUser && _currentUser.email !== ADMIN_EMAIL) {
+            var stuCourses = [];
+            try {
+                if (_currentUser.courses_data)
+                    stuCourses = JSON.parse(_currentUser.courses_data);
+            } catch (e) {}
+            stuCourses.forEach(function(c) {
+                if (!c.date || c.date === 'TBC')
+                    return;
+                if (c.status !== 'booked' && c.status !== 'active' && c.status !== 'done')
+                    return;
+                var already = COURSE_EVENTS.some(function(e) {
+                    return e.title === c.name && String(e.student_id) === String(_currentUser.id);
+                });
+                if (already)
+                    return;
+                var _nm = {
+                    'Superyacht Stew Course': 'Stew Course',
+                    'STCW Basic Safety Training': 'STCW',
+                    'Food Safety Level 2': 'Food Safety L2',
+                    'VHF Radio Course': 'VHF Radio',
+                    'Deckhand 4 Day Course': 'Deckhand',
+                    'SAMSA Medical': 'SAMSA Medical'
+                };
+                var cTitle = _nm[c.name] || (c.name.includes(' - ') ? c.name.split(' - ')[0].trim() : c.name);
+                COURSE_EVENTS.push({
+                    id: 'local-' + c.name.replace(/\s/g, ''),
+                    title: cTitle,
+                    type: (_currentUser.track === 'Stew' ? 'stew' : 'rya'),
+                    provider: c.provider || '',
+                    date: c.date,
+                    end_date: c.endDate || c.date,
+                    endDate: c.endDate || c.date,
+                    student_id: _currentUser.id,
+                    notes: 'Your booked course'
+                });
+            });
+        }
         rCalendar();
     }
 
@@ -2709,6 +2748,17 @@
         var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
         var daysInPrev = new Date(calYear, calMonth, 0).getDate();
         var cells = '';
+        // Use filtered events for month grid too
+        function evtsForDayFiltered(y, m, d) {
+            return VISIBLE_EVENTS.filter(function(e) {
+                var sp = e.date ? e.date.split('-') : [0, 0, 0];
+                var ep = (e.endDate || e.date).split('-');
+                var start = new Date(+sp[0], +sp[1] - 1, +sp[2]);
+                var end = new Date(+ep[0], +ep[1] - 1, +ep[2]);
+                var check = new Date(y, m, d);
+                return check >= start && check <= end;
+            });
+        }
 
         // Prev month filler days
         for (var pi = firstDay - 1; pi >= 0; pi--) {
@@ -2718,7 +2768,7 @@
         // This month days
         for (var d = 1; d <= daysInMonth; d++) {
             var isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-            var dayEvts = evtsForDay(calYear, calMonth, d);
+            var dayEvts = evtsForDayFiltered(calYear, calMonth, d);
             var evtDots = dayEvts.slice(0, 2).map(function(e) {
                 var sp = e.date ? e.date.split('-') : [2026, 1, 1];
                 var ep = (e.endDate || e.date).split('-');
@@ -4314,7 +4364,7 @@
         var el = document.getElementById('student-courses-list');
         if (!el)
             return;
-        // Render Quick Packages section
+        // Render roadmap summary if courses assigned, otherwise show packages
         var pkgEl = document.getElementById('student-pkg-section');
         if (pkgEl) {
             var track = _courseTrackView || (_currentUser && _currentUser.track) || 'Deckhand';
@@ -4323,69 +4373,122 @@
                 if (_currentUser && _currentUser.courses_data)
                     sCourses = JSON.parse(_currentUser.courses_data);
             } catch (e) {}
-            var pkgHtml = '<div style="margin-bottom:14px">';
-            pkgHtml += '<div class="shdr" style="margin-top:0"><i class="ti ti-package" style="font-size:13px" aria-hidden="true"></i> Course packages</div>';
-            if (track === 'Stew') {
-                var hasBasic = sCourses.some(function(c) {
-                    return c.name && (c.name.includes('STCW') || c.name.includes('stcw'));
-                })
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('stew');
-                })
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('food safety');
+            var hasAssigned = sCourses && sCourses.length > 0;
+            if (hasAssigned) {
+                var withDates = sCourses.filter(function(c) {
+                    return c.date && c.date !== 'TBC';
                 });
-                var hasFull = hasBasic
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('vhf');
-                })
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('barista');
+                withDates.sort(function(a, b) {
+                    return new Date(a.date) - new Date(b.date);
                 });
-                // Basic Stew Package
-                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasBasic ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
-                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-                pkgHtml += '<div><div style="font-size:13px;font-weight:600">🎀 Basic Stew Package</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R25,040</div></div>';
-                pkgHtml += (hasBasic
-                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
-                : '<div style="font-size:11px;color:var(--tm)">The essential starting package for interior crew</div>');
-                pkgHtml += '</div>';
-                // Full Stew Package
-                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasFull ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
-                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-                pkgHtml += '<div><div style="font-size:13px;font-weight:600">💎 Full Stew Package</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course · Food Safety · VHF · Barista</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R36,166</div></div>';
-                pkgHtml += (hasFull
-                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
-                : '<div style="font-size:11px;color:var(--tm)">Everything you need to launch your yachting career</div>');
-                pkgHtml += '</div>';
+                var firstC = withDates[0];
+                var lastC = withDates[withDates.length - 1];
+                var done = sCourses.filter(function(c) {
+                    return c.status === 'done';
+                }).length;
+                var pct = sCourses.length ? Math.round(done / sCourses.length * 100) : 0;
+                var rh = '<div style="background:var(--navy);border-radius:14px;padding:16px;margin-bottom:14px;color:#fff">';
+                rh += '<div style="font-size:11px;letter-spacing:.08em;opacity:.7;margin-bottom:6px">YOUR ROADMAP</div>';
+                rh += '<div style="font-size:16px;font-weight:700;margin-bottom:10px">' + sCourses.length + ' courses &middot; ' + pct + '% complete</div>';
+                rh += '<div style="background:rgba(255,255,255,.2);border-radius:6px;height:6px;margin-bottom:14px"><div style="background:#fff;border-radius:6px;height:6px;width:' + pct + '%"></div></div>';
+                if (firstC) {
+                    var fd = new Date(firstC.date);
+                    var fdStr = fd.toLocaleDateString('en-ZA', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    rh += '<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">';
+                    rh += '<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#128640;</div>';
+                    rh += '<div><div style="font-size:10px;opacity:.7;letter-spacing:.06em">FIRST COURSE STARTS</div>';
+                    rh += '<div style="font-size:13px;font-weight:600">' + firstC.name + '</div>';
+                    rh += '<div style="font-size:12px;opacity:.85">' + fdStr + '</div></div></div>';
+                }
+                if (lastC && lastC !== firstC) {
+                    var ld = new Date(lastC.date);
+                    var ldStr = ld.toLocaleDateString('en-ZA', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    rh += '<div style="display:flex;gap:10px;align-items:flex-start">';
+                    rh += '<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#127937;</div>';
+                    rh += '<div><div style="font-size:10px;opacity:.7;letter-spacing:.06em">LAST COURSE FINISHES</div>';
+                    rh += '<div style="font-size:13px;font-weight:600">' + lastC.name + '</div>';
+                    rh += '<div style="font-size:12px;opacity:.85">' + ldStr + '</div></div></div>';
+                }
+                if (!firstC) {
+                    rh += '<div style="font-size:12px;opacity:.75">Dates to be confirmed by Brandon soon.</div>';
+                }
+                rh += '</div>';
+                pkgEl.innerHTML = rh;
             } else {
-                var hasDeck = sCourses.some(function(c) {
-                    return c.name && c.name.includes('STCW');
-                })
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('vhf');
-                })
-                && sCourses.some(function(c) {
-                    return c.name && c.name.toLowerCase().includes('deckhand');
-                });
-                pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasDeck ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
-                pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-                pkgHtml += '<div><div style="font-size:13px;font-weight:600">⚓ Deckhand Starter</div>';
-                pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · VHF · Deckhand 4 Day</div></div>';
-                pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R24,149</div></div>';
-                pkgHtml += (hasDeck
-                ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
-                : '<div style="font-size:11px;color:var(--tm)">The core package to get you working on yachts</div>');
+                var pkgHtml = '<div style="margin-bottom:14px">';
+                pkgHtml += '<div class="shdr" style="margin-top:0"><i class="ti ti-package" style="font-size:13px" aria-hidden="true"></i> Course packages</div>';
+                if (track === 'Stew') {
+                    var hasBasic = sCourses.some(function(c) {
+                        return c.name && (c.name.includes('STCW') || c.name.includes('stcw'));
+                    })
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('stew');
+                    })
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('food safety');
+                    });
+                    var hasFull = hasBasic
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('vhf');
+                    })
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('barista');
+                    });
+                    // Basic Stew Package
+                    pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasBasic ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                    pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                    pkgHtml += '<div><div style="font-size:13px;font-weight:600">🎀 Basic Stew Package</div>';
+                    pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course (5 days) · Food Safety L2</div></div>';
+                    pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R25,040</div></div>';
+                    pkgHtml += (hasBasic
+                    ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                    : '<div style="font-size:11px;color:var(--tm)">The essential starting package for interior crew</div>');
+                    pkgHtml += '</div>';
+                    // Full Stew Package
+                    pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasFull ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                    pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                    pkgHtml += '<div><div style="font-size:13px;font-weight:600">💎 Full Stew Package</div>';
+                    pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · Stew Course · Food Safety · VHF · Barista</div></div>';
+                    pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R36,166</div></div>';
+                    pkgHtml += (hasFull
+                    ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                    : '<div style="font-size:11px;color:var(--tm)">Everything you need to launch your yachting career</div>');
+                    pkgHtml += '</div>';
+                } else {
+                    var hasDeck = sCourses.some(function(c) {
+                        return c.name && c.name.includes('STCW');
+                    })
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('vhf');
+                    })
+                    && sCourses.some(function(c) {
+                        return c.name && c.name.toLowerCase().includes('deckhand');
+                    });
+                    pkgHtml += '<div style="background:var(--s0);border-radius:12px;padding:12px 14px;border:1.5px solid ' + (hasDeck ? 'var(--fsu)' : 'var(--bdr)') + ';margin-bottom:8px">';
+                    pkgHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                    pkgHtml += '<div><div style="font-size:13px;font-weight:600">⚓ Deckhand Starter</div>';
+                    pkgHtml += '<div style="font-size:11px;color:var(--tm)">SAMSA Medical · STCW+DSD · VHF · Deckhand 4 Day</div></div>';
+                    pkgHtml += '<div style="font-size:13px;font-weight:700;color:var(--navy)">R24,149</div></div>';
+                    pkgHtml += (hasDeck
+                    ? '<div style="font-size:11px;color:var(--fsu);font-weight:500"><i class="ti ti-circle-check" aria-hidden="true"></i> Assigned to your roadmap</div>'
+                    : '<div style="font-size:11px;color:var(--tm)">The core package to get you working on yachts</div>');
+                    pkgHtml += '</div>';
+                }
+                var waBrandon = 'https://wa.me/27633798192?text=' + encodeURIComponent('Hi Brandon! I want to find out more about the course packages for my ' + track + ' track. My name is ' + ((_currentUser && _currentUser.name) || '') + '.');
+                pkgHtml += '<a href="' + waBrandon + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;margin-top:4px"><i class="ti ti-brand-whatsapp" style="font-size:15px" aria-hidden="true"></i> WhatsApp Brandon to get started</a>';
                 pkgHtml += '</div>';
+                pkgEl.innerHTML = pkgHtml;
             }
-            var waBrandon = 'https://wa.me/27633798192?text=' + encodeURIComponent('Hi Brandon! I want to find out more about the course packages for my ' + track + ' track. My name is ' + ((_currentUser && _currentUser.name) || '') + '.');
-            pkgHtml += '<a href="' + waBrandon + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;margin-top:4px"><i class="ti ti-brand-whatsapp" style="font-size:15px" aria-hidden="true"></i> WhatsApp Brandon to get started</a>';
-            pkgHtml += '</div>';
-            pkgEl.innerHTML = pkgHtml;
         }
         // Default to student's own track on first load
         var track = _courseTrackView || (_currentUser && _currentUser.track) || 'Deckhand';
@@ -4743,7 +4846,7 @@
             html += '<option value="active"' + (c.status === 'active' ? ' selected' : '') + '>In progress</option>';
             html += '<option value="done"' + (c.status === 'done' ? ' selected' : '') + '>Completed</option>';
             html += '</select>';
-            html += '<input type="text" value="' + (c.date || 'TBC') + '" placeholder="Date e.g. 15 Sep" onchange="updCourse(' + idx + ',' + ci + ',\'date\',this.value)" style="font-size:11px;padding:5px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/>';
+            html += '<input type="date" value="' + (c.date && c.date !== 'TBC' ? c.date : '') + '" onchange="updCourse(' + idx + ',' + ci + ',\'date\',this.value)" style="font-size:11px;padding:5px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/>';
             html += '<button onclick="saveCourseRow(' + idx + ')" style="font-size:10px;padding:5px 10px;border-radius:7px;border:1px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;font-family:var(--font-sans);white-space:nowrap">Save</button>';
             html += '</div></div>';
         });
@@ -4925,14 +5028,36 @@
             html += '<div style="margin-top:10px">';
             sCourses.forEach(function(c, ci) {
                 var sc = c.status === 'done' ? 'done' : c.status === 'active' ? 'active' : c.status === 'booked' ? 'booked' : 'pending';
-                html += '<div class="rrow" style="margin-bottom:6px"><div style="flex:1;font-size:13px;font-weight:500">' + c.name + '</div>';
+                var isSTCW = c.name && c.name.toLowerCase().includes('stcw');
+                var sdVal = c.date && c.date !== 'TBC' ? c.date : '';
+                var edVal = c.endDate && c.endDate !== 'TBC' ? c.endDate : '';
+                html += '<div style="background:var(--s0);border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--bdr)">';
+                // Row 1: name + status + delete
+                html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">';
+                html += '<div style="flex:1;font-size:13px;font-weight:600">' + c.name + '</div>';
                 html += '<select onchange="updCourseStatus(' + idx + ',' + ci + ',this.value)" style="font-size:11px;padding:3px 6px;border-radius:7px;border:1px solid var(--bdr);background:#fff;font-family:var(--font-sans)">';
                 html += '<option value="pending"' + (sc === 'pending' ? ' selected' : '') + '>Pending</option>';
-                html += '<option value="active"' + (sc === 'active' ? ' selected' : '') + '>In progress</option>';
                 html += '<option value="booked"' + (sc === 'booked' ? ' selected' : '') + '>Booked</option>';
+                html += '<option value="active"' + (sc === 'active' ? ' selected' : '') + '>In progress</option>';
                 html += '<option value="done"' + (sc === 'done' ? ' selected' : '') + '>Done</option>';
                 html += '</select>';
-                html += '<button class="btn sm" style="color:var(--td);border-color:var(--bdd)" onclick="rmCourse(' + idx + ',' + ci + ')"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button></div>';
+                html += '<button class="btn sm" style="color:var(--td);border-color:var(--bdd)" onclick="rmCourse(' + idx + ',' + ci + ')"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button>';
+                html += '</div>';
+                // Row 2: start date + end date + save
+                html += '<div style="display:flex;gap:6px;align-items:center">';
+                html += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">START</div>';
+                html += '<input type="date" value="' + sdVal + '" onchange="updCourse(' + idx + ',' + ci + ',\'date\',this.value)" style="font-size:11px;padding:5px 6px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+                html += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">END</div>';
+                html += '<input type="date" value="' + edVal + '" onchange="updCourse(' + idx + ',' + ci + ',\'endDate\',this.value)" style="font-size:11px;padding:5px 6px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+                html += '<div style="padding-top:14px"><button onclick="saveCourseRow(' + idx + ')" style="font-size:10px;padding:5px 10px;border-radius:7px;border:none;background:var(--navy);color:#fff;cursor:pointer;font-family:var(--font-sans);white-space:nowrap">Save</button></div>';
+                html += '</div>';
+                // Row 3: Expand STCW button
+                if (isSTCW) {
+                    html += '<div style="margin-top:8px">';
+                    html += '<button onclick="showSTCWPanel(' + idx + ',' + ci + ')" style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--navy);background:transparent;color:var(--navy);cursor:pointer;font-family:var(--font-sans)"><i class="ti ti-list-details" style="font-size:11px" aria-hidden="true"></i> Expand STCW sub-courses</button>';
+                    html += '</div>';
+                }
+                html += '</div>';
             });
             html += '</div>';
         }
@@ -6729,6 +6854,288 @@
         opS(idx);
     }
 
+    // Expand STCW into individual sub-courses with real dates
+    async function expandSTCW(idx, startDate, endDate) {
+        var s = STUDENTS[idx];
+        var courses = [];
+        try {
+            if (s.courses_data)
+                courses = JSON.parse(s.courses_data);
+        } catch (e) {}
+        // Remove generic STCW entry
+        courses = courses.filter(function(c) {
+            return !c.name.includes('STCW Basic Safety');
+        });
+        // Add the 5 STCW sub-courses
+        var stcwSubs = [
+        {
+            name: 'FHS - Fire, Health & Safety',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-flame',
+            status: 'pending',
+            date: 'TBC',
+            endDate: 'TBC'
+        },
+        {
+            name: 'PSSR - Personal Survival & Social Responsibilities',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-lifebuoy',
+            status: 'pending',
+            date: 'TBC',
+            endDate: 'TBC'
+        },
+        {
+            name: 'EFA - Elementary First Aid',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-heart-plus',
+            status: 'pending',
+            date: 'TBC',
+            endDate: 'TBC'
+        },
+        {
+            name: 'PST - Personal Survival Techniques',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-swim',
+            status: 'pending',
+            date: 'TBC',
+            endDate: 'TBC'
+        },
+        {
+            name: 'DSD - Designated Security Duties',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-shield-lock',
+            status: 'pending',
+            date: 'TBC',
+            endDate: 'TBC'
+        },
+        ];
+        stcwSubs.forEach(function(c) {
+            if (!courses.some(function(ec) {
+                return ec.name === c.name;
+            })) {
+                courses.push(c);
+            }
+        });
+        s.courses_data = JSON.stringify(courses);
+        STUDENTS[idx] = s;
+        await saveCourses(s.id, courses);
+        opS(idx);
+    }
+
+    // Show STCW sub-course panel inside admin student view
+    function showSTCWPanel(sidx, ci) {
+        var s = STUDENTS[sidx];
+        var courses = [];
+        try {
+            if (s.courses_data)
+                courses = JSON.parse(s.courses_data);
+        } catch (e) {}
+
+        // STCW standard sub-courses
+        var stcwSubs = [
+        {
+            name: 'FHS - Fire, Health & Safety',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-flame'
+        },
+        {
+            name: 'PSSR - Personal Survival & Social Responsibilities',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-lifebuoy'
+        },
+        {
+            name: 'EFA - Elementary First Aid',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-heart-plus'
+        },
+        {
+            name: 'PST - Personal Survival Techniques',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-swim'
+        },
+        {
+            name: 'DSD - Designated Security Duties',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-shield-lock'
+        },
+        ];
+
+        // Build panel HTML
+        var ph = '<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:flex-end" id="stcw-overlay">';
+        ph += '<div style="background:var(--bg);border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-height:85vh;overflow-y:auto">';
+        ph += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+        ph += '<div style="font-size:16px;font-weight:700">STCW Sub-courses</div>';
+        ph += '<button onclick="document.getElementById(\'stcw-overlay\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm)">&times;</button>';
+        ph += '</div>';
+        ph += '<div style="font-size:12px;color:var(--tm);margin-bottom:14px">Set dates for each STCW module. Tap Save to add them to the student calendar.</div>';
+
+        stcwSubs.forEach(function(sub, si) {
+            var existing = courses.find(function(c) {
+                return c.name === sub.name;
+            });
+            var sdVal = existing && existing.date && existing.date !== 'TBC' ? existing.date : '';
+            var edVal = existing && existing.endDate && existing.endDate !== 'TBC' ? existing.endDate : '';
+            ph += '<div style="margin-bottom:12px;padding:10px 12px;background:var(--s0);border-radius:10px;border:1px solid var(--bdr)">';
+            ph += '<div style="font-size:13px;font-weight:600;margin-bottom:8px">' + sub.name + '</div>';
+            ph += '<div style="display:flex;gap:8px">';
+            ph += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">START</div>';
+            ph += '<input type="date" id="stcw-s-' + si + '" value="' + sdVal + '" style="font-size:12px;padding:6px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+            ph += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">END</div>';
+            ph += '<input type="date" id="stcw-e-' + si + '" value="' + edVal + '" style="font-size:12px;padding:6px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+            ph += '</div></div>';
+        });
+
+        // Custom sub-course add
+        ph += '<div style="margin-bottom:14px;padding:10px 12px;background:var(--s0);border-radius:10px;border:1px dashed var(--bdr)">';
+        ph += '<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--tm)">+ Custom sub-course</div>';
+        ph += '<input id="stcw-custom-name" placeholder="Course name" style="font-size:12px;padding:6px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%;margin-bottom:8px"/>';
+        ph += '<div style="display:flex;gap:8px">';
+        ph += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">START</div>';
+        ph += '<input type="date" id="stcw-custom-s" style="font-size:12px;padding:6px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+        ph += '<div style="flex:1"><div style="font-size:10px;color:var(--tm);margin-bottom:2px">END</div>';
+        ph += '<input type="date" id="stcw-custom-e" style="font-size:12px;padding:6px 8px;border-radius:7px;border:1px solid var(--bdr);font-family:var(--font-sans);width:100%"/></div>';
+        ph += '</div></div>';
+
+        ph += '<button onclick="saveSTCWPanel(' + sidx + ',' + ci + ')" style="width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-sans)">Save & add to calendar</button>';
+        ph += '</div></div>';
+
+        var overlay = document.createElement('div');
+        overlay.innerHTML = ph;
+        document.body.appendChild(overlay.firstChild);
+    }
+
+    async function saveSTCWPanel(sidx, ci) {
+        var s = STUDENTS[sidx];
+        var courses = [];
+        try {
+            if (s.courses_data)
+                courses = JSON.parse(s.courses_data);
+        } catch (e) {}
+
+        var stcwSubs = [
+        {
+            name: 'FHS - Fire, Health & Safety',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-flame'
+        },
+        {
+            name: 'PSSR - Personal Survival & Social Responsibilities',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-lifebuoy'
+        },
+        {
+            name: 'EFA - Elementary First Aid',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-heart-plus'
+        },
+        {
+            name: 'PST - Personal Survival Techniques',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-swim'
+        },
+        {
+            name: 'DSD - Designated Security Duties',
+            provider: 'STC-SA, Cape Town',
+            icon: 'ti-shield-lock'
+        },
+        ];
+
+        stcwSubs.forEach(function(sub, si) {
+            var sd = document.getElementById('stcw-s-' + si);
+            var ed = document.getElementById('stcw-e-' + si);
+            if (!sd || !sd.value)
+                return;
+            var existing = courses.find(function(c) {
+                return c.name === sub.name;
+            });
+            if (existing) {
+                existing.date = sd.value;
+                existing.endDate = ed && ed.value ? ed.value : sd.value;
+                existing.status = 'booked';
+            } else {
+                courses.push({
+                    name: sub.name,
+                    provider: sub.provider,
+                    icon: sub.icon,
+                    status: 'booked',
+                    date: sd.value,
+                    endDate: ed && ed.value ? ed.value : sd.value
+                });
+            }
+        });
+
+        // Custom sub-course
+        var cn = document.getElementById('stcw-custom-name');
+        var cs = document.getElementById('stcw-custom-s');
+        var ce = document.getElementById('stcw-custom-e');
+        if (cn && cn.value.trim() && cs && cs.value) {
+            var nm = cn.value.trim();
+            var existing2 = courses.find(function(c) {
+                return c.name === nm;
+            });
+            if (existing2) {
+                existing2.date = cs.value;
+                existing2.endDate = ce && ce.value ? ce.value : cs.value;
+                existing2.status = 'booked';
+            } else {
+                courses.push({
+                    name: nm,
+                    provider: 'STC-SA, Cape Town',
+                    icon: 'ti-certificate',
+                    status: 'booked',
+                    date: cs.value,
+                    endDate: ce && ce.value ? ce.value : cs.value
+                });
+            }
+        }
+
+        s.courses_data = JSON.stringify(courses);
+        STUDENTS[sidx] = s;
+        await saveCourses(s.id, courses);
+
+        // Create calendar events for all booked sub-courses
+        for (var i = 0; i < courses.length; i++) {
+            if (courses[i].status === 'booked' && courses[i].date && courses[i].date !== 'TBC') {
+                await autoCreateCalEvent(s, courses[i]);
+            }
+        }
+
+        document.getElementById('stcw-overlay').remove();
+        opS(sidx);
+        alert('STCW sub-courses saved!');
+    }
+
+    // Set all dates for a student at once from a bulk date map
+    async function setBulkDates(idx, dateMap) {
+        var s = STUDENTS[idx];
+        var courses = [];
+        try {
+            if (s.courses_data)
+                courses = JSON.parse(s.courses_data);
+        } catch (e) {}
+        courses.forEach(function(c) {
+            Object.keys(dateMap).forEach(function(key) {
+                if (c.name.toLowerCase().includes(key.toLowerCase())) {
+                    c.date = dateMap[key].start;
+                    c.endDate = dateMap[key].end || dateMap[key].start;
+                    if (c.status === 'pending')
+                        c.status = 'booked';
+                }
+            });
+        });
+        s.courses_data = JSON.stringify(courses);
+        STUDENTS[idx] = s;
+        await saveCourses(s.id, courses);
+        // Auto-create calendar events for each booked course
+        for (var i = 0; i < courses.length; i++) {
+            if (courses[i].status === 'booked') {
+                await autoCreateCalEvent(s, courses[i]);
+            }
+        }
+        opS(idx);
+        alert('All dates saved and calendar updated!');
+    }
+
     function addCourseToStudent(idx) {
         var s = STUDENTS[idx];
         var sel = document.getElementById('cpick-' + idx);
@@ -6855,13 +7262,24 @@
             return;
         // Check if an event for this student+course already exists
         var exists = COURSE_EVENTS.some(function(e) {
-            return e.title === course.name && e.student_id === s.id;
+            var ct = course.name.includes(' - ') ? course.name.split(' - ')[0].trim() : course.name;
+            return e.title === ct && e.student_id === s.id;
         });
         if (exists)
             return;
         var evtType = (s.track === 'Stew') ? 'stew' : 'rya';
+        // Use short name for calendar display (e.g. "FHS" from "FHS - Fire, Health & Safety")
+        var _nameMap = {
+            'Superyacht Stew Course': 'Stew Course',
+            'STCW Basic Safety Training': 'STCW',
+            'Food Safety Level 2': 'Food Safety L2',
+            'VHF Radio Course': 'VHF Radio',
+            'Deckhand 4 Day Course': 'Deckhand',
+            'SAMSA Medical': 'SAMSA Medical'
+        };
+        var calTitle = _nameMap[course.name] || (course.name.includes(' - ') ? course.name.split(' - ')[0].trim() : course.name);
         var evtData = {
-            title: course.name,
+            title: calTitle,
             type: evtType,
             provider: course.provider || '',
             location: '',
