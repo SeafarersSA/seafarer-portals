@@ -4756,7 +4756,7 @@
             return '<div class="srow"><div class="sav">' + s.name.split(' ').map(function(w) {
                 return w[0] || '';
             }).join('').slice(0, 2) + '</div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div style="font-size:13px;font-weight:500">' + s.name + '</div><span class="ppill" style="background:' + pcB(p) + ';color:' + pcC(p) + '">' + p + '%</span></div><div style="font-size:11px;color:var(--tm)">' + s.track + ' · ' + s.done + '/' + s.total + ' courses' + (s.deposit_paid ? ' · <span style="color:#27ae60;font-weight:600">✓ Deposit</span>' : '')
-            + '</div><div class="pb" style="margin-top:5px;height:5px"><div class="pf" style="width:' + p + '%;background:' + pcC(p) + '"></div></div><div style="margin-top:5px;display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--tm)">Visa:</span><span class="bdg bdg-active">' + VSTAGES[s.vs || 0] + '</span></div></div><button class="btn sm" onclick="opS(' + i + ')">View ↗</button></div>';
+            + '</div><div class="pb" style="margin-top:5px;height:5px"><div class="pf" style="width:' + p + '%;background:' + pcC(p) + '"></div></div><div style="margin-top:5px;display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--tm)">Visa:</span><span class="bdg bdg-active">' + VSTAGES[s.vs || 0] + '</span></div></div><div style="display:flex;gap:6px"><button class="btn sm" onclick="opS(' + i + ')">View ↗</button><button class="btn sm" onclick="delStudent(' + i + ',event)" style="color:var(--td);border-color:var(--bdd)"><i class="ti ti-trash" style="font-size:11px" aria-hidden="true"></i></button></div></div>';
         }).join('');
     }
 
@@ -5095,6 +5095,30 @@
         document.getElementById('s-list').classList.remove('hide');
         document.getElementById('s-det').classList.add('hide');
     }
+
+    async function delStudent(i, evt) {
+        evt.stopPropagation();
+        var s = STUDENTS[i];
+        if (!confirm('Delete ' + s.name + '? This cannot be undone.'))
+            return;
+        try {
+            if (s.id) {
+                await fetch(SB_URL + '/rest/v1/students?id=eq.' + s.id, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY
+                    }
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
+        }
+        STUDENTS.splice(i, 1);
+        rAdmin();
+        sw('students');
+    }
+
 
     async function loadStudentQuizResults(studentId, idx) {
         const el = document.getElementById('student-quiz-results-' + idx);
