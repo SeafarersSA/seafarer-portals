@@ -1704,6 +1704,7 @@
         return 'https://wa.me/27' + ph.replace(/^0/, '').replace(/[^0-9]/g, '') + '?text=' + encodeURIComponent(msg);
     }
     const ADMIN_EMAIL = 'bsnyman13@gmail.com';
+    const ADMIN_PASS = 'Seafarer2025!';
 
     const DEFAULT_COURSES = [
     {
@@ -3381,6 +3382,35 @@
             btn.disabled = true;
         }
         try {
+            // Admin shortcut — bypass DB lookup
+            if (e === ADMIN_EMAIL) {
+                if (p !== ADMIN_PASS) {
+                    err.textContent = 'Incorrect password. Please try again.';
+                    err.style.display = 'block';
+                    if (btn) {
+                        btn.textContent = 'Sign in';
+                        btn.disabled = false;
+                    }
+                    return;
+                }
+                _currentUser = {
+                    id: 0,
+                    name: 'Brandon Snyman',
+                    email: ADMIN_EMAIL,
+                    track: 'Admin',
+                    password: ADMIN_PASS
+                };
+                const ini = 'BS';
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('portal').style.display = 'flex';
+                document.getElementById('unm').textContent = 'Brandon';
+                document.getElementById('uav').textContent = ini;
+                document.getElementById('uav').style.background = '#1A2B5C';
+                STUDENTS = await dbGetStudents() || [];
+                REFS = await dbGetReferrals() || [];
+                rAdmin();
+                return;
+            }
             const url = SB_URL + '/rest/v1/students?email=eq.' + encodeURIComponent(e) + '&select=*';
             const r = await fetch(url, {
                 headers: {
@@ -3410,6 +3440,7 @@
                 return;
             }
             _currentUser = student;
+            const stuIni = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             const ini = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('portal').style.display = 'flex';
@@ -4747,11 +4778,18 @@
             return '<div class="empty" style="padding:40px 20px"><i class="ti ti-users" style="font-size:36px;color:var(--bdr);display:block;margin-bottom:10px" aria-hidden="true"></i>No students yet. Tap "Add student" to get started.</div>';
         return STUDENTS.map((s, i) => {
             s.vs = s.visa_stage || s.vs || 0;
-            s.done = s.done || 0;
-            s.total = s.total || 7;
             s.pops = s.pops || 0;
             s.docs = s.docs || [];
             s.phone = s.phone || '';
+            var _sc = [];
+            try {
+                if (s.courses_data)
+                    _sc = JSON.parse(s.courses_data);
+            } catch (e) {}
+            s.total = _sc.length || s.total || 1;
+            s.done = _sc.filter(function(c) {
+                return c.status === 'done';
+            }).length || s.done || 0;
             const p = Math.round(s.done / s.total * 100);
             return '<div class="srow"><div class="sav">' + s.name.split(' ').map(function(w) {
                 return w[0] || '';
@@ -6247,7 +6285,7 @@
             <div class="fg"><label>Student</label><input id="ref-s" placeholder="Student name"/></div>
             <div class="fg"><label>Course</label><input id="ref-c" placeholder="Course name"/></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div class="fg"><label>Provider</label><select id="ref-p"><option>Black Pearl Yachting Academy</option><option>STC-SA</option><option>Sail and Power SA</option><option>SAMSA Doctor</option><option>Seafarer Online</option></select></div>
+              <div class="fg"><label>Provider</label><select id="ref-p"><option>Black Pearl Yachting Academy</option><option>STC-SA</option><option>SYNC Training</option><option>Sail and Power SA</option><option>SAMSA Doctor</option><option>Seafarer Online</option></select></div>
               <div class="fg"><label>Commission (R)</label><input type="number" id="ref-comm" placeholder="500"/></div>
             </div>
             <div id="ref-err" style="font-size:12px;color:var(--td);display:none;margin-bottom:6px">Fill in student and course first.</div>
