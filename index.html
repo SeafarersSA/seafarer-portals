@@ -2951,13 +2951,14 @@
         };
         const opts = {
             method,
-            headers
+            headers,
+            mode: 'cors'
         };
         if (body)
             opts.body = JSON.stringify(body);
         const r = await fetch(url, opts);
         if (!r.ok) {
-            console.error('SB error:', r.status);
+            console.error('SB error:', r.status, await r.text());
             return null;
         }
         const t = await r.text();
@@ -3400,11 +3401,10 @@
                     track: 'Admin',
                     password: ADMIN_PASS
                 };
-                const ini = 'BS';
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('portal').style.display = 'flex';
                 document.getElementById('unm').textContent = 'Brandon';
-                document.getElementById('uav').textContent = ini;
+                document.getElementById('uav').textContent = 'BS';
                 document.getElementById('uav').style.background = '#1A2B5C';
                 STUDENTS = await dbGetStudents() || [];
                 REFS = await dbGetReferrals() || [];
@@ -3412,14 +3412,30 @@
                 return;
             }
             const url = SB_URL + '/rest/v1/students?email=eq.' + encodeURIComponent(e) + '&select=*';
-            const r = await fetch(url, {
-                headers: {
-                    'apikey': SB_KEY,
-                    'Authorization': 'Bearer ' + SB_KEY,
-                    'Content-Type': 'application/json'
+            let data = null;
+            try {
+                const r = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!r.ok)
+                    throw new Error('Server error ' + r.status);
+                data = await r.json();
+            } catch (fetchErr) {
+                err.textContent = 'Could not reach server. Check your internet and try again. (' + fetchErr.message + ')';
+                err.style.display = 'block';
+                if (btn) {
+                    btn.textContent = 'Sign in';
+                    btn.disabled = false;
                 }
-            });
-            const data = await r.json();
+                return;
+            }
             if (!data || !data.length) {
                 err.textContent = 'Email not found. Please check and try again.';
                 err.style.display = 'block';
@@ -3430,6 +3446,15 @@
                 return;
             }
             const student = data[0];
+            if (!student.password) {
+                err.textContent = 'Your account has no password set. Please ask Brandon to reset it.';
+                err.style.display = 'block';
+                if (btn) {
+                    btn.textContent = 'Sign in';
+                    btn.disabled = false;
+                }
+                return;
+            }
             if (student.password !== p) {
                 err.textContent = 'Incorrect password. Please try again.';
                 err.style.display = 'block';
@@ -3440,8 +3465,7 @@
                 return;
             }
             _currentUser = student;
-            const stuIni = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-            const ini = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            var ini = student.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('portal').style.display = 'flex';
             document.getElementById('unm').textContent = student.name.split(' ')[0];
@@ -3457,7 +3481,12 @@
             }
         } catch (ex) {
             console.error('Login error:', ex);
-            err.textContent = 'Could not connect. Try again.';
+            var msg = ex.message || 'Unknown error';
+            if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+                err.textContent = 'Network error — check your internet connection and try again.';
+            } else {
+                err.textContent = 'Login error: ' + msg;
+            }
             err.style.display = 'block';
             if (btn) {
                 btn.textContent = 'Sign in';
@@ -5698,6 +5727,27 @@
 
     var _cart = [];
 
+    function swLcpt() {
+        _loc = 'cpt';
+        var cpt = document.getElementById('loc-cpt');
+        var gb = document.getElementById('loc-gb');
+        if (cpt)
+            cpt.classList.add('active');
+        if (gb)
+            gb.classList.remove('active');
+        rCL();
+    }
+    function swLgb() {
+        _loc = 'gb';
+        var cpt = document.getElementById('loc-cpt');
+        var gb = document.getElementById('loc-gb');
+        if (cpt)
+            cpt.classList.remove('active');
+        if (gb)
+            gb.classList.add('active');
+        rCL();
+    }
+
     function rCL() {
         var isStew = _currentUser && _currentUser.track === 'Stew';
         var courseData = isStew ? SYNC_STEW : ACAD;
@@ -7664,10 +7714,6 @@
         _aq = null;
     }
     // ── LOGBOOK ─────────────────────────────────────────────────
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none')
-            doLogin();
-    });
     </script>
 </body>
 </html>
