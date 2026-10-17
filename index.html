@@ -2473,6 +2473,146 @@
         COURSE_EVENTS.push(e);
     });
 
+    // Black Pearl Yachting Academy — Gordons Bay — Recurring Monthly Schedule
+    (function generateBlackPearlDates() {
+        var now = new Date();
+        var startYear = now.getFullYear();
+        var startMonth = now.getMonth();
+        var evtId = 8000;
+
+        // Schedule: offsets from first Monday of the month
+        var schedule = [// Week 1
+        {
+            title: 'Deckhand 3-Day Course',
+            type: 'rya',
+            days: 0,
+            dur: 3,
+            price: 'R6,000',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'RYA Powerboat Level 2',
+            type: 'rya',
+            days: 3,
+            dur: 2,
+            price: 'R5,000',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        }, // Week 2
+        {
+            title: 'PWC / Jet Ski Course',
+            type: 'pwc',
+            days: 7,
+            dur: 1,
+            price: 'R3,800',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'Water Sports Instructor',
+            type: 'water',
+            days: 8,
+            dur: 2,
+            price: 'R7,500',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'Pelagic Offshore Fishing',
+            type: 'rya',
+            days: 10,
+            dur: 2,
+            price: 'R9,500',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        }, // Week 3
+        {
+            title: 'Deckhand 3-Day Course',
+            type: 'rya',
+            days: 14,
+            dur: 3,
+            price: 'R6,000',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'RYA Powerboat Level 2',
+            type: 'rya',
+            days: 17,
+            dur: 2,
+            price: 'R5,000',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        }, // Week 4
+        {
+            title: 'PWC / Jet Ski Course',
+            type: 'pwc',
+            days: 21,
+            dur: 1,
+            price: 'R3,800',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'Water Sports Instructor',
+            type: 'water',
+            days: 22,
+            dur: 2,
+            price: 'R7,500',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        {
+            title: 'Pelagic Offshore Fishing',
+            type: 'rya',
+            days: 24,
+            dur: 2,
+            price: 'R9,500',
+            provider: 'Black Pearl Yachting Academy',
+            location: 'Gordons Bay'
+        },
+        ];
+
+        // Generate 18 months ahead
+        for (var m = 0; m < 18; m++) {
+            var yr = startYear + Math.floor((startMonth + m) / 12);
+            var mo = (startMonth + m) % 12;
+
+            // Find first Monday of the month
+            var d = new Date(yr, mo, 1);
+            var dow = d.getDay(); // 0=Sun
+            var daysToMon = dow === 1 ? 0 : dow === 0 ? 1 : (8 - dow);
+            var firstMon = new Date(yr, mo, 1 + daysToMon);
+
+            schedule.forEach(function(s) {
+                var startD = new Date(firstMon);
+                startD.setDate(firstMon.getDate() + s.days);
+                var endD = new Date(startD);
+                endD.setDate(startD.getDate() + s.dur - 1);
+
+                function fmt(dt) {
+                    return dt.getFullYear() + '-' + ('' + (dt.getMonth() + 1)).padStart(2, '0') + '-' + ('' + (dt.getDate())).padStart(2, '0');
+                }
+
+                COURSE_EVENTS.push({
+                    id: evtId++,
+                    title: s.title,
+                    type: s.type,
+                    provider: s.provider,
+                    location: s.location,
+                    price: s.price,
+                    duration: s.dur + ' day' + (s.dur > 1 ? 's' : ''),
+                    date: fmt(startD),
+                    end_date: fmt(endD),
+                    endDate: fmt(endD),
+                    notes: 'Gordons Bay · Black Pearl Yachting Academy',
+                    contact: 'info@seafarers.co.za'
+                });
+            });
+        }
+    })();
+
 
     const EVT_COLORS = {
         stcw: 'evt-stcw',
