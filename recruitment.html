@@ -1267,8 +1267,18 @@
        ============================================================ */
     const SB_URL = 'https://shbjnypgkvxovosjoxyc.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmpueXBna3Z4b3Zvc2pveHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNjM1ODIsImV4cCI6MjEwMjczOTU4Mn0.Wk4S2JS7OGQZpMlGuFvTKikn54bGqQ_vUJaf60fqy-A';
-    const ADMIN_EMAIL = 'bsnyman13@gmail.com';
-    const ADMIN_PASS = 'Seafarer2025!';
+    const ADMINS = [// passwords stored as hashes, not readable in page source
+    {
+        email: 'info@seafarers.co.za',
+        name: 'Brandon',
+        hash: 'c9ff15af1bd89af2aa7ac783c19bea406e9e10b17e5b8a96ce73eb0becda3e0c'
+    },
+    {
+        email: 'moolmaneloise@gmail.com',
+        name: 'Eloise',
+        hash: '08892ca4004b5c468b8dabca0dfb86da8e3d95b5101d8aa8f2d8beb46fe9ea84'
+    },
+    ];
     const SHORTLIST_MAX = 10;
 
     const DEMO = !SB_KEY.startsWith('eyJ');
@@ -1931,10 +1941,16 @@
     }
 
     /* ---------------- admin ---------------- */
-    function adminLogin() {
-        const ok = DEMO ? $('aPass').value === 'demo' : ($('aEmail').value.trim().toLowerCase() === ADMIN_EMAIL && $('aPass').value === ADMIN_PASS);
+    async function adminLogin() {
+        const em = $('aEmail').value.trim().toLowerCase(),
+            pw = $('aPass').value;
+        const h = await hash(em, pw);
+        const adm = ADMINS.find(a => a.email === em && a.hash === h);
+        const ok = DEMO ? pw === 'demo' : !!adm;
         if (!ok)
             return $('aErr').textContent = 'Incorrect email or password.';
+        $('aErr').textContent = '';
+        $('aPass').value = '';
         isAdmin = true;
         try {
             sessionStorage.setItem('sr_admin', '1')
