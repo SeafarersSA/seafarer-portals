@@ -1054,7 +1054,8 @@
     .kc b {
         display: block;
         font-size: 14px;
-        cursor: pointer
+        cursor: pointer;
+        color: var(--navy)
     }
 
     .kc b:hover {
@@ -1065,6 +1066,119 @@
         color: var(--muted);
         font-size: 12px;
         margin: 2px 0 8px
+    }
+
+    .av {
+        border-radius: 50%;
+        object-fit: cover;
+        background: #dbe4f3;
+        color: var(--navy);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0
+    }
+
+    .kc .who {
+        display: flex;
+        gap: 8px;
+        align-items: center
+    }
+
+    .es {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+        white-space: nowrap
+    }
+
+    .es-bad {
+        background: #fee2e2;
+        color:#991b1b
+    }
+
+    .es-warn {
+        background: #fef3c7;
+        color:#92400e
+    }
+
+    .es-ok {
+        background: #dcfce7;
+        color: #166534
+    }
+
+    .dec {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-top: 4px
+    }
+
+    .dec-interview {
+        background: #dcfce7;
+        color:#166534
+    }
+
+    .dec-maybe {
+        background: #fef3c7;
+        color:#92400e
+    }
+
+    .dec-no {
+        background: #fee2e2;
+        color:#991b1b
+    }
+
+    .dec-pending {
+        background: #e2e8f0;
+        color: #475569
+    }
+
+    .slc {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 18px
+    }
+
+    .slc .hd {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 14px
+    }
+
+    .dbtn {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-weight: 600;
+        font-size: 14px
+    }
+
+    .dbtn.on.interview {
+        background: #16a34a;
+        color: #fff;
+        border-color:#16a34a
+    }
+
+    .dbtn.on.maybe {
+        background: #d97706;
+        color: #fff;
+        border-color:#d97706
+    }
+
+    .dbtn.on.no {
+        background: #dc2626;
+        color: #fff;
+        border-color: #dc2626
     }
 
     .kc .acts {
@@ -1168,6 +1282,19 @@
     </style>
 </head>
 <body>
+    <script>
+    if (/[?&]shortlist=/.test(location.search))
+        document.documentElement.classList.add('sl-mode');
+    </script>
+    <style>
+    .sl-mode #view-jobs {
+        display:none !important
+    }
+
+    .sl-mode header nav {
+        display: none !important
+    }
+    </style>
 
     <div id="demoBanner" class="banner hide">
         Demo mode — Supabase key not set. Everything here is sample data and resets on refresh. Staff demo: log in with any email and password 
@@ -1290,6 +1417,10 @@
     </section>
 
     <!-- ================= CANDIDATE AREA ================= -->
+    <section id="view-sl" class="hide">
+        <div class="wrap page" id="slBox"></div>
+    </section>
+
     <section id="view-me" class="hide">
         <div class="wrap page" id="meBox"></div>
     </section>
@@ -1351,6 +1482,7 @@
                     <div class="a-bar">
                         <label style="margin:0">Job</label>
                         <select id="pJob" onchange="renderPipe()"></select>
+                        <button class="btn btn-g btn-sm" onclick="openSendYacht()">⚓ Send shortlist to yacht</button>
                         <span id="pInfo" style="font-size:13px;color:var(--muted)"></span>
                     </div>
                     <div class="board" id="board"></div>
@@ -1413,6 +1545,7 @@
     <footer>
         Seafarer Maritime Career Consultancy · Cape Town, South Africa · Visa support via 
         <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
+        <span style="opacity:.4">· v9</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1489,7 +1622,8 @@
     ];
     const SIDX = Object.fromEntries(STAGES.map((s, i) => [s.k, i]));
 
-    let JOBS = [],
+    let SLS = [],
+        JOBS = [],
         APPS = [],
         CANDS = [],
         ME = null,
@@ -1630,6 +1764,41 @@
                 body: JSON.stringify(a)
             });
             APPS.unshift(r[0]);
+        },
+        async shortlists() {
+            if (DEMO)
+                return;
+            SLS = await sb('recruit_shortlists?select=*&order=created_at.desc');
+        },
+        async addShortlist(x) {
+            if (DEMO) {
+                x.id = uid();
+                x.created_at = new Date().toISOString();
+                SLS.unshift(x);
+                return x;
+            }
+            const r = await sb('recruit_shortlists', {
+                method: 'POST',
+                body: JSON.stringify(x)
+            });
+            SLS.unshift(r[0]);
+            return r[0];
+        },
+        async getShortlist(id) {
+            if (DEMO)
+                return SLS.find(x => x.id === id);
+            const r = await sb('recruit_shortlists?select=*&id=eq.' + id);
+            return r[0];
+        },
+        async patchShortlist(id, f) {
+            if (DEMO) {
+                Object.assign(SLS.find(x => x.id === id), f);
+                return;
+            }
+            await sb('recruit_shortlists?id=eq.' + id, {
+                method: 'PATCH',
+                body: JSON.stringify(f)
+            });
         },
         async patchApp(id, f) {
             f.updated_at = new Date().toISOString();
@@ -1777,6 +1946,58 @@
         add('fExp', EXP_LEVELS);
         add('fRegion', REGIONS);
     }
+    function initials(c) {
+        return ((c.first_name || '?')[0] + ((c.last_name || '')[0] || '')).toUpperCase();
+    }
+    function av(c, size) {
+        return c.photo_url ? `<img class="av" src="${esc(c.photo_url)}" style="width:${size}px;height:${size}px" alt="">` : `<span class="av" style="width:${size}px;height:${size}px;font-size:${Math.round(size / 2.6)}px">${esc(initials(c))}</span>`;
+    }
+    function expInfo(x) {
+        if (!x.expiry)
+            return null;
+        const d = Math.floor((new Date(x.expiry) - Date.now()) / 864e5);
+        if (d < 0)
+            return {
+                cls: 'es-bad',
+                t: 'Expired ' + fdate(x.expiry),
+                bad: 2
+            };
+        if (d <= 90)
+            return {
+                cls: 'es-warn',
+                t: 'Expires in ' + d + ' days',
+                bad: 1
+            };
+        return {
+            cls: 'es-ok',
+            t: 'Valid to ' + fdate(x.expiry),
+            bad: 0
+        };
+    }
+    function expBadge(x) {
+        const e = expInfo(x);
+        return e ? `<span class="es ${e.cls}">${e.t}</span>` : '';
+    }
+    function certAlerts(c) {
+        return (c.documents || []).map(expInfo).filter(e => e && e.bad).length;
+    }
+    function refresherLink(x) {
+        return `mailto:info@seafarers.co.za?subject=${encodeURIComponent('Refresher course: ' + x.name)}&body=${encodeURIComponent('Hi Seafarer, my ' + x.name + ' certificate ' + (expInfo(x).bad === 2 ? 'has expired' : 'expires soon') + '. Please send me the next refresher course dates.')}`;
+    }
+    function capDecision(appId) {
+        for (const sl of SLS) {
+            const it = (sl.items || []).find(i => i.app_id === appId);
+            if (it)
+                return it;
+        }
+        return null;
+    }
+    const DEC = {
+        interview: 'Captain: Interview ✓',
+        maybe: 'Captain: Maybe',
+        no: 'Captain: Not for us',
+        pending: 'Sent to yacht'
+    };
     function missingForApply(c) {
         const m = [];
         if (!c.phone)
@@ -1795,6 +2016,8 @@
             m.push('Upload at least one certificate document');
         if (!c.cv_url)
             m.push('Upload your CV');
+        if (!c.photo_url)
+            m.push('Upload a profile photo (headshot)');
         return m;
     }
     function money(j) {
@@ -2120,7 +2343,7 @@
     }
 
     function completeness(c) {
-        const total = 8,
+        const total = 9,
             miss = missingForApply(c).length;
         return Math.round((total - miss) / total * 100);
     }
@@ -2135,6 +2358,10 @@
             ${pct < 100 ? `<div class="panel" style="background:#fff7ed;border-color:#fed7aa"><b>To apply for jobs, complete these:</b><ul class="req">${missingForApply(c).map(x => `<li class="no">✕ ${esc(x)}</li>`).join('')}</ul><span style="font-size:13px;color:var(--muted)">Yacht references and "About me" are optional but help a lot.</span></div>` : ''}
             ${justRegistered && PENDING_JOB ? `<div class="panel" style="background:#fffbeb;border-color:#fde68a">Save your profile below, then you'll be taken back to the job to apply.</div>` : ''}
             <div class="panel"><h3>My applications</h3>${mine.length ? mine.map(a => appCard(a)).join('') : '<p style="color:var(--muted)">No applications yet. <a href="#" onclick="show(\'jobs\');return false">Browse open jobs →</a></p>'}</div>
+            <div class="panel"><h3>Profile photo</h3>
+              <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">${av(c, 96)}
+                <div><p style="font-size:13px;color:var(--muted);margin-bottom:8px">A clear, smiling headshot in crew uniform or a white shirt. Captains look at this first.</p>
+                <input id="phFile" type="file" accept="image/*" style="max-width:320px"> <button class="btn btn-p btn-sm" id="phBtn" onclick="uploadPhoto()" style="margin-top:8px">${c.photo_url ? 'Replace photo' : 'Upload photo'}</button></div></div></div>
             <div class="panel"><h3>Personal details</h3><div class="form">
               <div><label>Name</label><input id="pFirst" value="${esc(c.first_name)}"></div><div><label>Surname</label><input id="pLast" value="${esc(c.last_name)}"></div>
               <div><label>Email</label><input value="${esc(c.email)}" disabled></div><div><label>Date of birth</label><input id="pDob" type="date" value="${esc(c.dob || '')}"></div>
@@ -2153,6 +2380,7 @@
               <div class="form" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
                 <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${CERT_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}<option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
                 <div><label>Certificate / course name</label><input id="dName" placeholder="e.g. STCW Basic Safety – STC-SA 2025"></div>
+                <div><label>Expiry date (leave blank if it doesn't expire)</label><input id="dExp" type="date"></div><div></div>
                 <div class="full"><label>File (PDF, photo or Word)</label><input id="dFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"></div>
                 <div class="full"><button class="btn btn-p" id="dBtn" onclick="addDoc()">Upload document</button> <span id="dMsg" style="font-size:13px;color:var(--muted)"></span></div>
               </div></div>
@@ -2185,11 +2413,49 @@
             <span class="st" style="background:${denied ? '#fee2e2' : a.stage === 'accepted' ? '#dcfce7' : '#fef3c7'};color:${denied ? '#991b1b' : a.stage === 'accepted' ? '#166534' : '#92400e'}">${STAGES[i].s}</span></div>
             <div class="track">${denied ? `<div class="s bad" style="flex:5"><i></i>Not successful this time — keep applying, new roles weekly</div>` : steps}</div></div>`;
     }
+    async function uploadPhoto() {
+        const f = $('phFile').files[0];
+        if (!f)
+            return toast('Choose a photo first');
+        $('phBtn').disabled = true;
+        $('phBtn').textContent = 'Uploading…';
+        try {
+            const url = await uploadCV(f);
+            ME = await db.patchCand(ME.id, {
+                photo_url: url
+            });
+            toast('Photo uploaded');
+            renderProfile();
+        }
+        catch (e) {
+            toast('Error: ' + e.message);
+            $('phBtn').disabled = false;
+            $('phBtn').textContent = 'Upload photo';
+        }
+    }
+    async function setExpiry(i, v) {
+        const docs = (ME.documents || []).slice();
+        docs[i] = {
+            ...docs[i],
+            expiry: v || null
+        };
+        try {
+            ME = await db.patchCand(ME.id, {
+                documents: docs
+            });
+            drawDocs();
+            toast('Expiry saved');
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
     function drawDocs() {
         const d = ME.documents || [];
         $('docList').innerHTML = d.length ? d.map((x, i) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px">
-            <div>📄 <b>${esc(x.name)}</b><br><small style="color:var(--muted)">${esc(x.type || '')} · uploaded ${fdate(x.uploaded)}</small></div>
-            <div style="white-space:nowrap"><a class="btn btn-o btn-sm" href="${esc(x.url)}" target="_blank">View</a> <button class="btn btn-d btn-sm" onclick="removeDoc(${i})">Remove</button></div></div>`).join('')
+            <div>📄 <b>${esc(x.name)}</b> ${expBadge(x)}<br><small style="color:var(--muted)">${esc(x.type || '')} · uploaded ${fdate(x.uploaded)}</small>
+              ${expInfo(x) && expInfo(x).bad ? `<br><a href="${refresherLink(x)}" style="font-size:13px;font-weight:600;color:var(--gold)">Book a refresher course with Seafarer →</a>` : ''}</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><label style="margin:0;font-size:11px">Expiry</label><input type="date" value="${esc(x.expiry || '')}" onchange="setExpiry(${i},this.value)" style="width:auto;padding:6px 8px;font-size:13px">
+              <a class="btn btn-o btn-sm" href="${esc(x.url)}" target="_blank">View</a> <button class="btn btn-d btn-sm" onclick="removeDoc(${i})">Remove</button></div></div>`).join('')
         : '<p style="color:var(--warn);font-size:14px">No certificates uploaded yet.</p>';
     }
     async function addDoc() {
@@ -2210,6 +2476,7 @@
                 type: t,
                 name: n,
                 url,
+                expiry: $('dExp').value || null,
                 uploaded: new Date().toISOString().slice(0, 10)
             }]);
             ME = await db.patchCand(ME.id, {
@@ -2322,7 +2589,7 @@
     }
     async function renderAdmin() {
         try {
-            await Promise.all([db.jobs(), db.apps(), db.cands()]);
+            await Promise.all([db.jobs(), db.apps(), db.cands(), db.shortlists().catch(e => console.warn('shortlists', e))]);
         } catch (e) {
             toast('Load error: ' + e.message);
         }
@@ -2358,7 +2625,7 @@
             const cs = as.filter(a => a.stage === s.k);
             const full = s.k === 'shortlist' && cs.length >= SHORTLIST_MAX;
             return `<div class="col col-${s.k} ${full ? 'full' : ''}"><h5>${s.t}<span>${cs.length}${s.k === 'shortlist' ? '/' + SHORTLIST_MAX : ''}</span></h5>
-                  ${cs.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};const wa = (c.phone || '').replace(/\D/g, '');const next = STAGES[i + 1];const canNext = i < 4 && next && next.k !== 'denied';return `<div class="kc"><b onclick="openCand('${c.id}','${a.id}')">${esc(fullName(c))}</b>
+                  ${cs.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};const wa = (c.phone || '').replace(/\D/g, '');const next = STAGES[i + 1];const canNext = i < 4 && next && next.k !== 'denied';const cd = capDecision(a.id),al = certAlerts(c);return `<div class="kc"><div class="who">${av(c, 34)}<div><b onclick="openCand('${c.id}','${a.id}')">${esc(fullName(c))}</b>${al ? `<span class="es es-bad" title="Expired or expiring certificates">⚠ ${al} cert${al > 1 ? 's' : ''}</span>` : ''}${cd ? `<br><span class="dec dec-${cd.decision || 'pending'}">${DEC[cd.decision || 'pending']}</span>` : ''}</div></div>
                           <div class="m">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + c.gender : ''}<br>${esc(c.experience || '')}</div>
                           <div class="acts">
                             ${i > 0 && i < 5 ? `<button class="btn-o" onclick="move('${a.id}',-1)" title="Move back">←</button>` : ''}
@@ -2427,6 +2694,156 @@
         $('kAcc').textContent = APPS.filter(a => a.stage === 'accepted').length;
     }
 
+    /* ---------- send shortlist to yacht ---------- */
+    const LIVE_URL = 'https://seafarerssa.github.io/seafarer-portals/recruitment.html';
+    // Always share the live web address (a link to a file on your Mac can't open on the captain's phone)
+    function slLink(id) {
+        return (location.protocol.startsWith('http') ? location.origin + location.pathname : LIVE_URL) + '?shortlist=' + id;
+    }
+    function waURL(num, txt) {
+        const n = (num || '').replace(/\D/g, '').replace(/^0/, '27');
+        return 'https://api.whatsapp.com/send?' + (n ? 'phone=' + n + '&' : '') + 'text=' + encodeURIComponent(txt);
+    }
+    function sendWA() {
+        const t = $('slOut').dataset.txt;
+        window.open(waURL($('slPhone').value, t), '_blank');
+    }
+    function openSendYacht() {
+        const jid = $('pJob').value,
+            j = JOBS.find(x => x.id === jid);
+        if (!j)
+            return toast('Choose a job first');
+        const as = APPS.filter(a => a.job_id === jid && a.stage !== 'denied');
+        const prev = SLS.filter(x => x.job_id === jid);
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.position)}</div><h2>Send shortlist to yacht</h2></div>
+          <div class="m-body">
+            <p style="color:var(--muted);font-size:14px;margin-bottom:14px">The captain gets one private link with each candidate's photo, CV, certificates and references. <b>Phone numbers and emails are hidden.</b> They mark each candidate Interview / Maybe / Not for us, and you'll see it on your pipeline.</p>
+            ${as.length ? as.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};return `<label class="ck" style="margin-bottom:8px"><input type="checkbox" name="slPick" value="${a.id}" ${['interview_yacht', 'shortlist'].includes(a.stage) ? 'checked' : ''}> ${av(c, 28)} <b>${esc(fullName(c))}</b> <span class="ref">${STAGES[SIDX[a.stage]].t}</span></label>`;}).join('') : '<p>No applicants for this job yet.</p>'}
+            <div class="form" style="margin-top:14px">
+              <div><label>Yacht / captain name</label><input id="slYacht" placeholder="e.g. M/Y Serenity – Capt. Smith"></div><div><label>Captain's WhatsApp number (optional)</label><input id="slPhone" placeholder="+33 6 12 34 56 78"></div>
+              <div class="full"><label>Message to the captain</label><textarea id="slMsg">Good day Captain, please find our shortlisted candidates for the ${esc(j.position)} position below. Let us know who you would like to interview and we will arrange it.</textarea></div>
+            </div>
+            <button class="btn btn-g" style="margin-top:14px" onclick="createShortlist('${jid}')">Create private link</button>
+            <div id="slOut"></div>
+            ${prev.length ? `<div class="hr"></div><h4 style="margin-bottom:8px">Links already sent for this job</h4>${prev.map(sl => {const it = sl.items || [];const n = k => it.filter(i => (i.decision || 'pending') === k).length;return `<div style="font-size:14px;margin-bottom:8px;padding:10px;border:1px solid var(--line);border-radius:10px"><b>${esc(sl.yacht || 'Yacht')}</b> <span class="ref">${fdate(sl.created_at)} · ${it.length} candidates</span><br>
+                  <span class="dec dec-interview">${n('interview')} interview</span> <span class="dec dec-maybe">${n('maybe')} maybe</span> <span class="dec dec-no">${n('no')} no</span> <span class="dec dec-pending">${n('pending')} waiting</span>
+                  <br><a href="${slLink(sl.id)}" target="_blank" style="font-size:13px">Open link</a> · <a href="#" onclick="copyText('${slLink(sl.id)}');return false" style="font-size:13px">Copy link</a></div>`;}).join('')}` : ''}
+          </div>`);
+    }
+    async function createShortlist(jid) {
+        const ids = [...document.querySelectorAll('input[name=slPick]:checked')].map(x => x.value);
+        if (!ids.length)
+            return toast('Tick at least one candidate');
+        const items = ids.map(id => ({
+            app_id: id,
+            candidate_id: APPS.find(a => a.id === id).candidate_id,
+            decision: null,
+            comment: ''
+        }));
+        try {
+            const sl = await db.addShortlist({
+                job_id: jid,
+                yacht: $('slYacht').value.trim(),
+                message: $('slMsg').value.trim(),
+                items
+            });
+            const link = slLink(sl.id),
+                j = JOBS.find(x => x.id === jid);
+            const txt = `Good day Captain, here are our shortlisted candidates for ${j.position} (${j.ref}): ${link}`;
+            $('slOut').dataset.txt = txt;
+            $('slOut').innerHTML = `<div class="panel" style="margin-top:14px;background:#f0fdf4;border-color:#bbf7d0"><b>✓ Private link ready</b>
+                  <input value="${esc(link)}" readonly style="margin:8px 0" onclick="this.select()">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-p btn-sm" onclick="copyText('${link}')">Copy link</button>
+                  <button class="btn btn-sm" style="background:#25D366;color:#fff" onclick="sendWA()">Send by WhatsApp</button>
+                  <a class="btn btn-o btn-sm" target="_blank" href="https://web.whatsapp.com/send?text=${encodeURIComponent(txt)}">WhatsApp Web</a>
+                  <a class="btn btn-o btn-sm" href="mailto:?subject=${encodeURIComponent('Shortlist: ' + j.position + ' (' + j.ref + ')')}&body=${encodeURIComponent(txt)}">Send by email</a>
+                  <a class="btn btn-o btn-sm" target="_blank" href="${link}">Preview</a></div></div>`;
+            renderPipe();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    function copyText(t) {
+        try {
+            navigator.clipboard.writeText(t).then(() => toast('Link copied'), () => prompt('Copy this link:', t));
+        } catch (e) {
+            prompt('Copy this link:', t);
+        }
+    }
+
+    /* ---------- captain's private shortlist page ---------- */
+    let SL = null,
+        CAP_C = [],
+        CAP_J = {};
+    async function openCaptainView(id) {
+        document.querySelector('header nav').classList.add('hide');
+        ['jobs', 'me', 'admin'].forEach(x => $('view-' + x).classList.add('hide'));
+        $('view-sl').classList.remove('hide');
+        $('slBox').innerHTML = '<p style="color:var(--muted)">Loading candidates…</p>';
+        try {
+            SL = await db.getShortlist(id);
+            if (!SL)
+                throw new Error('This link is no longer available.');
+            const ids = (SL.items || []).map(i => i.candidate_id);
+            if (DEMO) {
+                CAP_C = CANDS.filter(c => ids.includes(c.id));
+                CAP_J = JOBS.find(j => j.id === SL.job_id) || {};
+            }
+            else {
+                CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio&id=in.(' + ids.join(',') + ')') : [];
+                CAP_J = (await sb('recruit_jobs?select=*&id=eq.' + SL.job_id))[0] || {};
+            }
+            drawCaptain();
+        } catch (e) {
+            $('slBox').innerHTML = `<div class="panel"><h3>Link not found</h3><p>${esc(e.message)}</p></div>`;
+        }
+    }
+    function drawCaptain() {
+        const items = SL.items || [],
+            j = CAP_J;
+        $('slBox').innerHTML = `<div class="panel" style="background:var(--navy);color:#fff;border:none">
+              <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#fca5a5;font-weight:700">Private candidate shortlist</div>
+              <h2 class="t" style="color:#fff;margin-top:4px">${esc(j.position || '')}${SL.yacht ? ' · ' + esc(SL.yacht) : ''}</h2>
+              <p style="color:#cbd5e1;font-size:14px">${esc(j.ref || '')} · ${j.yacht_size ? ft(j.yacht_size) + ' ' : ''}${esc(j.yacht_type || '')}${j.salary_min || j.salary_max ? ' · ' + money(j) + ' ' + esc(j.currency || '') + ' ' + per(j) : ''}</p>
+              ${SL.message ? `<p style="margin-top:10px;white-space:pre-line">${esc(SL.message)}</p>` : ''}
+              <p style="margin-top:10px;font-size:13px;color:#cbd5e1">Please mark each candidate below. Questions? <a href="mailto:info@seafarers.co.za" style="color:#fff">info@seafarers.co.za</a></p></div>
+            ${items.map((it, i) => {const c = CAP_C.find(x => x.id === it.candidate_id);if (!c)return '';const d = it.decision;return `<div class="slc"><div class="hd">${av(c, 88)}<div><h3 style="font-size:22px">${esc(c.first_name)} ${esc((c.last_name || '')[0] || '')}.</h3>
+                    <div style="color:var(--muted);font-size:14px">${esc(c.position_sought || '')}${c.experience ? ' · ' + esc(c.experience) : ''}</div>
+                    <div style="font-size:14px;margin-top:2px">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + esc(c.gender) : ''}${c.visas ? ' · Visas: ' + esc(c.visas) : ''}</div></div>
+                    <div style="margin-left:auto">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}</div></div>
+                    ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
+                    <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div>
+                      ${(c.documents || []).length ? `<div style="margin-top:8px">${c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> ${expBadge(x)}</div>`).join('')}</div>` : ''}</div>
+                    ${(c.yacht_refs || []).length ? `<div class="sec"><h4>Previous yachts & references</h4><div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+                    <div class="hr" style="margin:14px 0"></div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b style="margin-right:6px">Your decision:</b>
+                      <button class="dbtn interview ${d === 'interview' ? 'on' : ''}" onclick="capSet(${i},'interview')">✓ Interview</button>
+                      <button class="dbtn maybe ${d === 'maybe' ? 'on' : ''}" onclick="capSet(${i},'maybe')">Maybe</button>
+                      <button class="dbtn no ${d === 'no' ? 'on' : ''}" onclick="capSet(${i},'no')">✕ Not for us</button></div>
+                    <textarea id="capC${i}" placeholder="Comment for Seafarer (optional)" style="margin-top:10px;min-height:60px" onchange="capSet(${i},null)">${esc(it.comment || '')}</textarea>
+                  </div>`;}).join('')}
+            <p style="text-align:center;color:var(--muted);font-size:13px">Candidates presented by Seafarer Maritime Career Consultancy. Please arrange all interviews through Seafarer.</p>`;
+    }
+    async function capSet(i, dec) {
+        const items = (SL.items || []).slice();
+        items[i] = {
+            ...items[i],
+            comment: $('capC' + i).value
+        };
+        if (dec)
+            items[i].decision = dec;
+        try {
+            await db.patchShortlist(SL.id, {
+                items
+            });
+            SL.items = items;
+            toast('Saved — thank you');
+            drawCaptain();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
             <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
@@ -2446,7 +2863,7 @@
         if (q)
             cs = cs.filter(c => [c.first_name, c.last_name, c.nationality, c.position_sought, c.certs, c.email].join(' ').toLowerCase().includes(q));
         $('aCandRows').innerHTML = cs.length ? cs.map(c => `<tr>
-            <td><b>${esc(fullName(c))}</b><br><small style="color:var(--muted)">${esc(c.email)} · joined ${ago(c.created_at)}</small></td>
+            <td><div style="display:flex;gap:10px;align-items:center">${av(c, 36)}<div><b>${esc(fullName(c))}</b>${certAlerts(c) ? ` <span class="es es-bad">⚠ ${certAlerts(c)}</span>` : ''}<br><small style="color:var(--muted)">${esc(c.email)} · joined ${ago(c.created_at)}</small></div></div></td>
             <td>${esc(c.position_sought || '—')}<br><small style="color:var(--muted)">${esc(c.experience || '')}</small></td>
             <td>${esc(c.nationality || '—')}</td><td>${c.dob ? age(c.dob) : '—'}</td>
             <td style="max-width:220px;font-size:13px">${esc(c.certs || '—')}</td><td>${(c.documents || []).length}</td><td>${(c.yacht_refs || []).length}</td>
@@ -2463,14 +2880,15 @@
         const fact = (k, v) => `<div class="fact"><small>${k}</small><b>${esc(v || '—')}</b></div>`;
         const apps = APPS.filter(x => x.candidate_id === cid);
         const wa = (c.phone || '').replace(/\D/g, '');
-        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(c.position_sought || 'Crew')} · ${esc(c.experience || '')}</div><h2>${esc(fullName(c))}</h2></div>
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(c.position_sought || 'Crew')} · ${esc(c.experience || '')}</div><div style="display:flex;gap:14px;align-items:center;margin-top:6px">${av(c, 64)}<h2>${esc(fullName(c))}</h2></div></div>
           <div class="m-body">
             <div class="facts">${fact('Email', c.email)}${fact('Phone', c.phone)}${fact('Nationality', c.nationality)}${fact('Gender', c.gender)}${fact('Date of birth', c.dob ? fdate(c.dob) + ' (' + age(c.dob) + ')' : '')}${fact('Visas', c.visas)}</div>
             <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div></div>
             ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
-            <div class="sec"><h4>Certificates & documents uploaded</h4>${(c.documents || []).length ? c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> <span class="ref">${esc(x.type || '')} · ${fdate(x.uploaded)}</span></div>`).join('') : '<p>None uploaded</p>'}</div>
+            <div class="sec"><h4>Certificates & documents uploaded</h4>${(c.documents || []).length ? c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> ${expBadge(x)} <span class="ref">${esc(x.type || '')} · ${fdate(x.uploaded)}</span></div>`).join('') : '<p>None uploaded</p>'}</div>
             <div class="sec"><h4>Superyacht references</h4>${(c.yacht_refs || []).length ? `<div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p>None added</p>'}</div>
             <div class="sec"><h4>Applications</h4>${apps.length ? apps.map(x => {const j = JOBS.find(y => y.id === x.job_id) || {};return `<div style="font-size:14px;margin-bottom:4px">${esc(j.position || '')} <span class="ref">${esc(j.ref || '')}</span> — <b>${STAGES[SIDX[x.stage]].t}</b></div>`}).join('') : '<p>None</p>'}</div>
+            ${a && capDecision(a.id) ? `<div class="sec"><h4>Captain's feedback</h4><p><span class="dec dec-${capDecision(a.id).decision || 'pending'}">${DEC[capDecision(a.id).decision || 'pending']}</span> ${esc(capDecision(a.id).comment || '')}</p></div>` : ''}
             ${a && a.cover_note ? `<div class="sec"><h4>Cover note for this job</h4><p>${esc(a.cover_note)}</p></div>` : ''}
             <div style="display:flex;gap:8px;flex-wrap:wrap">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}${wa ? `<a class="btn btn-o" target="_blank" href="https://wa.me/${wa}">WhatsApp</a>` : ''}<a class="btn btn-o" href="mailto:${esc(c.email)}">Email</a></div>
             <div class="hr"></div>
@@ -2827,6 +3245,10 @@
 
     /* ---------------- boot ---------------- */
     (async function() {
+        const SLID = new URLSearchParams(location.search).get('shortlist');
+        if (SLID && !DEMO) {
+            return openCaptainView(SLID);
+        }
         if (DEMO) {
             $('demoBanner').classList.remove('hide');
             JOBS = sampleJobs();
@@ -2954,6 +3376,8 @@
             show(isAdmin ? 'admin' : 'me');
         }
         const p = new URLSearchParams(location.search);
+        if (SLID)
+            return openCaptainView(SLID);
         if (p.get('view'))
             show(p.get('view'));
         if (p.get('job'))
