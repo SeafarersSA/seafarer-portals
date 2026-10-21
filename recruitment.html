@@ -1236,6 +1236,7 @@
                                     <th>Nationality</th>
                                     <th>Age</th>
                                     <th>Certificates</th>
+                                    <th>Docs</th>
                                     <th>Yacht refs</th>
                                     <th>CV</th>
                                     <th>Applied</th>
@@ -1728,7 +1729,7 @@
               ${j.profile ? `<div class="sec"><h4>The person we're looking for</h4><p>${esc(j.profile)}</p></div>` : ''}
               ${j.description ? `<div class="sec"><h4>About the role</h4><p>${esc(j.description)}</p></div>` : ''}
               ${list(j.certs).length ? `<div class="sec"><h4>Required certificates</h4><div class="tags">${list(j.certs).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div></div>` : ''}
-              ${list(j.visas).length ? `<div class="sec"><h4>Visas required</h4><div class="tags">${list(j.visas).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div><p style="font-size:13px;margin-top:6px;color:var(--muted)">Need a visa? We can help through <a href="https://xplorevisas.com" target="_blank">Xplore Visas</a>.</p></div>` : ''}
+              ${list(j.visas).length ? `<div class="sec"><h4>Visas required</h4><div class="tags">${list(j.visas).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div><p style="font-size:13px;margin-top:6px;color:var(--muted)">Need a visa? We can help through <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>.</p></div>` : ''}
               <div class="hr"></div>${applyBox}
             </div>`);
     }
@@ -1847,7 +1848,7 @@
     }
 
     function completeness(c) {
-        const checks = [c.position_sought, c.nationality, c.gender, c.certs, c.cv_url, (c.yacht_refs || []).length, c.bio];
+        const checks = [c.position_sought, c.nationality, c.gender, c.certs, c.cv_url, (c.documents || []).length, (c.yacht_refs || []).length, c.bio];
         return Math.round(checks.filter(Boolean).length / checks.length * 100);
     }
     function renderProfile(justRegistered) {
@@ -1872,6 +1873,15 @@
             <div class="panel"><h3>Qualified certificates</h3>${checkBoxes('pCert', CERT_OPTS, c.certs)}
               <div style="margin-top:12px"><label>Other certificates (comma separated)</label><input id="pCertOther" value="${esc(list(c.certs).filter(x => !CERT_OPTS.includes(x)).join(', '))}"></div>
               <h3 style="margin-top:20px">Visas held</h3>${checkBoxes('pVisa', VISA_OPTS, c.visas)}</div>
+            <div class="panel"><h3>Course certificates & documents</h3>
+              <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Upload your certificates one by one, or all of them combined in one file. Choose what each document is so we can check it quickly.</p>
+              <div id="docList"></div>
+              <div class="form" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
+                <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${CERT_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}<option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
+                <div><label>Certificate / course name</label><input id="dName" placeholder="e.g. STCW Basic Safety – STC-SA 2025"></div>
+                <div class="full"><label>File (PDF, photo or Word)</label><input id="dFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"></div>
+                <div class="full"><button class="btn btn-p" id="dBtn" onclick="addDoc()">Upload document</button> <span id="dMsg" style="font-size:13px;color:var(--muted)"></span></div>
+              </div></div>
             <div class="panel"><h3>CV</h3>${c.cv_url ? `<p style="margin-bottom:10px">✓ CV on file — <a href="${esc(c.cv_url)}" target="_blank">view current CV</a></p>` : '<p style="color:var(--warn);margin-bottom:10px">No CV uploaded yet.</p>'}
               <input id="pCV" type="file" accept=".pdf,.doc,.docx"><p style="font-size:12px;color:var(--muted);margin-top:6px">PDF or Word. Uploading a new file replaces the old one.</p></div>
             <div class="panel"><h3>Superyacht references</h3><p style="font-size:13px;color:var(--muted);margin-bottom:12px">Previous yachts you've worked on and a captain / HOD we can contact.</p>
@@ -1879,6 +1889,7 @@
               <div id="refRows"></div><button class="btn btn-o btn-sm" onclick="REFS.push({});drawRefs()">+ Add yacht reference</button></div>
             <div style="display:flex;gap:10px;align-items:center"><button class="btn btn-g" id="pSave" style="padding:13px 28px" onclick="saveProfile()">Save profile</button><span id="pMsg" style="font-size:13px;color:var(--muted)"></span></div>`;
         drawRefs();
+        drawDocs();
     }
     function appCard(a) {
         const j = JOBS.find(x => x.id === a.job_id) || {
@@ -1899,6 +1910,60 @@
         return `<div class="app-card"><div class="top"><div><b>${esc(j.position)}</b> <span class="ref">${esc(j.ref || '')} · applied ${ago(a.created_at)}</span></div>
             <span class="st" style="background:${denied ? '#fee2e2' : a.stage === 'accepted' ? '#dcfce7' : '#fef3c7'};color:${denied ? '#991b1b' : a.stage === 'accepted' ? '#166534' : '#92400e'}">${STAGES[i].s}</span></div>
             <div class="track">${denied ? `<div class="s bad" style="flex:5"><i></i>Not successful this time — keep applying, new roles weekly</div>` : steps}</div></div>`;
+    }
+    function drawDocs() {
+        const d = ME.documents || [];
+        $('docList').innerHTML = d.length ? d.map((x, i) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px">
+            <div>📄 <b>${esc(x.name)}</b><br><small style="color:var(--muted)">${esc(x.type || '')} · uploaded ${fdate(x.uploaded)}</small></div>
+            <div style="white-space:nowrap"><a class="btn btn-o btn-sm" href="${esc(x.url)}" target="_blank">View</a> <button class="btn btn-d btn-sm" onclick="removeDoc(${i})">Remove</button></div></div>`).join('')
+        : '<p style="color:var(--warn);font-size:14px">No certificates uploaded yet.</p>';
+    }
+    async function addDoc() {
+        const t = $('dType').value,
+            n = $('dName').value.trim() || t,
+            f = $('dFile').files[0];
+        if (!t)
+            return $('dMsg').textContent = 'Choose what the document is.';
+        if (!n)
+            return $('dMsg').textContent = 'Type the certificate / course name.';
+        if (!f)
+            return $('dMsg').textContent = 'Choose a file to upload.';
+        $('dBtn').disabled = true;
+        $('dMsg').textContent = 'Uploading…';
+        try {
+            const url = await uploadCV(f);
+            const docs = (ME.documents || []).concat([{
+                type: t,
+                name: n,
+                url,
+                uploaded: new Date().toISOString().slice(0, 10)
+            }]);
+            ME = await db.patchCand(ME.id, {
+                documents: docs
+            });
+            $('dType').value = '';
+            $('dName').value = '';
+            $('dFile').value = '';
+            $('dMsg').textContent = '✓ Uploaded';
+            drawDocs();
+        } catch (e) {
+            $('dMsg').textContent = 'Error: ' + e.message;
+        }
+        $('dBtn').disabled = false;
+    }
+    async function removeDoc(i) {
+        if (!confirm('Remove this document?'))
+            return;
+        const docs = (ME.documents || []).slice();
+        docs.splice(i, 1);
+        try {
+            ME = await db.patchCand(ME.id, {
+                documents: docs
+            });
+            drawDocs();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
     }
     function drawRefs() {
         const f = (i, k, ph, t='text') => `<input type="${t}" placeholder="${ph}" value="${esc(REFS[i][k] || '')}" oninput="REFS[${i}].${k}=this.value">`;
@@ -2104,11 +2169,11 @@
             <td><b>${esc(fullName(c))}</b><br><small style="color:var(--muted)">${esc(c.email)} · joined ${ago(c.created_at)}</small></td>
             <td>${esc(c.position_sought || '—')}<br><small style="color:var(--muted)">${esc(c.experience || '')}</small></td>
             <td>${esc(c.nationality || '—')}</td><td>${c.dob ? age(c.dob) : '—'}</td>
-            <td style="max-width:220px;font-size:13px">${esc(c.certs || '—')}</td><td>${(c.yacht_refs || []).length}</td>
+            <td style="max-width:220px;font-size:13px">${esc(c.certs || '—')}</td><td>${(c.documents || []).length}</td><td>${(c.yacht_refs || []).length}</td>
             <td>${c.cv_url ? `<a href="${esc(c.cv_url)}" target="_blank">CV</a>` : '—'}</td>
             <td>${APPS.filter(a => a.candidate_id === c.id).length}</td>
             <td><button class="btn btn-o btn-sm" onclick="openCand('${c.id}')">Profile</button></td></tr>`).join('')
-        : `<tr><td colspan="9" class="empty">No registered crew yet.</td></tr>`;
+        : `<tr><td colspan="10" class="empty">No registered crew yet.</td></tr>`;
     }
     function openCand(cid, appId) {
         const c = CANDS.find(x => x.id === cid);
@@ -2123,6 +2188,7 @@
             <div class="facts">${fact('Email', c.email)}${fact('Phone', c.phone)}${fact('Nationality', c.nationality)}${fact('Gender', c.gender)}${fact('Date of birth', c.dob ? fdate(c.dob) + ' (' + age(c.dob) + ')' : '')}${fact('Visas', c.visas)}</div>
             <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div></div>
             ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
+            <div class="sec"><h4>Certificates & documents uploaded</h4>${(c.documents || []).length ? c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> <span class="ref">${esc(x.type || '')} · ${fdate(x.uploaded)}</span></div>`).join('') : '<p>None uploaded</p>'}</div>
             <div class="sec"><h4>Superyacht references</h4>${(c.yacht_refs || []).length ? `<div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p>None added</p>'}</div>
             <div class="sec"><h4>Applications</h4>${apps.length ? apps.map(x => {const j = JOBS.find(y => y.id === x.job_id) || {};return `<div style="font-size:14px;margin-bottom:4px">${esc(j.position || '')} <span class="ref">${esc(j.ref || '')}</span> — <b>${STAGES[SIDX[x.stage]].t}</b></div>`}).join('') : '<p>None</p>'}</div>
             ${a && a.cover_note ? `<div class="sec"><h4>Cover note for this job</h4><p>${esc(a.cover_note)}</p></div>` : ''}
