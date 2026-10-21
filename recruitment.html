@@ -1053,7 +1053,7 @@
 <body>
 
     <div id="demoBanner" class="banner hide">
-        Demo mode — Supabase key not set. Everything here is sample data and resets on refresh. Demo admin: any email / password 
+        Demo mode — Supabase key not set. Everything here is sample data and resets on refresh. Staff demo: log in with any email and password 
         <b>demo</b>
     </div>
 
@@ -1066,7 +1066,7 @@
             <nav>
                 <button id="nav-jobs" class="on" onclick="show('jobs')">Jobs</button>
                 <button id="nav-me" onclick="show('me')">My Profile</button>
-                <button id="nav-admin" onclick="show('admin')">Admin</button>
+                <button id="nav-admin" class="hide" onclick="show('admin')">Dashboard</button>
                 <span class="who" id="whoLbl"></span>
             </nav>
         </div>
@@ -1144,7 +1144,12 @@
     <section id="view-admin" class="hide">
         <div class="wrap page">
             <div id="adminLogin" class="login">
-                <h2>Admin login</h2>
+                <h2>Staff login</h2>
+                <p style="color:var(--muted);font-size:14px;margin:-8px 0 16px">
+                    For Seafarer recruitment team only. Crew, please use 
+                    <a href="#" onclick="show('me');return false">Register / Login</a>
+                    .
+                </p>
                 <div style="margin-bottom:12px">
                     <label>Email</label>
                     <input id="aEmail" type="email">
@@ -1653,6 +1658,10 @@
             renderJobs();
         if (v === 'me')
             renderMe();
+        if (v === 'admin' && !isAdmin) {
+            authMode = 'login';
+            return show('me');
+        }
         if (v === 'admin' && isAdmin)
             renderAdmin();
         window.scrollTo(0, 0);
@@ -1818,6 +1827,11 @@
     async function doLogin() {
         const e = $('lEmail').value.trim().toLowerCase(),
             p = $('lPass').value;
+        const h = await hash(e, p);
+        if (ADMINS.some(a => a.email === e && a.hash === h) || (DEMO && p === 'demo')) {
+            enterAdmin();
+            return show('admin');
+        }
         try {
             const c = await db.findCand(e);
             if (!c || c.pass_hash !== await hash(e, p))
@@ -2016,13 +2030,17 @@
             return $('aErr').textContent = 'Incorrect email or password.';
         $('aErr').textContent = '';
         $('aPass').value = '';
+        enterAdmin();
+        renderAdmin();
+    }
+    function enterAdmin() {
         isAdmin = true;
         try {
             sessionStorage.setItem('sr_admin', '1')
         } catch (e) {}
+        $('nav-admin').classList.remove('hide');
         $('adminLogin').classList.add('hide');
         $('adminPanel').classList.remove('hide');
-        renderAdmin();
     }
     function adminLogout() {
         isAdmin = false;
@@ -2031,6 +2049,8 @@
         } catch (e) {}
         $('adminPanel').classList.add('hide');
         $('adminLogin').classList.remove('hide');
+        $('nav-admin').classList.add('hide');
+        show('jobs');
     }
     function aTab(t) {
         aCur = t;
@@ -2573,8 +2593,13 @@
                 isAdmin = true;
                 $('adminLogin').classList.add('hide');
                 $('adminPanel').classList.remove('hide');
+                $('nav-admin').classList.remove('hide');
             }
         } catch (e) {}
+        if (location.hash === '#staff' || new URLSearchParams(location.search).has('staff')) {
+            authMode = 'login';
+            show(isAdmin ? 'admin' : 'me');
+        }
         const p = new URLSearchParams(location.search);
         if (p.get('view'))
             show(p.get('view'));
