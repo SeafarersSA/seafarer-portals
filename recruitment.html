@@ -249,6 +249,114 @@
         height: 60px
     }
 
+    .more {
+        display: none;
+        grid-column: 1/-1;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--line)
+    }
+
+    .more.on {
+        display: grid
+    }
+
+    .fbar {
+        grid-column: 1/-1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap
+    }
+
+    .fbar button {
+        background: none;
+        border: none;
+        color: var(--sea);
+        font-weight: 600;
+        font-size: 14px;
+        padding: 4px 0
+    }
+
+    .ck {
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--ink);
+        font-weight: 500;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0 12px;
+        font-size: 14px;
+        background: #fff;
+        cursor: pointer;
+        min-height: 42px
+    }
+
+    .ck input {
+        width: auto
+    }
+
+    .badge {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-right: 6px;
+        vertical-align: middle
+    }
+
+    .b-urgent {
+        background: var(--gold);
+        color:#fff
+    }
+
+    .b-featured {
+        background: var(--navy);
+        color:#fff
+    }
+
+    .b-new {
+        background: #dcfce7;
+        color:#166534
+    }
+
+    .b-couple {
+        background: #fff7ed;
+        color: #9a3412
+    }
+
+    .job.feat {
+        border-color: var(--navy);
+        box-shadow: 0 0 0 1px var(--navy) inset
+    }
+
+    .req {
+        list-style: none;
+        margin: 8px 0 14px;
+        font-size:14px
+    }
+
+    .req li {
+        padding:3px 0
+    }
+
+    .req .ok {
+        color:var(--ok)
+    }
+
+    .req .no {
+        color: var(--bad)
+    }
+
     .filters {
         background: #fff;
         border-radius: var(--r);
@@ -340,6 +448,11 @@
         padding: 4px 9px;
         border-radius: 6px;
         white-space: nowrap
+    }
+
+    .d-Specialist {
+        background: #ede9fe;
+        color:#5b21b6
     }
 
     .d-Deck {
@@ -1021,7 +1134,11 @@
         }
 
         .filters .q {
-            grid-column: 1/-1
+            grid-column:1/-1
+        }
+
+        .more {
+            grid-template-columns: 1fr 1fr
         }
 
         .kpis {
@@ -1104,11 +1221,7 @@
             <div class="filters">
                 <input class="q" id="fQ" placeholder="Search position, location, yacht…" oninput="renderJobs()">
                 <select id="fContract" onchange="renderJobs()">
-                    <option value="">Any contract</option>
-                    <option>Permanent</option>
-                    <option>Seasonal</option>
-                    <option>Rotational</option>
-                    <option>Temp</option>
+                    <option value="">Any position type</option>
                 </select>
                 <select id="fGender" onchange="renderJobs()">
                     <option value="">Any cabin</option>
@@ -1118,16 +1231,57 @@
                 </select>
                 <select id="fSize" onchange="renderJobs()">
                     <option value="">Any size</option>
-                    <option value="0-40">Under 40m</option>
-                    <option value="40-60">40–60m</option>
+                    <option value="0-30">Under 30m</option>
+                    <option value="30-40">30–40m</option>
+                    <option value="40-50">40–50m</option>
+                    <option value="50-60">50–60m</option>
                     <option value="60-80">60–80m</option>
-                    <option value="80-999">80m+</option>
+                    <option value="80-95">80–95m</option>
+                    <option value="95-999">95m+</option>
                 </select>
                 <select id="fSort" onchange="renderJobs()">
+                    <option value="best">Best match</option>
                     <option value="new">Newest</option>
                     <option value="pay">Highest salary</option>
                     <option value="start">Soonest start</option>
                 </select>
+                <div class="more" id="moreF">
+                    <select id="fType" onchange="renderJobs()">
+                        <option value="">Any vessel type</option>
+                    </select>
+                    <select id="fUsage" onchange="renderJobs()">
+                        <option value="">Private or charter</option>
+                        <option value="Private">Private</option>
+                        <option value="Charter">Charter</option>
+                        <option value="Private & Charter">Both</option>
+                    </select>
+                    <select id="fExp" onchange="renderJobs()">
+                        <option value="">Any experience</option>
+                    </select>
+                    <select id="fRegion" onchange="renderJobs()">
+                        <option value="">Any location</option>
+                    </select>
+                    <select id="fPay" onchange="renderJobs()">
+                        <option value="">Any salary (€ per month)</option>
+                        <option value="0-3000">Up to €3,000</option>
+                        <option value="3000-5000">€3,000 – €5,000</option>
+                        <option value="5000-8000">€5,000 – €8,000</option>
+                        <option value="8000-12000">€8,000 – €12,000</option>
+                        <option value="12000-9999999">€12,000+</option>
+                    </select>
+                    <label class="ck">
+                        <input type="checkbox" id="fCouple" onchange="renderJobs()">
+                         Couple positions only
+                    </label>
+                    <label class="ck">
+                        <input type="checkbox" id="fUrgent" onchange="renderJobs()">
+                         Urgent only
+                    </label>
+                </div>
+                <div class="fbar">
+                    <button onclick="$('moreF').classList.toggle('on');this.textContent=$('moreF').classList.contains('on')?'− Fewer filters':'+ More filters'">+ More filters</button>
+                    <button onclick="clearFilters()">Clear all</button>
+                </div>
             </div>
             <div class="chips" id="deptChips"></div>
             <div class="count" id="jobCount"></div>
@@ -1288,7 +1442,16 @@
     const SHORTLIST_MAX = 10;
 
     const DEMO = !SB_KEY.startsWith('eyJ');
-    const DEPTS = ['Deck', 'Interior', 'Galley', 'Engineering'];
+    const DEPTS = ['Deck', 'Interior', 'Galley', 'Engineering', 'Specialist'];
+    const CONTRACTS = ['Permanent', 'Rotational', 'Seasonal', 'Temporary', 'Daywork', 'Delivery'];
+    const VTYPES = ['Motor', 'Sail', 'Expedition', 'Catamaran', 'Support', 'New Build'];
+    const EXP_LEVELS = ['Green / no experience', '0–6 months', '6–12 months', '1–2 years', '2–5 years', '5–10 years', '10+ years'];
+    const REGIONS = ['Mediterranean', 'Caribbean', 'USA & Bahamas', 'Northern Europe', 'Middle East', 'Asia & Pacific', 'South Africa', 'Worldwide'];
+    const PERIODS = {
+        day: 'per day',
+        month: 'per month',
+        year: 'per year'
+    };
     const CERT_OPTS = ['STCW Basic Safety', 'ENG1 Medical', 'PDSD', 'Food Hygiene L2', 'Powerboat L2', 'Yachtmaster Offshore', 'RYA Day Skipper', 'Proficiency in Survival Craft', 'Silver Service', 'WSET Wine L2', 'Culinary Diploma', "Ship's Cook Cert", 'AEC', 'PADI Divemaster'];
     const VISA_OPTS = ['B1/B2 (USA)', 'Schengen', 'UK', 'Australian MCV', "Seaman's Book"];
     const POSITIONS = ['Deckhand', 'Lead Deckhand', 'Bosun', 'Second Officer', 'Chief Officer', 'Captain', 'Junior Steward/ess', 'Steward/ess', 'Second Steward/ess', 'Chief Steward/ess', 'Head of Housekeeping', 'Laundry Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer', 'Deck/Engineer'];
@@ -1572,6 +1735,68 @@
     function $(id) {
         return document.getElementById(id);
     }
+    function per(j) {
+        return PERIODS[j.salary_period || 'month'];
+    }
+    function monthly(j) {
+        const v = j.salary_max || j.salary_min || 0;
+        const m = j.salary_period === 'day' ? v * 22 : j.salary_period === 'year' ? v / 12 : v;
+        return m * ({
+            EUR: 1,
+            USD: 0.92,
+            GBP: 1.17,
+            ZAR: 0.05
+        }[j.currency] || 1);
+    } // approx EUR per month
+    function ft(m) {
+        return m ? m + 'm / ' + Math.round(m * 3.281) + 'ft' : '';
+    }
+    function isNew(j) {
+        return (Date.now() - new Date(j.created_at)) < 864e5;
+    }
+    function badges(j) {
+        return (j.urgent ? '<span class="badge b-urgent">Urgent</span>' : '') + (j.featured ? '<span class="badge b-featured">★ Featured</span>' : '') + (isNew(j) ? '<span class="badge b-new">Posted today</span>' : '') + (j.couple ? '<span class="badge b-couple">Couple</span>' : '');
+    }
+    function clearFilters() {
+        ['fQ', 'fContract', 'fGender', 'fSize', 'fType', 'fUsage', 'fExp', 'fRegion', 'fPay'].forEach(i => $(i).value = '');
+        $('fCouple').checked = false;
+        $('fUrgent').checked = false;
+        $('fSort').value = 'best';
+        deptFilter = '';
+        renderJobs();
+    }
+    function fillFilterOpts() {
+        const add = (id, opts) => {
+            const el = $(id);
+            if (el.options.length > 1)
+                return;
+            opts.forEach(o => el.add(new Option(o, o)));
+        };
+        add('fContract', CONTRACTS);
+        add('fType', VTYPES);
+        add('fExp', EXP_LEVELS);
+        add('fRegion', REGIONS);
+    }
+    function missingForApply(c) {
+        const m = [];
+        if (!c.phone)
+            m.push('WhatsApp / phone number');
+        if (!c.nationality)
+            m.push('Nationality');
+        if (!c.gender)
+            m.push('Gender');
+        if (!c.dob)
+            m.push('Date of birth');
+        if (!c.position_sought)
+            m.push("Position you're looking for");
+        if (!c.certs)
+            m.push('Tick your certificates');
+        if (!(c.documents || []).length)
+            m.push('Upload at least one certificate document');
+        if (!c.cv_url)
+            m.push('Upload your CV');
+        return m;
+    }
     function money(j) {
         const c = {
             EUR: '€',
@@ -1678,16 +1903,41 @@
         $('sOpen').textContent = open.length;
         $('sDept').textContent = new Set(open.map(j => j.department)).size;
         $('deptChips').innerHTML = ['', ...DEPTS].map(d => `<button class="chip ${deptFilter === d ? 'on' : ''}" onclick="deptFilter='${d}';renderJobs()">${d || 'All departments'} (${d ? open.filter(j => j.department === d).length : open.length})</button>`).join('');
+        fillFilterOpts();
         const q = $('fQ').value.toLowerCase(),
             c = $('fContract').value,
             g = $('fGender').value,
             sz = $('fSize').value,
             sort = $('fSort').value;
+        const vt = $('fType').value,
+            us = $('fUsage').value,
+            ex = $('fExp').value,
+            rg = $('fRegion').value,
+            pay = $('fPay').value;
         let js = open.slice();
         if (deptFilter)
             js = js.filter(j => j.department === deptFilter);
         if (c)
-            js = js.filter(j => j.contract === c);
+            js = js.filter(j => (j.contract === 'Temp' ? 'Temporary' : j.contract) === c);
+        if (vt)
+            js = js.filter(j => j.yacht_type === vt);
+        if (us)
+            js = js.filter(j => j.usage === us);
+        if (ex)
+            js = js.filter(j => j.exp_level === ex);
+        if (rg)
+            js = js.filter(j => j.region === rg);
+        if (pay) {
+            const [a, b] = pay.split('-').map(Number);
+            js = js.filter(j => {
+                const m = monthly(j);
+                return m >= a && m < b;
+            });
+        }
+        if ($('fCouple').checked)
+            js = js.filter(j => j.couple);
+        if ($('fUrgent').checked)
+            js = js.filter(j => j.urgent);
         if (g)
             js = js.filter(j => (j.gender || 'Any') === g);
         if (sz) {
@@ -1696,19 +1946,23 @@
         }
         if (q)
             js = js.filter(j => [j.position, j.location, j.yacht_type, j.usage, j.profile, j.ref, j.department].join(' ').toLowerCase().includes(q));
+        const score = j => (j.featured ? 2 : 0) + (j.urgent ? 1 : 0);
         if (sort === 'pay')
-            js.sort((a, b) => (b.salary_max || b.salary_min || 0) - (a.salary_max || a.salary_min || 0));
+            js.sort((a, b) => monthly(b) - monthly(a));
         else if (sort === 'start')
             js.sort((a, b) => new Date(a.start_date || 0) - new Date(b.start_date || 0));
-        else
+        else if (sort === 'new')
             js.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        else
+            js.sort((a, b) => score(b) - score(a) || new Date(b.created_at) - new Date(a.created_at));
         $('jobCount').textContent = js.length + ' position' + (js.length === 1 ? '' : 's') + ' found';
         $('jobGrid').innerHTML = js.length ? js.map(j => {
             const applied = ME && APPS.some(a => a.job_id === j.id && a.candidate_id === ME.id);
-            return `<div class="job" onclick="openJob('${j.id}')">
+            return `<div class="job ${j.featured ? 'feat' : ''}" onclick="openJob('${j.id}')">
+                  ${badges(j) ? `<div>${badges(j)}</div>` : ''}
                   <div class="job-top"><div><h3>${esc(j.position)}</h3><div class="ref">${esc(j.ref || '')} · Posted ${ago(j.created_at)}</div></div><span class="dept d-${esc(j.department)}">${esc(j.department || '')}</span></div>
-                  <div class="meta"><span>⚓ ${j.yacht_size ? j.yacht_size + 'm ' : ''}${esc(j.yacht_type || '')}${j.usage ? ' · ' + esc(j.usage) : ''}</span><span>📍 ${esc(j.location || 'TBC')}</span><span>📅 ${fdate(j.start_date)}</span><span>📝 ${esc(j.contract || '')}${j.rotation ? ' · ' + esc(j.rotation) : ''}</span></div>
-                  <div class="salary">${money(j)} <small>${esc(j.currency || '')} / month</small></div>
+                  <div class="meta"><span>⚓ ${j.yacht_size ? ft(j.yacht_size) + ' ' : ''}${esc(j.yacht_type || '')}${j.usage ? ' · ' + esc(j.usage) : ''}</span><span>📍 ${esc(j.location || 'TBC')}</span><span>📅 ${fdate(j.start_date)}</span><span>📝 ${esc(j.contract || '')}${j.rotation ? ' · ' + esc(j.rotation) : ''}</span></div>
+                  <div class="salary">${money(j)} <small>${esc(j.currency || '')} ${per(j)}</small></div>
                   <div class="profile">${esc(j.profile || j.description || '')}</div>
                   <div class="tags"><span class="tag g-${esc(j.gender || 'Any')}">${genderLabel(j.gender)}</span>${list(j.certs).slice(0, 3).map(c => `<span class="tag">${esc(c)}</span>`).join('')}${list(j.certs).length > 3 ? `<span class="tag">+${list(j.certs).length - 3}</span>` : ''}</div>
                   <div class="job-foot"><span style="font-size:13px;color:var(--muted)">${esc(j.experience || '')}</span>${applied ? '<span class="tag" style="background:#dcfce7;border-color:#bbf7d0">✓ Applied</span>' : '<button class="btn btn-p btn-sm">View & apply</button>'}</div>
@@ -1726,15 +1980,19 @@
             applyBox = `<div class="success"><div class="tick">✓</div><h3>You've applied for this role</h3><p style="color:var(--muted)">Current stage: <b>${STAGES[SIDX[mine.stage]].t}</b>. Track it under My Profile.</p></div>`;
         else if (!ME)
             applyBox = `<div style="text-align:center;padding:10px"><h3 style="margin-bottom:6px">Want this role?</h3><p style="color:var(--muted);margin-bottom:14px">Register your crew profile once (CV, certificates, yacht references), then apply to any job in one click.</p><button class="btn btn-g" onclick="closeModal();PENDING_JOB='${j.id}';show('me')">Register or log in to apply</button></div>`;
+        else if (missingForApply(ME).length)
+            applyBox = `<div><h3 style="margin-bottom:6px">Complete your profile to apply</h3><p style="color:var(--muted);font-size:14px">Captains want the full picture, so we only accept applications from complete profiles. Still missing:</p>
+                <ul class="req">${missingForApply(ME).map(x => `<li class="no">✕ ${esc(x)}</li>`).join('')}</ul>
+                <button class="btn btn-g" onclick="closeModal();PENDING_JOB='${j.id}';show('me')">Complete my profile</button></div>`;
         else
             applyBox = `<div id="applyBox"><h3 style="margin-bottom:6px">Apply as ${esc(fullName(ME))}</h3><p style="color:var(--muted);font-size:14px;margin-bottom:12px">Your profile, CV and references will be sent with this application.${ME.cv_url ? '' : ' <b style="color:var(--warn)">Tip: upload your CV in My Profile first.</b>'}</p>
                 <label>Why are you a good fit? (optional)</label><textarea id="apNote"></textarea>
                 <button class="btn btn-g" id="apBtn" style="width:100%;padding:13px;margin-top:12px" onclick="applyJob('${j.id}')">Submit application</button></div>`;
         openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button>
               <div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.department || '')}</div><h2>${esc(j.position)}</h2>
-              <div style="color:var(--gold);font-weight:700;font-size:18px;margin-top:4px">${money(j)} ${esc(j.currency || '')} / month</div></div>
+              <div style="color:var(--gold);font-weight:700;font-size:18px;margin-top:4px">${money(j)} ${esc(j.currency || '')} ${per(j)}</div>${badges(j) ? `<div style="margin-top:8px">${badges(j)}</div>` : ''}</div>
             <div class="m-body">
-              <div class="facts">${fact('Yacht', (j.yacht_size ? j.yacht_size + 'm ' : '') + (j.yacht_type || ''))}${fact('Program', j.usage)}${fact('Location', j.location)}${fact('Contract', j.contract)}${fact('Rotation', j.rotation)}${fact('Start date', fdate(j.start_date))}${fact('Cabin', genderLabel(j.gender) + (j.cabin ? ' — ' + j.cabin : ''))}${fact('Experience', j.experience)}</div>
+              <div class="facts">${fact('Yacht', (j.yacht_size ? ft(j.yacht_size) + ' ' : '') + (j.yacht_type || ''))}${fact('Couple position', j.couple ? 'Yes — couples welcome' : '')}${fact('Region', j.region)}${fact('Program', j.usage)}${fact('Location', j.location)}${fact('Contract', j.contract)}${fact('Rotation', j.rotation)}${fact('Start date', fdate(j.start_date))}${fact('Cabin', genderLabel(j.gender) + (j.cabin ? ' — ' + j.cabin : ''))}${fact('Experience', j.experience)}</div>
               ${j.profile ? `<div class="sec"><h4>The person we're looking for</h4><p>${esc(j.profile)}</p></div>` : ''}
               ${j.description ? `<div class="sec"><h4>About the role</h4><p>${esc(j.description)}</p></div>` : ''}
               ${list(j.certs).length ? `<div class="sec"><h4>Required certificates</h4><div class="tags">${list(j.certs).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div></div>` : ''}
@@ -1862,8 +2120,9 @@
     }
 
     function completeness(c) {
-        const checks = [c.position_sought, c.nationality, c.gender, c.certs, c.cv_url, (c.documents || []).length, (c.yacht_refs || []).length, c.bio];
-        return Math.round(checks.filter(Boolean).length / checks.length * 100);
+        const total = 8,
+            miss = missingForApply(c).length;
+        return Math.round((total - miss) / total * 100);
     }
     function renderProfile(justRegistered) {
         const c = ME;
@@ -1871,8 +2130,9 @@
         const mine = APPS.filter(a => a.candidate_id === c.id).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         const pct = completeness(c);
         $('meBox').innerHTML = `
-            <div class="a-top"><div><h2 class="t">Hi ${esc(c.first_name)}</h2><p class="sub" style="margin:0">Profile ${pct}% complete ${pct < 100 ? '— complete profiles get interviewed first.' : '✓'}</p></div>
+            <div class="a-top"><div><h2 class="t">Hi ${esc(c.first_name)}</h2><p class="sub" style="margin:0">Profile ${pct}% complete ${pct < 100 ? '— you need 100% to apply for jobs.' : '✓ Ready to apply'}</p></div>
               <div style="display:flex;gap:8px"><button class="btn btn-p" onclick="show('jobs')">Browse jobs</button><button class="btn btn-o" onclick="logoutMe()">Log out</button></div></div>
+            ${pct < 100 ? `<div class="panel" style="background:#fff7ed;border-color:#fed7aa"><b>To apply for jobs, complete these:</b><ul class="req">${missingForApply(c).map(x => `<li class="no">✕ ${esc(x)}</li>`).join('')}</ul><span style="font-size:13px;color:var(--muted)">Yacht references and "About me" are optional but help a lot.</span></div>` : ''}
             ${justRegistered && PENDING_JOB ? `<div class="panel" style="background:#fffbeb;border-color:#fde68a">Save your profile below, then you'll be taken back to the job to apply.</div>` : ''}
             <div class="panel"><h3>My applications</h3>${mine.length ? mine.map(a => appCard(a)).join('') : '<p style="color:var(--muted)">No applications yet. <a href="#" onclick="show(\'jobs\');return false">Browse open jobs →</a></p>'}</div>
             <div class="panel"><h3>Personal details</h3><div class="form">
@@ -1958,8 +2218,8 @@
             $('dType').value = '';
             $('dName').value = '';
             $('dFile').value = '';
-            $('dMsg').textContent = '✓ Uploaded';
-            drawDocs();
+            toast('Document uploaded');
+            renderProfile();
         } catch (e) {
             $('dMsg').textContent = 'Error: ' + e.message;
         }
@@ -1974,7 +2234,7 @@
             ME = await db.patchCand(ME.id, {
                 documents: docs
             });
-            drawDocs();
+            renderProfile();
         } catch (e) {
             toast('Error: ' + e.message);
         }
@@ -2010,7 +2270,7 @@
             ME = await db.patchCand(ME.id, f);
             setWho();
             toast('Profile saved');
-            if (PENDING_JOB)
+            if (PENDING_JOB && !missingForApply(ME).length)
                 return afterLogin();
             renderProfile();
         } catch (e) {
@@ -2169,9 +2429,9 @@
 
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
-            <td>${esc(j.ref || '')}</td><td><b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
+            <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
             <td>${j.yacht_size ? j.yacht_size + 'm ' : ''}${esc(j.yacht_type || '')}<br><small style="color:var(--muted)">${esc(j.location || '')}</small></td>
-            <td>${money(j)} ${esc(j.currency || '')}</td><td>${esc(j.gender || 'Any')}</td><td>${fdate(j.start_date)}</td>
+            <td>${money(j)} ${esc(j.currency || '')}<br><small style="color:var(--muted)">${per(j)}</small></td><td>${esc(j.gender || 'Any')}${j.couple ? '<br><small>Couple</small>' : ''}</td><td>${fdate(j.start_date)}</td>
             <td><a href="#" onclick="aTab('pipe');$('pJob').value='${j.id}';renderPipe();return false">${APPS.filter(a => a.job_id === j.id).length} →</a></td>
             <td><span class="st st-${j.status}">${j.status}</span></td>
             <td style="white-space:nowrap"><button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
@@ -2240,6 +2500,7 @@
             status: 'open',
             currency: 'EUR',
             gender: 'Any',
+            salary_period: 'month',
             ref: nextRef()
         };
         const sel = (i, o, v) => `<select id="${i}">${o.map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
@@ -2247,13 +2508,16 @@
         openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><h2>${id ? 'Edit job' : 'Post a new job'}</h2></div>
           <div class="m-body"><div class="form">
             <div><label>Reference</label><input id="jRef" value="${v('ref')}"></div><div><label>Status</label>${sel('jStatus', ['open', 'closed', 'filled'], j.status)}</div>
+            <div class="full" style="display:flex;gap:10px;flex-wrap:wrap"><label class="ck"><input type="checkbox" id="jUrgent" ${j.urgent ? 'checked' : ''}> <span class="badge b-urgent">Urgent</span> red label</label><label class="ck"><input type="checkbox" id="jFeatured" ${j.featured ? 'checked' : ''}> <span class="badge b-featured">★ Featured</span> pinned to top</label><label class="ck"><input type="checkbox" id="jCouple" ${j.couple ? 'checked' : ''}> Couple position</label></div>
             <div><label>Position *</label><input id="jPos" list="posList2" value="${v('position')}" placeholder="e.g. Deckhand"><datalist id="posList2">${POSITIONS.map(p => `<option>${p}</option>`).join('')}</datalist></div>
             <div><label>Department</label>${sel('jDept', DEPTS, j.department)}</div>
-            <div><label>Yacht type</label>${sel('jType', ['Motor', 'Sail', 'Expedition', 'Catamaran'], j.yacht_type)}</div><div><label>Yacht size (m)</label><input id="jSize" type="number" value="${v('yacht_size')}"></div>
+            <div><label>Yacht type</label>${sel('jType', VTYPES, j.yacht_type)}</div><div><label>Yacht size (m)</label><input id="jSize" type="number" value="${v('yacht_size')}"></div>
             <div><label>Program</label>${sel('jUsage', ['Private', 'Charter', 'Private & Charter'], j.usage)}</div><div><label>Location / cruising</label><input id="jLoc" value="${v('location')}" placeholder="Med summer / Caribbean winter"></div>
-            <div><label>Contract</label>${sel('jContract', ['Permanent', 'Seasonal', 'Rotational', 'Temp'], j.contract)}</div><div><label>Rotation / leave</label><input id="jRot" value="${v('rotation')}" placeholder="2:2 or 35 days leave"></div>
+            <div><label>Region (for filter)</label>${sel('jRegion', REGIONS, j.region)}</div><div><label>Experience level (for filter)</label>${sel('jExpL', EXP_LEVELS, j.exp_level)}</div>
+            <div><label>Contract</label>${sel('jContract', CONTRACTS, j.contract === 'Temp' ? 'Temporary' : j.contract)}</div><div><label>Rotation / leave</label><input id="jRot" value="${v('rotation')}" placeholder="2:2 or 35 days leave"></div>
             <div><label>Start date</label><input id="jStart" type="date" value="${v('start_date')}"></div><div><label>Currency</label>${sel('jCur', ['EUR', 'USD', 'GBP', 'ZAR'], j.currency)}</div>
-            <div><label>Salary from (monthly)</label><input id="jMin" type="number" value="${v('salary_min')}"></div><div><label>Salary to (monthly)</label><input id="jMax" type="number" value="${v('salary_max')}"></div>
+            <div><label>Salary paid</label><select id="jPer">${Object.entries(PERIODS).map(([k, t]) => `<option value="${k}" ${(j.salary_period || 'month') === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div><div></div>
+            <div><label>Salary from</label><input id="jMin" type="number" value="${v('salary_min')}"></div><div><label>Salary to</label><input id="jMax" type="number" value="${v('salary_max')}"></div>
             <div><label>Male / female (cabin)</label>${sel('jGender', ['Any', 'Male', 'Female'], j.gender)}</div><div><label>Cabin arrangement</label><input id="jCabin" value="${v('cabin')}" placeholder="Shared twin with female stew"></div>
             <div class="full"><label>Experience required</label><input id="jExp" value="${v('experience')}" placeholder="1+ season on 50m+ motor yacht"></div>
             <div class="full"><label>Certificates required (comma separated)</label><input id="jCerts" value="${v('certs')}" placeholder="STCW Basic Safety, ENG1 Medical, PDSD"></div>
@@ -2292,7 +2556,13 @@
             certs: $('jCerts').value.trim(),
             visas: $('jVisas').value.trim(),
             profile: $('jProfile').value.trim(),
-            description: $('jDesc').value.trim()
+            description: $('jDesc').value.trim(),
+            salary_period: $('jPer').value,
+            couple: $('jCouple').checked,
+            urgent: $('jUrgent').checked,
+            featured: $('jFeatured').checked,
+            region: $('jRegion').value,
+            exp_level: $('jExpL').value
         };
         if (id)
             j.id = id;
@@ -2562,6 +2832,89 @@
             JOBS = sampleJobs();
             CANDS = sampleCands();
             APPS = sampleApps();
+            const X = {
+                j1: {
+                    featured: true,
+                    region: 'Mediterranean',
+                    exp_level: '6–12 months'
+                },
+                j2: {
+                    region: 'Mediterranean',
+                    exp_level: '1–2 years'
+                },
+                j3: {
+                    region: 'Worldwide',
+                    exp_level: '2–5 years'
+                },
+                j4: {
+                    region: 'Caribbean',
+                    exp_level: '1–2 years'
+                },
+                j5: {
+                    urgent: true,
+                    region: 'Mediterranean',
+                    exp_level: '2–5 years'
+                },
+                j6: {
+                    urgent: true,
+                    region: 'Mediterranean',
+                    exp_level: '1–2 years'
+                }
+            };
+            JOBS.forEach(j => Object.assign(j, {
+                salary_period: 'month'
+            }, X[j.id] || {}));
+            JOBS.push({
+                id: 'j7',
+                created_at: new Date().toISOString(),
+                ref: 'SMR-0007',
+                position: 'Daywork Deckhand',
+                department: 'Deck',
+                yacht_type: 'Motor',
+                yacht_size: 45,
+                usage: 'Private',
+                location: 'V&A Waterfront, Cape Town',
+                region: 'South Africa',
+                contract: 'Daywork',
+                rotation: '5 days',
+                start_date: null,
+                salary_min: 1200,
+                salary_max: 1500,
+                currency: 'ZAR',
+                salary_period: 'day',
+                gender: 'Any',
+                certs: 'STCW Basic Safety',
+                experience: 'Green crew welcome',
+                exp_level: 'Green / no experience',
+                profile: 'Hard-working, reliable green crew for washdowns and varnish prep.',
+                status: 'open'
+            },
+            {
+                id: 'j8',
+                created_at: new Date(Date.now() - 2 * 864e5).toISOString(),
+                ref: 'SMR-0008',
+                position: 'Captain & Chef (couple)',
+                department: 'Deck',
+                yacht_type: 'Sail',
+                yacht_size: 30,
+                usage: 'Private',
+                location: 'Caribbean',
+                region: 'Caribbean',
+                contract: 'Permanent',
+                rotation: '',
+                start_date: null,
+                salary_min: 12000,
+                salary_max: 14000,
+                currency: 'USD',
+                salary_period: 'month',
+                gender: 'Any',
+                couple: true,
+                certs: 'Yachtmaster Offshore, STCW Basic Safety, ENG1 Medical',
+                experience: 'Couple with sailing yacht experience',
+                exp_level: '5–10 years',
+                profile: 'Experienced couple to run a private sailing yacht. Combined salary.',
+                status: 'open'
+            });
         }
         try {
             await db.jobs();
