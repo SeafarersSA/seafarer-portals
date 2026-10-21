@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seafarer Recruitment — Superyacht Crew Jobs</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8 L90 92 L50 70 Z' fill='%23e82b30'/%3E%3Cpath d='M50 8 L10 92 L50 70 Z' fill='%23011950'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --navy: #011950;
+        --navy2: #0d2a6b;
+        --sea: #1d4ed8;
+        --teal: #2bb3b1;
+        --gold: #e82b30;
+        --bg: #f4f7fa;
+        --card: #fff;
+        --ink: #14213d;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --ok: #16a34a;
+        --warn: #d97706;
+        --bad: #dc2626;
+        --r: 14px;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    body {
+        font-family: Inter, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.5
+    }
+
+    a {
+        color: var(--sea)
+    }
+
+    button {
+        font-family: inherit;
+        cursor: pointer
+    }
+
+    input, select, textarea {
+        font-family: inherit;
+        font-size: 14px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        width: 100%;
+        background: #fff;
+        color: var(--ink)
+    }
+
+    textarea {
+        min-height: 90px;
+        resize: vertical
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        display: block;
+        margin-bottom: 5px
+    }
+
+    .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: .15s;
+        text-decoration: none;
+        display: inline-block
+    }
+
+    .btn-p {
+        background: var(--sea);
+        color:#fff
+    }
+
+    .btn-p:hover {
+        background: var(--navy2)
+    }
+
+    .btn-g {
+        background: var(--gold);
+        color:#fff
+    }
+
+    .btn-g:hover {
+        filter: brightness(1.05)
+    }
+
+    .btn-o {
+        background: #fff;
+        border: 1px solid var(--line);
+        color:var(--ink)
+    }
+
+    .btn-o:hover {
+        border-color: var(--sea)
+    }
+
+    .btn-d {
+        background: #fee2e2;
+        color: var(--bad)
+    }
+
+    .btn-ok {
+        background: #dcfce7;
+        color: #166534
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px
+    }
+
+    .btn:disabled {
+        opacity: .55;
+        cursor: not-allowed
+    }
+
+    .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 20px
+    }
+
+    header {
+        background: #fff;
+        color: var(--navy);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 3px solid var(--gold);
+        box-shadow: 0 2px 10px rgba(1, 25, 80, .06)
+    }
+
+    header .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 64px;
+        gap: 10px;
+        flex-wrap: wrap
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--gold)
+    }
+
+    .logo img {
+        height: 52px;
+        display: block
+    }
+
+    nav {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap
+    }
+
+    nav button {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-weight: 500;
+        padding: 8px 12px;
+        font-size: 14px;
+        border-radius: 8px
+    }
+
+    nav button:hover, nav button.on {
+        color: var(--navy);
+        background: #eef2fb
+    }
+
+    .who {
+        font-size: 13px;
+        color: var(--gold);
+        margin-left: 6px
+    }
+
+    .hero {
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 55%, var(--sea) 100%);
+        color: #fff;
+        padding: 56px 0 90px;
+        position: relative;
+        overflow: hidden
+    }
+
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(30px, 5vw, 46px);
+        line-height: 1.15;
+        max-width: 660px
+    }
+
+    .hero p {
+        color: #cbd5e1;
+        max-width: 580px;
+        margin-top: 12px;
+        font-size: 16px
+    }
+
+    .hero .stats {
+        display: flex;
+        gap: 28px;
+        margin-top: 26px;
+        flex-wrap: wrap
+    }
+
+    .hero .stats b {
+        display: block;
+        font-size: 24px;
+        color: var(--gold)
+    }
+
+    .hero .stats span {
+        font-size: 13px;
+        color: #cbd5e1
+    }
+
+    .wave {
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 60px
+    }
+
+    .filters {
+        background: #fff;
+        border-radius: var(--r);
+        box-shadow: 0 10px 30px rgba(11, 31, 58, .12);
+        padding: 16px;
+        margin-top: -50px;
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 2fr repeat(4, 1fr);
+        gap: 10px
+    }
+
+    .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 22px 0 14px
+    }
+
+    .chip {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink)
+    }
+
+    .chip.on {
+        background: var(--navy);
+        color: #fff;
+        border-color: var(--navy)
+    }
+
+    .count {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 12px
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 16px;
+        padding-bottom: 60px
+    }
+
+    .job {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: .15s;
+        cursor: pointer
+    }
+
+    .job:hover {
+        border-color: var(--sea);
+        box-shadow: 0 8px 24px rgba(11, 31, 58, .08);
+        transform: translateY(-2px)
+    }
+
+    .job-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px
+    }
+
+    .job h3 {
+        font-size: 18px
+    }
+
+    .ref {
+        font-size: 12px;
+        color: var(--muted)
+    }
+
+    .dept {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        padding: 4px 9px;
+        border-radius: 6px;
+        white-space: nowrap
+    }
+
+    .d-Deck {
+        background: #dbeafe;
+        color:#1e40af
+    }
+
+    .d-Interior {
+        background: #fce7f3;
+        color:#9d174d
+    }
+
+    .d-Galley {
+        background: #fef3c7;
+        color:#92400e
+    }
+
+    .d-Engineering {
+        background: #dcfce7;
+        color: #166534
+    }
+
+    .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        font-size: 13px;
+        color: var(--muted)
+    }
+
+    .salary {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--navy)
+    }
+
+    .salary small {
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 12px
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px
+    }
+
+    .tag {
+        font-size: 12px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        padding: 3px 8px;
+        border-radius: 6px
+    }
+
+    .g-Male {
+        background: #e0f2fe;
+        border-color:#bae6fd
+    }
+
+    .g-Female {
+        background: #fdf2f8;
+        border-color: #fbcfe8
+    }
+
+    .job .profile {
+        font-size: 14px;
+        color: #334155;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden
+    }
+
+    .job-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid var(--line)
+    }
+
+    .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 50px 20px;
+        grid-column: 1/-1
+    }
+
+    .ov {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 31, 58, .55);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        z-index: 50;
+        overflow-y: auto;
+        padding: 30px 14px
+    }
+
+    .ov.on {
+        display: flex
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 18px;
+        max-width: 780px;
+        width: 100%;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, .3)
+    }
+
+    .m-head {
+        background: var(--navy);
+        color: #fff;
+        padding: 22px 26px;
+        position: relative
+    }
+
+    .m-head h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 26px
+    }
+
+    .m-head .x {
+        position: absolute;
+        right: 16px;
+        top: 14px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 26px
+    }
+
+    .m-body {
+        padding: 24px 26px
+    }
+
+    .facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px
+    }
+
+    .fact {
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 12px
+    }
+
+    .fact small {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 600
+    }
+
+    .fact b {
+        font-size: 14px;
+        word-break: break-word
+    }
+
+    .sec {
+        margin-bottom: 18px
+    }
+
+    .sec h4 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--sea);
+        margin-bottom: 6px
+    }
+
+    .sec p {
+        white-space: pre-line;
+        font-size: 14px;
+        color: #334155
+    }
+
+    .form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px
+    }
+
+    .form .full {
+        grid-column: 1/-1
+    }
+
+    .checks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px
+    }
+
+    .checks label {
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 500;
+        color: var(--ink);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        padding: 6px 10px;
+        border-radius: 8px;
+        margin: 0;
+        cursor: pointer
+    }
+
+    .checks input {
+        width: auto
+    }
+
+    .hr {
+        height: 1px;
+        background: var(--line);
+        margin: 22px 0
+    }
+
+    .success {
+        text-align: center;
+        padding: 24px 10px
+    }
+
+    .tick {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: var(--ok);
+        font-size: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px
+    }/* candidate area */
+    .page {
+        padding: 34px 0 60px
+    }
+
+    .page h2.t {
+        font-family: 'Playfair Display', serif;
+        font-size: 30px;
+        margin-bottom: 6px
+    }
+
+    .sub {
+        color: var(--muted);
+        margin-bottom: 22px
+    }
+
+    .panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 18px
+    }
+
+    .panel h3 {
+        font-size: 17px;
+        margin-bottom: 14px
+    }
+
+    .auth {
+        max-width: 520px;
+        margin: 0 auto
+    }
+
+    .switch {
+        display: flex;
+        background: var(--bg);
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 18px
+    }
+
+    .switch button {
+        flex: 1;
+        border: none;
+        background: none;
+        padding: 10px;
+        border-radius: 9px;
+        font-weight: 600;
+        color: var(--muted)
+    }
+
+    .switch button.on {
+        background: #fff;
+        color: var(--navy);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, .08)
+    }
+
+    .refrow {
+        display: grid;
+        grid-template-columns: 1.3fr .6fr 1fr .8fr .8fr 1.2fr 1.2fr auto;
+        gap: 8px;
+        margin-bottom: 8px;
+        align-items: end
+    }
+
+    .refrow input {
+        padding: 8px 10px;
+        font-size: 13px
+    }
+
+    .refhead {
+        display: grid;
+        grid-template-columns: 1.3fr .6fr 1fr .8fr .8fr 1.2fr 1.2fr auto;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 4px
+    }
+
+    .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px
+    }/* stage tracker */
+    .app-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px
+    }
+
+    .app-card .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px
+    }
+
+    .track {
+        display: flex;
+        gap: 4px
+    }
+
+    .track .s {
+        flex: 1;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted)
+    }
+
+    .track .s i {
+        display: block;
+        height: 6px;
+        border-radius: 4px;
+        background: var(--line);
+        margin-bottom: 6px
+    }
+
+    .track .s.done i {
+        background:var(--teal)
+    }
+
+    .track .s.cur i {
+        background:var(--gold)
+    }
+
+    .track .s.cur {
+        color: var(--navy)
+    }
+
+    .track .s.bad i {
+        background:var(--bad)
+    }
+
+    .track .s.bad {
+        color: var(--bad)
+    }
+
+    .track .s.win i {
+        background:var(--ok)
+    }
+
+    .track .s.win {
+        color: var(--ok)
+    }/* admin */
+    .a-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px
+    }
+
+    .a-top h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px
+    }
+
+    .tabs {
+        display: flex;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 4px;
+        border-radius: 12px;
+        width: max-content;
+        max-width: 100%;
+        overflow-x: auto;
+        margin-bottom: 18px
+    }
+
+    .tabs button {
+        border: none;
+        background: none;
+        padding: 8px 16px;
+        border-radius: 9px;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--muted);
+        white-space: nowrap
+    }
+
+    .tabs button.on {
+        background: var(--navy);
+        color: #fff
+    }
+
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px
+    }
+
+    .kpi {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px
+    }
+
+    .kpi small {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase
+    }
+
+    .kpi b {
+        display: block;
+        font-size: 26px;
+        color: var(--navy)
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        font-size: 14px
+    }
+
+    th {
+        background: var(--bg);
+        text-align: left;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: var(--muted);
+        padding: 11px 12px
+    }
+
+    td {
+        padding: 11px 12px;
+        border-top: 1px solid var(--line);
+        vertical-align: top
+    }
+
+    tr:hover td {
+        background: #fafcff
+    }
+
+    .st {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 999px;
+        display: inline-block;
+        white-space: nowrap
+    }
+
+    .st-open {
+        background: #dcfce7;
+        color:#166534
+    }
+
+    .st-closed {
+        background: #fee2e2;
+        color:#991b1b
+    }
+
+    .st-filled {
+        background: #e0e7ff;
+        color: #3730a3
+    }
+
+    .tbl-wrap {
+        overflow-x: auto
+    }
+
+    .a-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+        align-items: center
+    }
+
+    .a-bar select, .a-bar input {
+        width: auto;
+        min-width: 200px
+    }
+
+    .login {
+        max-width: 380px;
+        margin: 70px auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 30px
+    }
+
+    .login h2 {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 16px
+    }/* kanban */
+    .board {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(190px, 1fr));
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 10px
+    }
+
+    .col {
+        background: #eef2f7;
+        border-radius: 12px;
+        padding: 10px;
+        min-height: 260px
+    }
+
+    .col h5 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--navy);
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 2px 4px
+    }
+
+    .col h5 span {
+        align-self: flex-start;
+        white-space: nowrap;
+        background: #fff;
+        border-radius: 999px;
+        padding: 0 8px;
+        color: var(--muted)
+    }
+
+    .col.full h5 span {
+        background: var(--bad);
+        color: #fff
+    }
+
+    .kc {
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 3px rgba(11, 31, 58, .08);
+        font-size: 13px
+    }
+
+    .kc b {
+        display: block;
+        font-size: 14px;
+        cursor: pointer
+    }
+
+    .kc b:hover {
+        color: var(--sea)
+    }
+
+    .kc .m {
+        color: var(--muted);
+        font-size: 12px;
+        margin: 2px 0 8px
+    }
+
+    .kc .acts {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap
+    }
+
+    .kc .acts button {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600
+    }
+
+    .col-accepted {
+        background:#ecfdf5
+    }
+
+    .col-denied {
+        background: #fef2f2
+    }
+
+    .banner {
+        background: #fef3c7;
+        color: #92400e;
+        text-align: center;
+        font-size: 13px;
+        padding: 7px 12px
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--navy);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        z-index: 99;
+        display: none;
+        max-width: 90vw
+    }
+
+    footer {
+        background: var(--navy);
+        color: #94a3b8;
+        font-size: 13px;
+        padding: 24px 0;
+        text-align: center
+    }
+
+    footer a {
+        color: #cbd5e1
+    }
+
+    .hide {
+        display: none !important
+    }
+
+    @media (max-width: 860px) {
+        .filters {
+            grid-template-columns:1fr 1fr
+        }
+
+        .filters .q {
+            grid-column: 1/-1
+        }
+
+        .kpis {
+            grid-template-columns: 1fr 1fr
+        }
+
+        .form, .two {
+            grid-template-columns: 1fr
+        }
+
+        .grid {
+            grid-template-columns: 1fr
+        }
+
+        .refrow, .refhead {
+            grid-template-columns:1fr 1fr
+        }
+
+        .refhead {
+            display: none
+        }
+
+        .board {
+            grid-template-columns: repeat(6, 220px)
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <div id="demoBanner" class="banner hide">
+        Demo mode — Supabase key not set. Everything here is sample data and resets on refresh. Demo admin: any email / password 
+        <b>demo</b>
+    </div>
+
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <img src="data:image/png;base64,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" alt="Seafarer — Anchor your career">
+                Recruitment
+            </div>
+            <nav>
+                <button id="nav-jobs" class="on" onclick="show('jobs')">Jobs</button>
+                <button id="nav-me" onclick="show('me')">My Profile</button>
+                <button id="nav-admin" onclick="show('admin')">Admin</button>
+                <span class="who" id="whoLbl"></span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ================= JOB BOARD ================= -->
+    <section id="view-jobs">
+        <div class="hero">
+            <div class="wrap">
+                <h1>Superyacht crew positions, placed by people who've worked onboard.</h1>
+                <p>Register your crew profile once, then apply for deck, interior and galley roles in one click. We interview you first, then put you forward to the yacht.</p>
+                <div class="stats">
+                    <div>
+                        <b id="sOpen">0</b>
+                        <span>Open positions</span>
+                    </div>
+                    <div>
+                        <b id="sDept">0</b>
+                        <span>Departments hiring</span>
+                    </div>
+                    <div>
+                        <b>10+ yrs</b>
+                        <span>Superyacht experience</span>
+                    </div>
+                </div>
+                <div style="margin-top:24px" id="heroCta">
+                    <button class="btn btn-g" onclick="show('me')">Register your crew profile</button>
+                </div>
+            </div>
+            <svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none">
+                <path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z" fill="#f4f7fa"/>
+            </svg>
+        </div>
+        <div class="wrap">
+            <div class="filters">
+                <input class="q" id="fQ" placeholder="Search position, location, yacht…" oninput="renderJobs()">
+                <select id="fContract" onchange="renderJobs()">
+                    <option value="">Any contract</option>
+                    <option>Permanent</option>
+                    <option>Seasonal</option>
+                    <option>Rotational</option>
+                    <option>Temp</option>
+                </select>
+                <select id="fGender" onchange="renderJobs()">
+                    <option value="">Any cabin</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Any</option>
+                </select>
+                <select id="fSize" onchange="renderJobs()">
+                    <option value="">Any size</option>
+                    <option value="0-40">Under 40m</option>
+                    <option value="40-60">40–60m</option>
+                    <option value="60-80">60–80m</option>
+                    <option value="80-999">80m+</option>
+                </select>
+                <select id="fSort" onchange="renderJobs()">
+                    <option value="new">Newest</option>
+                    <option value="pay">Highest salary</option>
+                    <option value="start">Soonest start</option>
+                </select>
+            </div>
+            <div class="chips" id="deptChips"></div>
+            <div class="count" id="jobCount"></div>
+            <div class="grid" id="jobGrid"></div>
+        </div>
+    </section>
+
+    <!-- ================= CANDIDATE AREA ================= -->
+    <section id="view-me" class="hide">
+        <div class="wrap page" id="meBox"></div>
+    </section>
+
+    <!-- ================= ADMIN ================= -->
+    <section id="view-admin" class="hide">
+        <div class="wrap page">
+            <div id="adminLogin" class="login">
+                <h2>Admin login</h2>
+                <div style="margin-bottom:12px">
+                    <label>Email</label>
+                    <input id="aEmail" type="email">
+                </div>
+                <div style="margin-bottom:16px">
+                    <label>Password</label>
+                    <input id="aPass" type="password" onkeydown="if(event.key==='Enter')adminLogin()">
+                </div>
+                <button class="btn btn-p" style="width:100%" onclick="adminLogin()">Sign in</button>
+                <p id="aErr" style="color:var(--bad);font-size:13px;margin-top:10px"></p>
+            </div>
+            <div id="adminPanel" class="hide">
+                <div class="a-top">
+                    <h2>Recruitment dashboard</h2>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn btn-g" onclick="openJobForm()">+ Post a job</button>
+                        <button class="btn btn-o" onclick="adminLogout()">Log out</button>
+                    </div>
+                </div>
+                <div class="kpis">
+                    <div class="kpi">
+                        <small>Registered crew</small>
+                        <b id="kCand">0</b>
+                    </div>
+                    <div class="kpi">
+                        <small>Open jobs</small>
+                        <b id="kOpen">0</b>
+                    </div>
+                    <div class="kpi">
+                        <small>Waiting for interview</small>
+                        <b id="kNew">0</b>
+                    </div>
+                    <div class="kpi">
+                        <small>Accepted</small>
+                        <b id="kAcc">0</b>
+                    </div>
+                </div>
+                <div class="tabs">
+                    <button id="t-pipe" class="on" onclick="aTab('pipe')">Pipeline</button>
+                    <button id="t-jobs" onclick="aTab('jobs')">Jobs</button>
+                    <button id="t-cand" onclick="aTab('cand')">Registered crew</button>
+                </div>
+
+                <div id="a-pipe">
+                    <div class="a-bar">
+                        <label style="margin:0">Job</label>
+                        <select id="pJob" onchange="renderPipe()"></select>
+                        <span id="pInfo" style="font-size:13px;color:var(--muted)"></span>
+                    </div>
+                    <div class="board" id="board"></div>
+                </div>
+
+                <div id="a-jobs" class="hide">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ref</th>
+                                    <th>Position</th>
+                                    <th>Yacht</th>
+                                    <th>Salary</th>
+                                    <th>Cabin</th>
+                                    <th>Start</th>
+                                    <th>Applicants</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="aJobRows"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="a-cand" class="hide">
+                    <div class="a-bar">
+                        <input id="cQ" placeholder="Search name, nationality, position, cert…" oninput="renderCands()">
+                        <select id="cG" onchange="renderCands()">
+                            <option value="">Any gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Looking for</th>
+                                    <th>Nationality</th>
+                                    <th>Age</th>
+                                    <th>Certificates</th>
+                                    <th>Yacht refs</th>
+                                    <th>CV</th>
+                                    <th>Applied</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="aCandRows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        Seafarer Maritime Career Consultancy · Cape Town, South Africa · Visa support via 
+        <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
+    </footer>
+
+    <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
+        <div class="modal" id="modal"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    /* ============================================================
+       CONFIG — same Supabase project as the student portal.
+       Key must be the JWT anon key (starts with eyJ).
+       ============================================================ */
+    const SB_URL = 'https://shbjnypgkvxovosjoxyc.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmpueXBna3Z4b3Zvc2pveHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNjM1ODIsImV4cCI6MjEwMjczOTU4Mn0.Wk4S2JS7OGQZpMlGuFvTKikn54bGqQ_vUJaf60fqy-A';
+    const ADMIN_EMAIL = 'bsnyman13@gmail.com';
+    const ADMIN_PASS = 'Seafarer2025!';
+    const SHORTLIST_MAX = 10;
+
+    const DEMO = !SB_KEY.startsWith('eyJ');
+    const DEPTS = ['Deck', 'Interior', 'Galley', 'Engineering'];
+    const CERT_OPTS = ['STCW Basic Safety', 'ENG1 Medical', 'PDSD', 'Food Hygiene L2', 'Powerboat L2', 'Yachtmaster Offshore', 'RYA Day Skipper', 'Proficiency in Survival Craft', 'Silver Service', 'WSET Wine L2', 'Culinary Diploma', "Ship's Cook Cert", 'AEC', 'PADI Divemaster'];
+    const VISA_OPTS = ['B1/B2 (USA)', 'Schengen', 'UK', 'Australian MCV', "Seaman's Book"];
+    const POSITIONS = ['Deckhand', 'Lead Deckhand', 'Bosun', 'Second Officer', 'Chief Officer', 'Captain', 'Junior Steward/ess', 'Steward/ess', 'Second Steward/ess', 'Chief Steward/ess', 'Head of Housekeeping', 'Laundry Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer', 'Deck/Engineer'];
+    const STAGES = [
+    {
+        k: 'applied',
+        t: 'Applied',
+        s: 'Application received'
+    },
+    {
+        k: 'interview_us',
+        t: 'Interview with us',
+        s: 'Phase 1 — Seafarer interview'
+    },
+    {
+        k: 'interview_yacht',
+        t: 'Interview with yacht',
+        s: 'Phase 2 — Captain / HOD interview'
+    },
+    {
+        k: 'shortlist',
+        t: 'Final 10',
+        s: 'Phase 3 — Shortlisted'
+    },
+    {
+        k: 'accepted',
+        t: 'Accepted',
+        s: 'Offer accepted'
+    },
+    {
+        k: 'denied',
+        t: 'Not successful',
+        s: 'Not successful this time'
+    }
+    ];
+    const SIDX = Object.fromEntries(STAGES.map((s, i) => [s.k, i]));
+
+    let JOBS = [],
+        APPS = [],
+        CANDS = [],
+        ME = null,
+        isAdmin = false,
+        deptFilter = '',
+        aCur = 'pipe',
+        authMode = 'register',
+        REFS = [];
+
+    /* ---------------- data layer ---------------- */
+    const H = {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json'
+    };
+    async function sb(path, opt={}) {
+        const r = await fetch(SB_URL + '/rest/v1/' + path, {
+            ...opt,
+            headers: {
+                ...H,
+                Prefer: 'return=representation',
+                ...(opt.headers || {})
+            }
+        });
+        const txt = await r.text();
+        if (!r.ok) {
+            let m = txt;
+            try {
+                m = JSON.parse(txt).message || txt
+            } catch (e) {}
+            throw new Error(m);
+        }
+        return txt ? JSON.parse(txt) : [];
+    }
+    const db = {
+        async jobs() {
+            if (DEMO)
+                return;
+            JOBS = await sb('recruit_jobs?select=*&order=created_at.desc');
+        },
+        async apps() {
+            if (DEMO)
+                return;
+            APPS = await sb('recruit_applications?select=*&order=created_at.desc');
+        },
+        async cands() {
+            if (DEMO)
+                return;
+            CANDS = await sb('recruit_candidates?select=*&order=created_at.desc');
+        },
+        async myApps(cid) {
+            if (DEMO) {
+                await db.apps();
+                return;
+            }
+            const mine = await sb('recruit_applications?select=*&candidate_id=eq.' + cid);
+            APPS = APPS.filter(a => a.candidate_id !== cid).concat(mine);
+        },
+        async findCand(email) {
+            if (DEMO) {
+                await db.cands();
+                return CANDS.find(c => c.email === email) || null;
+            }
+            const r = await sb('recruit_candidates?select=*&email=eq.' + encodeURIComponent(email));
+            return r[0] || null;
+        },
+        async addCand(c) {
+            if (DEMO) {
+                c.id = uid();
+                c.created_at = new Date().toISOString();
+                CANDS.unshift(c);
+                return c;
+            }
+            const r = await sb('recruit_candidates', {
+                method: 'POST',
+                body: JSON.stringify(c)
+            });
+            return r[0];
+        },
+        async patchCand(id, f) {
+            if (DEMO) {
+                Object.assign(CANDS.find(c => c.id === id), f);
+                return CANDS.find(c => c.id === id);
+            }
+            const r = await sb('recruit_candidates?id=eq.' + id, {
+                method: 'PATCH',
+                body: JSON.stringify(f)
+            });
+            const i = CANDS.findIndex(c => c.id === id);
+            if (i > -1)
+                CANDS[i] = r[0];
+            return r[0];
+        },
+        async saveJob(j) {
+            if (DEMO) {
+                if (j.id) {
+                    Object.assign(JOBS.find(x => x.id === j.id), j);
+                } else {
+                    j.id = uid();
+                    j.created_at = new Date().toISOString();
+                    JOBS.unshift(j);
+                }
+                return;
+            }
+            const id = j.id;
+            delete j.id;
+            if (id)
+                await sb('recruit_jobs?id=eq.' + id, {
+                    method: 'PATCH',
+                    body: JSON.stringify(j)
+                });
+            else
+                await sb('recruit_jobs', {
+                    method: 'POST',
+                    body: JSON.stringify(j)
+                });
+        },
+        async delJob(id) {
+            if (DEMO) {
+                JOBS = JOBS.filter(j => j.id !== id);
+                APPS = APPS.filter(a => a.job_id !== id);
+                return;
+            }
+            await sb('recruit_jobs?id=eq.' + id, {
+                method: 'DELETE'
+            });
+        },
+        async apply(a) {
+            if (DEMO) {
+                a.id = uid();
+                a.created_at = a.updated_at = new Date().toISOString();
+                a.stage = 'applied';
+                APPS.unshift(a);
+                return;
+            }
+            const r = await sb('recruit_applications', {
+                method: 'POST',
+                body: JSON.stringify(a)
+            });
+            APPS.unshift(r[0]);
+        },
+        async patchApp(id, f) {
+            f.updated_at = new Date().toISOString();
+            if (!DEMO)
+                await sb('recruit_applications?id=eq.' + id, {
+                    method: 'PATCH',
+                    body: JSON.stringify(f)
+                });
+            Object.assign(APPS.find(a => a.id === id), f);
+        }
+    };
+    async function uploadCV(file) {
+        if (!file)
+            return null;
+        if (DEMO)
+            return URL.createObjectURL(file);
+        const name = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const r = await fetch(SB_URL + '/storage/v1/object/cvs/' + name, {
+            method: 'POST',
+            headers: {
+                apikey: SB_KEY,
+                Authorization: 'Bearer ' + SB_KEY,
+                'Content-Type': file.type || 'application/octet-stream'
+            },
+            body: file
+        });
+        if (!r.ok)
+            throw new Error('CV upload failed: ' + await r.text());
+        return SB_URL + '/storage/v1/object/public/cvs/' + name;
+    }
+    async function hash(email, pw) {
+        const msg = email.toLowerCase() + '|seafarer|' + pw;
+        if (window.crypto && crypto.subtle) {
+            try {
+                const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+                return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {}
+        }
+        return sha256(msg); // fallback for Safari when opened as a local file
+    }
+    function sha256(ascii) {
+        const rr = (v, a) => (v >>> a) | (v << (32 - a));
+        const bytes = new TextEncoder().encode(ascii);
+        const K = [],
+            Hh = [];
+        let p = 2,
+            n = 0;
+        while (n < 64) {
+            let prime = true;
+            for (let i = 2; i * i <= p; i++)
+                if (p % i === 0) {
+                    prime = false;
+                    break;
+                }
+            if (prime) {
+                if (n < 8)
+                    Hh[n] = (Math.pow(p, 1 / 2) * 2 ** 32) | 0;
+                K[n++] = (Math.pow(p, 1 / 3) * 2 ** 32) | 0;
+            }
+            p++;
+        }
+        const l = bytes.length,
+            words = new Array(((l + 9 + 63) >> 6) << 4).fill(0);
+        for (let i = 0; i < l; i++)
+            words[i >> 2] |= bytes[i] << ((3 - i % 4) * 8);
+        words[l >> 2] |= 0x80 << ((3 - l % 4) * 8);
+        words[words.length - 1] = l * 8;
+        const h = Hh.slice();
+        for (let j = 0; j < words.length; j += 16) {
+            const w = words.slice(j, j + 16);
+            const o = h.slice();
+            for (let i = 0; i < 64; i++) {
+                if (i >= 16) {
+                    const a = w[i - 15],
+                        b = w[i - 2];
+                    w[i] = (w[i - 16] + (rr(a, 7) ^ rr(a, 18) ^ (a >>> 3)) + w[i - 7] + (rr(b, 17) ^ rr(b, 19) ^ (b >>> 10))) | 0;
+                }
+                const t1 = (o[7] + (rr(o[4], 6) ^ rr(o[4], 11) ^ rr(o[4], 25)) + ((o[4] & o[5]) ^ (~o[4] & o[6])) + K[i] + w[i]) | 0;
+                const t2 = ((rr(o[0], 2) ^ rr(o[0], 13) ^ rr(o[0], 22)) + ((o[0] & o[1]) ^ (o[0] & o[2]) ^ (o[1] & o[2]))) | 0;
+                o.unshift((t1 + t2) | 0);
+                o[4] = (o[4] + t1) | 0;
+                o.pop();
+            }
+            for (let i = 0; i < 8; i++)
+                h[i] = (h[i] + o[i]) | 0;
+        }
+        return h.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+    }
+
+    /* ---------------- helpers ---------------- */
+    function uid() {
+        return Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+    function esc(s) {
+        return (s ?? '').toString().replace(/[&<>"']/g, c => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c]));
+    }
+    function $(id) {
+        return document.getElementById(id);
+    }
+    function money(j) {
+        const c = {
+            EUR: '€',
+            USD: '$',
+            GBP: '£',
+            ZAR: 'R'
+        }[j.currency] || '';
+        const f = n => c + Number(n).toLocaleString('en');
+        if (j.salary_min && j.salary_max && j.salary_min != j.salary_max)
+            return f(j.salary_min) + ' – ' + f(j.salary_max);
+        if (j.salary_min || j.salary_max)
+            return f(j.salary_min || j.salary_max);
+        return 'DOE';
+    }
+    function fdate(d) {
+        if (!d)
+            return 'ASAP';
+        const x = new Date(d);
+        return isNaN(x) ? d : x.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    function ago(d) {
+        const n = Math.floor((Date.now() - new Date(d)) / 864e5);
+        return n <= 0 ? 'Today' : n === 1 ? 'Yesterday' : n < 30 ? n + ' days ago' : fdate(d);
+    }
+    function age(d) {
+        const b = new Date(d);
+        return isNaN(b) ? '' : Math.floor((Date.now() - b) / 31557600000);
+    }
+    function list(s) {
+        return (s || '').split(',').map(x => x.trim()).filter(Boolean);
+    }
+    function toast(m) {
+        const t = $('toast');
+        t.textContent = m;
+        t.style.display = 'block';
+        clearTimeout(t._t);
+        t._t = setTimeout(() => t.style.display = 'none', 2800);
+    }
+    function genderLabel(g) {
+        return g === 'Male' ? 'Male (cabin)' : g === 'Female' ? 'Female (cabin)' : 'Male or female';
+    }
+    function fullName(c) {
+        return c ? (c.first_name + ' ' + c.last_name) : '—';
+    }
+    function checked(n) {
+        return [...document.querySelectorAll(`input[name=${n}]:checked`)].map(x => x.value).join(', ');
+    }
+    function checkBoxes(name, opts, sel) {
+        const s = list(sel);
+        return `<div class="checks">${opts.map(o => `<label><input type="checkbox" name="${name}" value="${esc(o)}" ${s.includes(o) ? 'checked' : ''}> ${esc(o)}</label>`).join('')}</div>`;
+    }
+    function store(k, v) {
+        try {
+            v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v);
+        } catch (e) {}
+    }
+    function read(k) {
+        try {
+            return localStorage.getItem(k);
+        } catch (e) {
+            return null;
+        }
+    }
+    function closeModal() {
+        $('ov').classList.remove('on');
+    }
+    function openModal(html) {
+        $('modal').innerHTML = html;
+        $('ov').classList.add('on');
+        $('ov').scrollTop = 0;
+    }
+
+    /* ---------------- navigation ---------------- */
+    function show(v) {
+        ['jobs', 'me', 'admin'].forEach(x => {
+            $('view-' + x).classList.toggle('hide', x !== v);
+            $('nav-' + x).classList.toggle('on', x === v);
+        });
+        if (v === 'jobs')
+            renderJobs();
+        if (v === 'me')
+            renderMe();
+        if (v === 'admin' && isAdmin)
+            renderAdmin();
+        window.scrollTo(0, 0);
+    }
+    function setWho() {
+        $('whoLbl').textContent = ME ? '● ' + ME.first_name : '';
+        $('nav-me').textContent = ME ? 'My Profile' : 'Register / Login';
+        $('heroCta').classList.toggle('hide', !!ME);
+    }
+
+    /* ---------------- job board ---------------- */
+    function renderJobs() {
+        const open = JOBS.filter(j => j.status === 'open');
+        $('sOpen').textContent = open.length;
+        $('sDept').textContent = new Set(open.map(j => j.department)).size;
+        $('deptChips').innerHTML = ['', ...DEPTS].map(d => `<button class="chip ${deptFilter === d ? 'on' : ''}" onclick="deptFilter='${d}';renderJobs()">${d || 'All departments'} (${d ? open.filter(j => j.department === d).length : open.length})</button>`).join('');
+        const q = $('fQ').value.toLowerCase(),
+            c = $('fContract').value,
+            g = $('fGender').value,
+            sz = $('fSize').value,
+            sort = $('fSort').value;
+        let js = open.slice();
+        if (deptFilter)
+            js = js.filter(j => j.department === deptFilter);
+        if (c)
+            js = js.filter(j => j.contract === c);
+        if (g)
+            js = js.filter(j => (j.gender || 'Any') === g);
+        if (sz) {
+            const [a, b] = sz.split('-').map(Number);
+            js = js.filter(j => j.yacht_size >= a && j.yacht_size < b);
+        }
+        if (q)
+            js = js.filter(j => [j.position, j.location, j.yacht_type, j.usage, j.profile, j.ref, j.department].join(' ').toLowerCase().includes(q));
+        if (sort === 'pay')
+            js.sort((a, b) => (b.salary_max || b.salary_min || 0) - (a.salary_max || a.salary_min || 0));
+        else if (sort === 'start')
+            js.sort((a, b) => new Date(a.start_date || 0) - new Date(b.start_date || 0));
+        else
+            js.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        $('jobCount').textContent = js.length + ' position' + (js.length === 1 ? '' : 's') + ' found';
+        $('jobGrid').innerHTML = js.length ? js.map(j => {
+            const applied = ME && APPS.some(a => a.job_id === j.id && a.candidate_id === ME.id);
+            return `<div class="job" onclick="openJob('${j.id}')">
+                  <div class="job-top"><div><h3>${esc(j.position)}</h3><div class="ref">${esc(j.ref || '')} · Posted ${ago(j.created_at)}</div></div><span class="dept d-${esc(j.department)}">${esc(j.department || '')}</span></div>
+                  <div class="meta"><span>⚓ ${j.yacht_size ? j.yacht_size + 'm ' : ''}${esc(j.yacht_type || '')}${j.usage ? ' · ' + esc(j.usage) : ''}</span><span>📍 ${esc(j.location || 'TBC')}</span><span>📅 ${fdate(j.start_date)}</span><span>📝 ${esc(j.contract || '')}${j.rotation ? ' · ' + esc(j.rotation) : ''}</span></div>
+                  <div class="salary">${money(j)} <small>${esc(j.currency || '')} / month</small></div>
+                  <div class="profile">${esc(j.profile || j.description || '')}</div>
+                  <div class="tags"><span class="tag g-${esc(j.gender || 'Any')}">${genderLabel(j.gender)}</span>${list(j.certs).slice(0, 3).map(c => `<span class="tag">${esc(c)}</span>`).join('')}${list(j.certs).length > 3 ? `<span class="tag">+${list(j.certs).length - 3}</span>` : ''}</div>
+                  <div class="job-foot"><span style="font-size:13px;color:var(--muted)">${esc(j.experience || '')}</span>${applied ? '<span class="tag" style="background:#dcfce7;border-color:#bbf7d0">✓ Applied</span>' : '<button class="btn btn-p btn-sm">View & apply</button>'}</div>
+                </div>`;
+        }).join('') : `<div class="empty">No positions match your filters right now.<br>Check back soon — new roles are added weekly.</div>`;
+    }
+    function openJob(id) {
+        const j = JOBS.find(x => x.id === id);
+        if (!j)
+            return;
+        const fact = (k, v) => v ? `<div class="fact"><small>${k}</small><b>${esc(v)}</b></div>` : '';
+        const mine = ME && APPS.find(a => a.job_id === j.id && a.candidate_id === ME.id);
+        let applyBox;
+        if (mine)
+            applyBox = `<div class="success"><div class="tick">✓</div><h3>You've applied for this role</h3><p style="color:var(--muted)">Current stage: <b>${STAGES[SIDX[mine.stage]].t}</b>. Track it under My Profile.</p></div>`;
+        else if (!ME)
+            applyBox = `<div style="text-align:center;padding:10px"><h3 style="margin-bottom:6px">Want this role?</h3><p style="color:var(--muted);margin-bottom:14px">Register your crew profile once (CV, certificates, yacht references), then apply to any job in one click.</p><button class="btn btn-g" onclick="closeModal();PENDING_JOB='${j.id}';show('me')">Register or log in to apply</button></div>`;
+        else
+            applyBox = `<div id="applyBox"><h3 style="margin-bottom:6px">Apply as ${esc(fullName(ME))}</h3><p style="color:var(--muted);font-size:14px;margin-bottom:12px">Your profile, CV and references will be sent with this application.${ME.cv_url ? '' : ' <b style="color:var(--warn)">Tip: upload your CV in My Profile first.</b>'}</p>
+                <label>Why are you a good fit? (optional)</label><textarea id="apNote"></textarea>
+                <button class="btn btn-g" id="apBtn" style="width:100%;padding:13px;margin-top:12px" onclick="applyJob('${j.id}')">Submit application</button></div>`;
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button>
+              <div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.department || '')}</div><h2>${esc(j.position)}</h2>
+              <div style="color:var(--gold);font-weight:700;font-size:18px;margin-top:4px">${money(j)} ${esc(j.currency || '')} / month</div></div>
+            <div class="m-body">
+              <div class="facts">${fact('Yacht', (j.yacht_size ? j.yacht_size + 'm ' : '') + (j.yacht_type || ''))}${fact('Program', j.usage)}${fact('Location', j.location)}${fact('Contract', j.contract)}${fact('Rotation', j.rotation)}${fact('Start date', fdate(j.start_date))}${fact('Cabin', genderLabel(j.gender) + (j.cabin ? ' — ' + j.cabin : ''))}${fact('Experience', j.experience)}</div>
+              ${j.profile ? `<div class="sec"><h4>The person we're looking for</h4><p>${esc(j.profile)}</p></div>` : ''}
+              ${j.description ? `<div class="sec"><h4>About the role</h4><p>${esc(j.description)}</p></div>` : ''}
+              ${list(j.certs).length ? `<div class="sec"><h4>Required certificates</h4><div class="tags">${list(j.certs).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div></div>` : ''}
+              ${list(j.visas).length ? `<div class="sec"><h4>Visas required</h4><div class="tags">${list(j.visas).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div><p style="font-size:13px;margin-top:6px;color:var(--muted)">Need a visa? We can help through <a href="https://xplorevisas.com" target="_blank">Xplore Visas</a>.</p></div>` : ''}
+              <div class="hr"></div>${applyBox}
+            </div>`);
+    }
+    let PENDING_JOB = null;
+    async function applyJob(jobId) {
+        const b = $('apBtn');
+        b.disabled = true;
+        b.textContent = 'Submitting…';
+        try {
+            await db.apply({
+                job_id: jobId,
+                candidate_id: ME.id,
+                cover_note: $('apNote').value.trim()
+            });
+            $('applyBox').innerHTML = `<div class="success"><div class="tick">✓</div><h3>Application received</h3><p style="color:var(--muted)">Next step is a <b>Phase 1 interview with us</b>. We'll contact you on WhatsApp or email if you're selected.</p></div>`;
+            renderJobs();
+        } catch (e) {
+            toast(e.message.includes('duplicate') ? 'You already applied for this job.' : 'Error: ' + e.message);
+            b.disabled = false;
+            b.textContent = 'Submit application';
+        }
+    }
+
+    /* ---------------- candidate: register / login / profile ---------------- */
+    function renderMe() {
+        if (ME)
+            return renderProfile();
+        $('meBox').innerHTML = `<div class="auth">
+            <h2 class="t" style="text-align:center">Crew profile</h2><p class="sub" style="text-align:center">Register once and apply to any job in one click.</p>
+            <div class="switch"><button id="sw-register" class="${authMode === 'register' ? 'on' : ''}" onclick="authMode='register';renderMe()">Register</button><button id="sw-login" class="${authMode === 'login' ? 'on' : ''}" onclick="authMode='login';renderMe()">Log in</button></div>
+            <div class="panel">${authMode === 'login' ? `
+              <div style="margin-bottom:12px"><label>Email</label><input id="lEmail" type="email"></div>
+              <div style="margin-bottom:16px"><label>Password</label><input id="lPass" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+              <button class="btn btn-p" style="width:100%" onclick="doLogin()">Log in</button>` : `
+              <div class="form">
+                <div><label>Name *</label><input id="rFirst"></div><div><label>Surname *</label><input id="rLast"></div>
+                <div class="full"><label>Email *</label><input id="rEmail" type="email"></div>
+                <div><label>Date of birth *</label><input id="rDob" type="date"></div><div><label>WhatsApp / phone</label><input id="rPhone" placeholder="+27…"></div>
+                <div><label>Password *</label><input id="rPass" type="password"></div><div><label>Confirm password *</label><input id="rPass2" type="password"></div>
+              </div>
+              <button class="btn btn-g" style="width:100%;margin-top:16px;padding:13px" id="rBtn" onclick="doRegister()">Create profile</button>
+              <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">Next you'll add certificates, CV and yacht references.</p>`}
+              <p id="authErr" style="color:var(--bad);font-size:13px;margin-top:10px"></p>
+            </div></div>`;
+    }
+    async function doRegister() {
+        const f = $('rFirst').value.trim(),
+            l = $('rLast').value.trim(),
+            e = $('rEmail').value.trim().toLowerCase(),
+            d = $('rDob').value,
+            p = $('rPass').value,
+            p2 = $('rPass2').value;
+        const err = m => $('authErr').textContent = m;
+        if (!f || !l || !e || !d || !p)
+            return err('Please fill in all required fields.');
+        if (!/^\S+@\S+\.\S+$/.test(e))
+            return err('Please enter a valid email.');
+        if (p.length < 6)
+            return err('Password must be at least 6 characters.');
+        if (p !== p2)
+            return err('Passwords do not match.');
+        $('rBtn').disabled = true;
+        try {
+            if (await db.findCand(e)) {
+                $('rBtn').disabled = false;
+                return err('This email is already registered — please log in.');
+            }
+            ME = await db.addCand({
+                first_name: f,
+                last_name: l,
+                email: e,
+                dob: d,
+                phone: $('rPhone').value.trim(),
+                pass_hash: await hash(e, p),
+                yacht_refs: []
+            });
+            store('sr_cand', ME.id);
+            setWho();
+            toast('Welcome aboard, ' + f + '! Now complete your profile.');
+            renderProfile(true);
+        } catch (x) {
+            err('Error: ' + x.message);
+            $('rBtn').disabled = false;
+        }
+    }
+    async function doLogin() {
+        const e = $('lEmail').value.trim().toLowerCase(),
+            p = $('lPass').value;
+        try {
+            const c = await db.findCand(e);
+            if (!c || c.pass_hash !== await hash(e, p))
+                return $('authErr').textContent = 'Incorrect email or password.';
+            ME = c;
+            store('sr_cand', c.id);
+            await db.myApps(c.id);
+            setWho();
+            afterLogin();
+        } catch (x) {
+            $('authErr').textContent = 'Error: ' + x.message;
+        }
+    }
+    function afterLogin() {
+        if (PENDING_JOB) {
+            const j = PENDING_JOB;
+            PENDING_JOB = null;
+            show('jobs');
+            openJob(j);
+        } else
+            renderProfile();
+    }
+    function logoutMe() {
+        ME = null;
+        store('sr_cand', null);
+        setWho();
+        renderMe();
+    }
+
+    function completeness(c) {
+        const checks = [c.position_sought, c.nationality, c.gender, c.certs, c.cv_url, (c.yacht_refs || []).length, c.bio];
+        return Math.round(checks.filter(Boolean).length / checks.length * 100);
+    }
+    function renderProfile(justRegistered) {
+        const c = ME;
+        REFS = JSON.parse(JSON.stringify(c.yacht_refs || []));
+        const mine = APPS.filter(a => a.candidate_id === c.id).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const pct = completeness(c);
+        $('meBox').innerHTML = `
+            <div class="a-top"><div><h2 class="t">Hi ${esc(c.first_name)}</h2><p class="sub" style="margin:0">Profile ${pct}% complete ${pct < 100 ? '— complete profiles get interviewed first.' : '✓'}</p></div>
+              <div style="display:flex;gap:8px"><button class="btn btn-p" onclick="show('jobs')">Browse jobs</button><button class="btn btn-o" onclick="logoutMe()">Log out</button></div></div>
+            ${justRegistered && PENDING_JOB ? `<div class="panel" style="background:#fffbeb;border-color:#fde68a">Save your profile below, then you'll be taken back to the job to apply.</div>` : ''}
+            <div class="panel"><h3>My applications</h3>${mine.length ? mine.map(a => appCard(a)).join('') : '<p style="color:var(--muted)">No applications yet. <a href="#" onclick="show(\'jobs\');return false">Browse open jobs →</a></p>'}</div>
+            <div class="panel"><h3>Personal details</h3><div class="form">
+              <div><label>Name</label><input id="pFirst" value="${esc(c.first_name)}"></div><div><label>Surname</label><input id="pLast" value="${esc(c.last_name)}"></div>
+              <div><label>Email</label><input value="${esc(c.email)}" disabled></div><div><label>Date of birth</label><input id="pDob" type="date" value="${esc(c.dob || '')}"></div>
+              <div><label>WhatsApp / phone</label><input id="pPhone" value="${esc(c.phone || '')}"></div><div><label>Nationality</label><input id="pNat" value="${esc(c.nationality || '')}"></div>
+              <div><label>Gender</label><select id="pGender"><option value="">Select</option>${['Male', 'Female'].map(g => `<option ${c.gender === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div>
+              <div><label>Position I'm looking for</label><input id="pPos" list="posList" value="${esc(c.position_sought || '')}"><datalist id="posList">${POSITIONS.map(p => `<option>${p}</option>`).join('')}</datalist></div>
+              <div class="full"><label>Yachting experience</label><select id="pExp">${['Green / no experience', 'Under 1 season', '1–2 seasons', '2–4 years', '5+ years'].map(x => `<option ${c.experience === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+              <div class="full"><label>About me</label><textarea id="pBio" placeholder="Skills, hobbies, languages, previous hospitality work…">${esc(c.bio || '')}</textarea></div>
+            </div></div>
+            <div class="panel"><h3>Qualified certificates</h3>${checkBoxes('pCert', CERT_OPTS, c.certs)}
+              <div style="margin-top:12px"><label>Other certificates (comma separated)</label><input id="pCertOther" value="${esc(list(c.certs).filter(x => !CERT_OPTS.includes(x)).join(', '))}"></div>
+              <h3 style="margin-top:20px">Visas held</h3>${checkBoxes('pVisa', VISA_OPTS, c.visas)}</div>
+            <div class="panel"><h3>CV</h3>${c.cv_url ? `<p style="margin-bottom:10px">✓ CV on file — <a href="${esc(c.cv_url)}" target="_blank">view current CV</a></p>` : '<p style="color:var(--warn);margin-bottom:10px">No CV uploaded yet.</p>'}
+              <input id="pCV" type="file" accept=".pdf,.doc,.docx"><p style="font-size:12px;color:var(--muted);margin-top:6px">PDF or Word. Uploading a new file replaces the old one.</p></div>
+            <div class="panel"><h3>Superyacht references</h3><p style="font-size:13px;color:var(--muted);margin-bottom:12px">Previous yachts you've worked on and a captain / HOD we can contact.</p>
+              <div class="refhead"><span>Yacht</span><span>Size (m)</span><span>Position</span><span>From</span><span>To</span><span>Referee (Capt/HOD)</span><span>Referee email/phone</span><span></span></div>
+              <div id="refRows"></div><button class="btn btn-o btn-sm" onclick="REFS.push({});drawRefs()">+ Add yacht reference</button></div>
+            <div style="display:flex;gap:10px;align-items:center"><button class="btn btn-g" id="pSave" style="padding:13px 28px" onclick="saveProfile()">Save profile</button><span id="pMsg" style="font-size:13px;color:var(--muted)"></span></div>`;
+        drawRefs();
+    }
+    function appCard(a) {
+        const j = JOBS.find(x => x.id === a.job_id) || {
+            position: '(job removed)'
+        };
+        const i = SIDX[a.stage];
+        const denied = a.stage === 'denied';
+        const steps = STAGES.slice(0, 5).map((s, n) => {
+            let cls = '';
+            if (denied) {
+                cls = n <= (a.denied_at ?? 0) ? 'done' : '';
+            } else if (n < i)
+                cls = 'done';
+            else if (n === i)
+                cls = a.stage === 'accepted' ? 'win' : 'cur';
+            return `<div class="s ${cls}"><i></i>${s.t}</div>`;
+        }).join('');
+        return `<div class="app-card"><div class="top"><div><b>${esc(j.position)}</b> <span class="ref">${esc(j.ref || '')} · applied ${ago(a.created_at)}</span></div>
+            <span class="st" style="background:${denied ? '#fee2e2' : a.stage === 'accepted' ? '#dcfce7' : '#fef3c7'};color:${denied ? '#991b1b' : a.stage === 'accepted' ? '#166534' : '#92400e'}">${STAGES[i].s}</span></div>
+            <div class="track">${denied ? `<div class="s bad" style="flex:5"><i></i>Not successful this time — keep applying, new roles weekly</div>` : steps}</div></div>`;
+    }
+    function drawRefs() {
+        const f = (i, k, ph, t='text') => `<input type="${t}" placeholder="${ph}" value="${esc(REFS[i][k] || '')}" oninput="REFS[${i}].${k}=this.value">`;
+        $('refRows').innerHTML = REFS.map((r, i) => `<div class="refrow">${f(i, 'yacht', 'M/Y name')}${f(i, 'size', 'm', 'number')}${f(i, 'position', 'Deckhand')}${f(i, 'from', '', 'month')}${f(i, 'to', '', 'month')}${f(i, 'referee', 'Capt. name')}${f(i, 'contact', 'email / +phone')}<button class="btn btn-d btn-sm" onclick="REFS.splice(${i},1);drawRefs()">✕</button></div>`).join('') || '<p style="color:var(--muted);font-size:13px;margin-bottom:10px">No references added.</p>';
+    }
+    async function saveProfile() {
+        const b = $('pSave');
+        b.disabled = true;
+        $('pMsg').textContent = 'Saving…';
+        try {
+            const file = $('pCV').files[0];
+            const cv = file ? await uploadCV(file) : null;
+            const certs = [...checked('pCert').split(', ').filter(Boolean), ...list($('pCertOther').value)].join(', ');
+            const f = {
+                first_name: $('pFirst').value.trim() || ME.first_name,
+                last_name: $('pLast').value.trim() || ME.last_name,
+                dob: $('pDob').value || null,
+                phone: $('pPhone').value.trim(),
+                nationality: $('pNat').value.trim(),
+                gender: $('pGender').value,
+                position_sought: $('pPos').value.trim(),
+                experience: $('pExp').value,
+                bio: $('pBio').value.trim(),
+                certs,
+                visas: checked('pVisa'),
+                yacht_refs: REFS.filter(r => r.yacht || r.referee)
+            };
+            if (cv)
+                f.cv_url = cv;
+            ME = await db.patchCand(ME.id, f);
+            setWho();
+            toast('Profile saved');
+            if (PENDING_JOB)
+                return afterLogin();
+            renderProfile();
+        } catch (e) {
+            $('pMsg').textContent = 'Error: ' + e.message;
+            b.disabled = false;
+        }
+    }
+
+    /* ---------------- admin ---------------- */
+    function adminLogin() {
+        const ok = DEMO ? $('aPass').value === 'demo' : ($('aEmail').value.trim().toLowerCase() === ADMIN_EMAIL && $('aPass').value === ADMIN_PASS);
+        if (!ok)
+            return $('aErr').textContent = 'Incorrect email or password.';
+        isAdmin = true;
+        try {
+            sessionStorage.setItem('sr_admin', '1')
+        } catch (e) {}
+        $('adminLogin').classList.add('hide');
+        $('adminPanel').classList.remove('hide');
+        renderAdmin();
+    }
+    function adminLogout() {
+        isAdmin = false;
+        try {
+            sessionStorage.removeItem('sr_admin')
+        } catch (e) {}
+        $('adminPanel').classList.add('hide');
+        $('adminLogin').classList.remove('hide');
+    }
+    function aTab(t) {
+        aCur = t;
+        ['pipe', 'jobs', 'cand'].forEach(x => {
+            $('a-' + x).classList.toggle('hide', x !== t);
+            $('t-' + x).classList.toggle('on', x === t);
+        });
+        drawAdmin();
+    }
+    async function renderAdmin() {
+        try {
+            await Promise.all([db.jobs(), db.apps(), db.cands()]);
+        } catch (e) {
+            toast('Load error: ' + e.message);
+        }
+        drawAdmin();
+    }
+    function drawAdmin() {
+        $('kCand').textContent = CANDS.length;
+        $('kOpen').textContent = JOBS.filter(j => j.status === 'open').length;
+        $('kNew').textContent = APPS.filter(a => a.stage === 'applied').length;
+        $('kAcc').textContent = APPS.filter(a => a.stage === 'accepted').length;
+        const cur = $('pJob').value;
+        $('pJob').innerHTML = JOBS.map(j => `<option value="${j.id}">${esc((j.ref ? j.ref + ' · ' : '') + j.position)} (${APPS.filter(a => a.job_id === j.id).length})${j.status !== 'open' ? ' — ' + j.status : ''}</option>`).join('') || '<option value="">No jobs yet</option>';
+        if (cur && JOBS.some(j => j.id === cur))
+            $('pJob').value = cur;
+        if (aCur === 'pipe')
+            renderPipe();
+        if (aCur === 'jobs')
+            renderAJobs();
+        if (aCur === 'cand')
+            renderCands();
+    }
+    function renderPipe() {
+        const jid = $('pJob').value;
+        const j = JOBS.find(x => x.id === jid);
+        if (!j) {
+            $('board').innerHTML = '<div class="empty">Post a job to start receiving applicants.</div>';
+            $('pInfo').textContent = '';
+            return;
+        }
+        const as = APPS.filter(a => a.job_id === jid);
+        $('pInfo').textContent = `${as.length} applicant${as.length === 1 ? '' : 's'} · ${money(j)} ${j.currency} · ${genderLabel(j.gender)}`;
+        $('board').innerHTML = STAGES.map((s, i) => {
+            const cs = as.filter(a => a.stage === s.k);
+            const full = s.k === 'shortlist' && cs.length >= SHORTLIST_MAX;
+            return `<div class="col col-${s.k} ${full ? 'full' : ''}"><h5>${s.t}<span>${cs.length}${s.k === 'shortlist' ? '/' + SHORTLIST_MAX : ''}</span></h5>
+                  ${cs.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};const wa = (c.phone || '').replace(/\D/g, '');const next = STAGES[i + 1];const canNext = i < 4 && next && next.k !== 'denied';return `<div class="kc"><b onclick="openCand('${c.id}','${a.id}')">${esc(fullName(c))}</b>
+                          <div class="m">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + c.gender : ''}<br>${esc(c.experience || '')}</div>
+                          <div class="acts">
+                            ${i > 0 && i < 5 ? `<button class="btn-o" onclick="move('${a.id}',-1)" title="Move back">←</button>` : ''}
+                            ${canNext ? `<button class="btn-ok" onclick="move('${a.id}',1)">${i === 3 ? 'Accept ✓' : 'Pass →'}</button>` : ''}
+                            ${i < 4 ? `<button class="btn-d" onclick="deny('${a.id}')">Deny</button>` : ''}
+                            ${s.k === 'denied' || s.k === 'accepted' ? `<button class="btn-o" onclick="reopen('${a.id}')">Reopen</button>` : ''}
+                            ${wa ? `<a class="btn-o" style="font-size:11px;padding:4px 8px;border-radius:6px;font-weight:600;text-decoration:none;color:var(--ink);border:1px solid var(--line)" target="_blank" href="https://wa.me/${wa}?text=${encodeURIComponent(waMsg(c, j, a.stage))}">WA</a>` : ''}
+                          </div></div>`;}).join('') || '<p style="font-size:12px;color:var(--muted);padding:4px">—</p>'}
+                </div>`;
+        }).join('');
+    }
+    function waMsg(c, j, stage) {
+        const n = c.first_name || '';
+        const m = {
+            applied: `Hi ${n}, thanks for applying for ${j.position} (${j.ref}) with Seafarer Recruitment. We'd like to book your first interview with us — when are you available?`,
+            interview_us: `Hi ${n}, great news — you've passed your interview with us for ${j.position} (${j.ref}). Next step is an interview with the yacht. We'll send times shortly.`,
+            interview_yacht: `Hi ${n}, update on ${j.position} (${j.ref}): you're through to the final shortlist. We'll be in touch with the outcome soon.`,
+            shortlist: `Hi ${n}, regarding ${j.position} (${j.ref})…`,
+            accepted: `Hi ${n}, congratulations! You've been accepted for ${j.position} (${j.ref}).`,
+            denied: `Hi ${n}, thank you for applying for ${j.position} (${j.ref}).`
+        };
+        return m[stage] || '';
+    }
+    async function move(appId, dir) {
+        const a = APPS.find(x => x.id === appId);
+        const i = SIDX[a.stage] + dir;
+        const to = STAGES[i].k;
+        if (to === 'shortlist' && APPS.filter(x => x.job_id === a.job_id && x.stage === 'shortlist').length >= SHORTLIST_MAX && !confirm(`The final shortlist already has ${SHORTLIST_MAX} candidates. Add anyway?`))
+            return;
+        try {
+            await db.patchApp(appId, {
+                stage: to
+            });
+            toast('Moved to ' + STAGES[i].t);
+            renderPipe();
+            drawKpis();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    async function deny(appId) {
+        const a = APPS.find(x => x.id === appId);
+        try {
+            await db.patchApp(appId, {
+                stage: 'denied',
+                notes: (a.notes || '') + (a.notes ? '\n' : '') + 'Denied at: ' + STAGES[SIDX[a.stage]].t
+            });
+            toast('Marked not successful');
+            renderPipe();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    async function reopen(appId) {
+        try {
+            await db.patchApp(appId, {
+                stage: 'shortlist'
+            });
+            renderPipe();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    function drawKpis() {
+        $('kNew').textContent = APPS.filter(a => a.stage === 'applied').length;
+        $('kAcc').textContent = APPS.filter(a => a.stage === 'accepted').length;
+    }
+
+    function renderAJobs() {
+        $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
+            <td>${esc(j.ref || '')}</td><td><b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
+            <td>${j.yacht_size ? j.yacht_size + 'm ' : ''}${esc(j.yacht_type || '')}<br><small style="color:var(--muted)">${esc(j.location || '')}</small></td>
+            <td>${money(j)} ${esc(j.currency || '')}</td><td>${esc(j.gender || 'Any')}</td><td>${fdate(j.start_date)}</td>
+            <td><a href="#" onclick="aTab('pipe');$('pJob').value='${j.id}';renderPipe();return false">${APPS.filter(a => a.job_id === j.id).length} →</a></td>
+            <td><span class="st st-${j.status}">${j.status}</span></td>
+            <td style="white-space:nowrap"><button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
+        : `<tr><td colspan="9" class="empty">No jobs yet — click “Post a job”.</td></tr>`;
+    }
+    function renderCands() {
+        const q = $('cQ').value.toLowerCase(),
+            g = $('cG').value;
+        let cs = CANDS.slice();
+        if (g)
+            cs = cs.filter(c => c.gender === g);
+        if (q)
+            cs = cs.filter(c => [c.first_name, c.last_name, c.nationality, c.position_sought, c.certs, c.email].join(' ').toLowerCase().includes(q));
+        $('aCandRows').innerHTML = cs.length ? cs.map(c => `<tr>
+            <td><b>${esc(fullName(c))}</b><br><small style="color:var(--muted)">${esc(c.email)} · joined ${ago(c.created_at)}</small></td>
+            <td>${esc(c.position_sought || '—')}<br><small style="color:var(--muted)">${esc(c.experience || '')}</small></td>
+            <td>${esc(c.nationality || '—')}</td><td>${c.dob ? age(c.dob) : '—'}</td>
+            <td style="max-width:220px;font-size:13px">${esc(c.certs || '—')}</td><td>${(c.yacht_refs || []).length}</td>
+            <td>${c.cv_url ? `<a href="${esc(c.cv_url)}" target="_blank">CV</a>` : '—'}</td>
+            <td>${APPS.filter(a => a.candidate_id === c.id).length}</td>
+            <td><button class="btn btn-o btn-sm" onclick="openCand('${c.id}')">Profile</button></td></tr>`).join('')
+        : `<tr><td colspan="9" class="empty">No registered crew yet.</td></tr>`;
+    }
+    function openCand(cid, appId) {
+        const c = CANDS.find(x => x.id === cid);
+        if (!c)
+            return;
+        const a = appId && APPS.find(x => x.id === appId);
+        const fact = (k, v) => `<div class="fact"><small>${k}</small><b>${esc(v || '—')}</b></div>`;
+        const apps = APPS.filter(x => x.candidate_id === cid);
+        const wa = (c.phone || '').replace(/\D/g, '');
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(c.position_sought || 'Crew')} · ${esc(c.experience || '')}</div><h2>${esc(fullName(c))}</h2></div>
+          <div class="m-body">
+            <div class="facts">${fact('Email', c.email)}${fact('Phone', c.phone)}${fact('Nationality', c.nationality)}${fact('Gender', c.gender)}${fact('Date of birth', c.dob ? fdate(c.dob) + ' (' + age(c.dob) + ')' : '')}${fact('Visas', c.visas)}</div>
+            <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div></div>
+            ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
+            <div class="sec"><h4>Superyacht references</h4>${(c.yacht_refs || []).length ? `<div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p>None added</p>'}</div>
+            <div class="sec"><h4>Applications</h4>${apps.length ? apps.map(x => {const j = JOBS.find(y => y.id === x.job_id) || {};return `<div style="font-size:14px;margin-bottom:4px">${esc(j.position || '')} <span class="ref">${esc(j.ref || '')}</span> — <b>${STAGES[SIDX[x.stage]].t}</b></div>`}).join('') : '<p>None</p>'}</div>
+            ${a && a.cover_note ? `<div class="sec"><h4>Cover note for this job</h4><p>${esc(a.cover_note)}</p></div>` : ''}
+            <div style="display:flex;gap:8px;flex-wrap:wrap">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}${wa ? `<a class="btn btn-o" target="_blank" href="https://wa.me/${wa}">WhatsApp</a>` : ''}<a class="btn btn-o" href="mailto:${esc(c.email)}">Email</a></div>
+            <div class="hr"></div>
+            ${a ? `<label>Interview notes for this application</label><textarea id="nApp">${esc(a.notes || '')}</textarea>` : ''}
+            <label style="margin-top:12px">General notes on candidate (private)</label><textarea id="nCand">${esc(c.admin_notes || '')}</textarea>
+            <button class="btn btn-p" style="margin-top:10px" onclick="saveNotes('${c.id}','${appId || ''}')">Save notes</button>
+          </div>`);
+    }
+    async function saveNotes(cid, aid) {
+        try {
+            await db.patchCand(cid, {
+                admin_notes: $('nCand').value
+            });
+            if (aid)
+                await db.patchApp(aid, {
+                    notes: $('nApp').value
+                });
+            toast('Notes saved');
+            closeModal();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+
+    function openJobForm(id) {
+        const j = id ? JOBS.find(x => x.id === id) : {
+            status: 'open',
+            currency: 'EUR',
+            gender: 'Any',
+            ref: nextRef()
+        };
+        const sel = (i, o, v) => `<select id="${i}">${o.map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
+        const v = k => esc(j[k] ?? '');
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><h2>${id ? 'Edit job' : 'Post a new job'}</h2></div>
+          <div class="m-body"><div class="form">
+            <div><label>Reference</label><input id="jRef" value="${v('ref')}"></div><div><label>Status</label>${sel('jStatus', ['open', 'closed', 'filled'], j.status)}</div>
+            <div><label>Position *</label><input id="jPos" list="posList2" value="${v('position')}" placeholder="e.g. Deckhand"><datalist id="posList2">${POSITIONS.map(p => `<option>${p}</option>`).join('')}</datalist></div>
+            <div><label>Department</label>${sel('jDept', DEPTS, j.department)}</div>
+            <div><label>Yacht type</label>${sel('jType', ['Motor', 'Sail', 'Expedition', 'Catamaran'], j.yacht_type)}</div><div><label>Yacht size (m)</label><input id="jSize" type="number" value="${v('yacht_size')}"></div>
+            <div><label>Program</label>${sel('jUsage', ['Private', 'Charter', 'Private & Charter'], j.usage)}</div><div><label>Location / cruising</label><input id="jLoc" value="${v('location')}" placeholder="Med summer / Caribbean winter"></div>
+            <div><label>Contract</label>${sel('jContract', ['Permanent', 'Seasonal', 'Rotational', 'Temp'], j.contract)}</div><div><label>Rotation / leave</label><input id="jRot" value="${v('rotation')}" placeholder="2:2 or 35 days leave"></div>
+            <div><label>Start date</label><input id="jStart" type="date" value="${v('start_date')}"></div><div><label>Currency</label>${sel('jCur', ['EUR', 'USD', 'GBP', 'ZAR'], j.currency)}</div>
+            <div><label>Salary from (monthly)</label><input id="jMin" type="number" value="${v('salary_min')}"></div><div><label>Salary to (monthly)</label><input id="jMax" type="number" value="${v('salary_max')}"></div>
+            <div><label>Male / female (cabin)</label>${sel('jGender', ['Any', 'Male', 'Female'], j.gender)}</div><div><label>Cabin arrangement</label><input id="jCabin" value="${v('cabin')}" placeholder="Shared twin with female stew"></div>
+            <div class="full"><label>Experience required</label><input id="jExp" value="${v('experience')}" placeholder="1+ season on 50m+ motor yacht"></div>
+            <div class="full"><label>Certificates required (comma separated)</label><input id="jCerts" value="${v('certs')}" placeholder="STCW Basic Safety, ENG1 Medical, PDSD"></div>
+            <div class="full"><label>Visas required (comma separated)</label><input id="jVisas" value="${v('visas')}" placeholder="B1/B2 (USA), Schengen"></div>
+            <div class="full"><label>The type of person required</label><textarea id="jProfile" placeholder="Personality, skills, non-smoker, no visible tattoos, team player…">${v('profile')}</textarea></div>
+            <div class="full"><label>Job description</label><textarea id="jDesc" placeholder="Duties, yacht culture, perks…">${v('description')}</textarea></div>
+            <div class="full" style="display:flex;gap:10px"><button class="btn btn-g" onclick="submitJob('${id || ''}')">${id ? 'Save changes' : 'Publish job'}</button><button class="btn btn-o" onclick="closeModal()">Cancel</button></div>
+          </div></div>`);
+    }
+    function nextRef() {
+        const n = JOBS.map(j => parseInt((j.ref || '').replace(/\D/g, '')) || 0);
+        return 'SMR-' + String(Math.max(0, ...n) + 1).padStart(4, '0');
+    }
+    async function submitJob(id) {
+        if (!$('jPos').value.trim())
+            return toast('Position is required');
+        const num = x => x === '' ? null : Number(x);
+        const j = {
+            ref: $('jRef').value.trim(),
+            status: $('jStatus').value,
+            position: $('jPos').value.trim(),
+            department: $('jDept').value,
+            yacht_type: $('jType').value,
+            yacht_size: num($('jSize').value),
+            usage: $('jUsage').value,
+            location: $('jLoc').value.trim(),
+            contract: $('jContract').value,
+            rotation: $('jRot').value.trim(),
+            start_date: $('jStart').value || null,
+            currency: $('jCur').value,
+            salary_min: num($('jMin').value),
+            salary_max: num($('jMax').value),
+            gender: $('jGender').value,
+            cabin: $('jCabin').value.trim(),
+            experience: $('jExp').value.trim(),
+            certs: $('jCerts').value.trim(),
+            visas: $('jVisas').value.trim(),
+            profile: $('jProfile').value.trim(),
+            description: $('jDesc').value.trim()
+        };
+        if (id)
+            j.id = id;
+        try {
+            await db.saveJob(j);
+            closeModal();
+            toast(id ? 'Job updated' : 'Job published');
+            renderAdmin();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    async function toggleJob(id) {
+        const j = JOBS.find(x => x.id === id);
+        try {
+            await db.saveJob({
+                id,
+                status: j.status === 'open' ? 'closed' : 'open'
+            });
+            renderAdmin();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    async function removeJob(id) {
+        if (!confirm('Delete this job and all its applications?'))
+            return;
+        try {
+            await db.delJob(id);
+            toast('Job deleted');
+            renderAdmin();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+
+    /* ---------------- sample data (demo mode only) ---------------- */
+    function sampleJobs() {
+        const d = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10),
+            c = n => new Date(Date.now() - n * 864e5).toISOString();
+        return [
+        {
+            id: 'j1',
+            created_at: c(1),
+            ref: 'SMR-0001',
+            position: 'Deckhand',
+            department: 'Deck',
+            yacht_type: 'Motor',
+            yacht_size: 62,
+            usage: 'Private & Charter',
+            location: 'Mediterranean / Caribbean',
+            contract: 'Permanent',
+            rotation: '35 days leave',
+            start_date: d(20),
+            salary_min: 3000,
+            salary_max: 3300,
+            currency: 'EUR',
+            gender: 'Male',
+            cabin: 'Shared twin with deckhand',
+            certs: 'STCW Basic Safety, ENG1 Medical, PDSD, Powerboat L2',
+            visas: 'B1/B2 (USA), Schengen',
+            experience: '1+ season on 50m+',
+            profile: 'Hard-working, positive deckhand who takes pride in exterior detailing. Tender driving and water sports experience preferred. Non-smoker, no visible tattoos.',
+            description: 'Busy charter program with a crew of 14. Wash downs, varnish touch-ups, tender ops and guest water sports.',
+            status: 'open'
+        },
+        {
+            id: 'j2',
+            created_at: c(2),
+            ref: 'SMR-0002',
+            position: 'Second Steward/ess',
+            department: 'Interior',
+            yacht_type: 'Motor',
+            yacht_size: 55,
+            usage: 'Charter',
+            location: 'Western Med',
+            contract: 'Seasonal',
+            rotation: '',
+            start_date: d(10),
+            salary_min: 3500,
+            salary_max: 3800,
+            currency: 'EUR',
+            gender: 'Female',
+            cabin: 'Shared with third stew',
+            certs: 'STCW Basic Safety, ENG1 Medical, Food Hygiene L2',
+            visas: 'Schengen',
+            experience: '2 seasons interior',
+            profile: 'Polished, guest-focused stew with strong service skills. Silver service and cocktails a plus. Calm on back-to-back charters.',
+            description: 'Reports to the Chief Stew. Mix of service, housekeeping and laundry.',
+            status: 'open'
+        },
+        {
+            id: 'j3',
+            created_at: c(4),
+            ref: 'SMR-0003',
+            position: 'Bosun',
+            department: 'Deck',
+            yacht_type: 'Motor',
+            yacht_size: 78,
+            usage: 'Private',
+            location: 'Worldwide',
+            contract: 'Rotational',
+            rotation: '10 weeks on / 10 off',
+            start_date: d(45),
+            salary_min: 5000,
+            salary_max: 5800,
+            currency: 'EUR',
+            gender: 'Any',
+            cabin: 'Own cabin',
+            certs: 'STCW Basic Safety, ENG1 Medical, PDSD, Yachtmaster Offshore',
+            visas: 'B1/B2 (USA), Schengen',
+            experience: '2+ years as bosun or lead deckhand on 60m+',
+            profile: 'Natural leader who can run a deck team of 4. Strong on maintenance planning, crane ops and tender driving.',
+            description: 'Private family yacht on a worldwide itinerary.',
+            status: 'open'
+        },
+        {
+            id: 'j4',
+            created_at: c(3),
+            ref: 'SMR-0004',
+            position: 'Sole Chef',
+            department: 'Galley',
+            yacht_type: 'Sail',
+            yacht_size: 38,
+            usage: 'Charter',
+            location: 'Caribbean',
+            contract: 'Seasonal',
+            rotation: '',
+            start_date: d(60),
+            salary_min: 5500,
+            salary_max: 6500,
+            currency: 'USD',
+            gender: 'Any',
+            cabin: 'Shared with stew',
+            certs: "STCW Basic Safety, ENG1 Medical, Ship's Cook Cert, Food Hygiene L2",
+            visas: 'B1/B2 (USA)',
+            experience: 'Sole chef experience on yachts',
+            profile: 'Creative chef cooking for up to 10 guests and 5 crew. Comfortable with dietary requirements and remote provisioning.',
+            description: '',
+            status: 'open'
+        },
+        {
+            id: 'j5',
+            created_at: c(6),
+            ref: 'SMR-0005',
+            position: 'Chief Steward/ess',
+            department: 'Interior',
+            yacht_type: 'Motor',
+            yacht_size: 85,
+            usage: 'Private & Charter',
+            location: 'Med summer / Bahamas winter',
+            contract: 'Rotational',
+            rotation: '2:2',
+            start_date: d(30),
+            salary_min: 7500,
+            salary_max: 8500,
+            currency: 'EUR',
+            gender: 'Female',
+            cabin: 'Own cabin',
+            certs: 'STCW Basic Safety, ENG1 Medical, PDSD, Food Hygiene L2, WSET Wine L2',
+            visas: 'B1/B2 (USA), Schengen',
+            experience: '3+ years as Chief Stew on 60m+',
+            profile: 'Head of department managing a team of 6. Exceptional standards, budgeting, inventory and guest preference management.',
+            description: '',
+            status: 'open'
+        },
+        {
+            id: 'j6',
+            created_at: c(8),
+            ref: 'SMR-0006',
+            position: 'Lead Deckhand',
+            department: 'Deck',
+            yacht_type: 'Motor',
+            yacht_size: 48,
+            usage: 'Charter',
+            location: 'Croatia / Greece',
+            contract: 'Seasonal',
+            rotation: '',
+            start_date: d(7),
+            salary_min: 3800,
+            salary_max: 4200,
+            currency: 'EUR',
+            gender: 'Male',
+            cabin: 'Shared with deckhand',
+            certs: 'STCW Basic Safety, ENG1 Medical, Powerboat L2, RYA Day Skipper',
+            visas: 'Schengen',
+            experience: '2+ seasons on deck',
+            profile: 'Confident tender driver and water sports lead. Can step up when the bosun is off.',
+            description: '',
+            status: 'open'
+        }
+        ];
+    }
+    function sampleCands() {
+        const c = n => new Date(Date.now() - n * 864e5).toISOString();
+        const mk = (id, f, l, nat, g, dob, pos, exp, certs, refs, days) => ({
+            id,
+            created_at: c(days),
+            first_name: f,
+            last_name: l,
+            email: f.toLowerCase() + '@example.com',
+            pass_hash: '',
+            phone: '+27 82 000 00' + id.slice(1).padStart(2, '0'),
+            nationality: nat,
+            gender: g,
+            dob,
+            position_sought: pos,
+            experience: exp,
+            certs,
+            visas: 'Schengen',
+            cv_url: '',
+            yacht_refs: refs,
+            bio: '',
+            admin_notes: ''
+        });
+        return [
+        mk('c1', 'Liam', 'van der Merwe', 'South African', 'Male', '1999-04-12', 'Deckhand', '1–2 seasons', 'STCW Basic Safety, ENG1 Medical, PDSD, Powerboat L2', [{
+            yacht: 'M/Y Serenity',
+            size: 52,
+            position: 'Deckhand',
+            from: '2024-04',
+            to: '2025-10',
+            referee: 'Capt. J. Smith',
+            contact: 'capt@example.com'
+        }], 3),
+        mk('c2', 'Jessica', 'Naidoo', 'South African', 'Female', '1997-09-03', 'Second Steward/ess', '2–4 years', 'STCW Basic Safety, ENG1 Medical, Food Hygiene L2, Silver Service', [{
+            yacht: 'M/Y Aurora',
+            size: 60,
+            position: 'Third Stew',
+            from: '2023-05',
+            to: '2025-09',
+            referee: 'Chief Stew A. Brown',
+            contact: '+33 600 000 000'
+        }], 5),
+        mk('c3', 'Ethan', 'Botha', 'South African', 'Male', '2000-01-22', 'Deckhand', 'Green / no experience', 'STCW Basic Safety, ENG1 Medical', [], 1),
+        mk('c4', 'Megan', 'Jacobs', 'South African', 'Female', '1998-06-15', 'Steward/ess', 'Under 1 season', 'STCW Basic Safety, ENG1 Medical, Food Hygiene L2', [], 2),
+        mk('c5', 'Ruan', 'Pretorius', 'South African', 'Male', '1994-11-30', 'Bosun', '5+ years', 'STCW Basic Safety, ENG1 Medical, PDSD, Yachtmaster Offshore, Powerboat L2', [{
+            yacht: 'M/Y Kairos',
+            size: 74,
+            position: 'Lead Deckhand',
+            from: '2021-03',
+            to: '2025-08',
+            referee: 'Capt. M. Rossi',
+            contact: 'rossi@example.com'
+        }], 6)
+        ];
+    }
+    function sampleApps() {
+        const c = n => new Date(Date.now() - n * 864e5).toISOString();
+        const a = (id, j, cid, stage, d) => ({
+            id,
+            job_id: j,
+            candidate_id: cid,
+            stage,
+            created_at: c(d),
+            updated_at: c(d),
+            cover_note: '',
+            notes: ''
+        });
+        return [a('a1', 'j1', 'c1', 'interview_us', 2), a('a2', 'j1', 'c3', 'applied', 0), a('a3', 'j1', 'c5', 'interview_yacht', 4), a('a4', 'j2', 'c2', 'shortlist', 4), a('a5', 'j2', 'c4', 'applied', 1), a('a6', 'j3', 'c5', 'applied', 3)];
+    }
+
+    /* ---------------- boot ---------------- */
+    (async function() {
+        if (DEMO) {
+            $('demoBanner').classList.remove('hide');
+            JOBS = sampleJobs();
+            CANDS = sampleCands();
+            APPS = sampleApps();
+        }
+        try {
+            await db.jobs();
+        } catch (e) {
+            console.error(e);
+            toast('Could not load jobs: ' + e.message);
+        }
+        const cid = read('sr_cand');
+        if (cid) {
+            try {
+                if (DEMO) {
+                    await db.cands();
+                    await db.apps();
+                    ME = CANDS.find(c => c.id === cid) || null;
+                } else {
+                    const r = await sb('recruit_candidates?select=*&id=eq.' + cid);
+                    ME = r[0] || null;
+                    if (ME)
+                        await db.myApps(ME.id);
+                }
+            } catch (e) {
+                ME = null;
+            }
+        }
+        setWho();
+        renderJobs();
+        try {
+            if (sessionStorage.getItem('sr_admin') === '1') {
+                isAdmin = true;
+                $('adminLogin').classList.add('hide');
+                $('adminPanel').classList.remove('hide');
+            }
+        } catch (e) {}
+        const p = new URLSearchParams(location.search);
+        if (p.get('view'))
+            show(p.get('view'));
+        if (p.get('job'))
+            openJob(p.get('job'));
+    })();
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape')
+            closeModal();
+    });
+    </script>
+</body>
+</html>
