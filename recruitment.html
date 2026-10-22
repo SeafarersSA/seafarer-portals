@@ -1097,6 +1097,32 @@
         align-items: center
     }
 
+    .certgrp {
+        background: var(--bg);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-top: 10px
+    }
+
+    .certgrp h4 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--sea);
+        margin-bottom:8px
+    }
+
+    .certgrp h4 span {
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--muted);
+        font-weight: 500
+    }
+
+    .certgrp .ck, .certgrp .checks label {
+        background: #fff
+    }
+
     .skrow {
         display: flex;
         justify-content: space-between;
@@ -1745,7 +1771,7 @@
         <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
          · 
         <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
-        <span style="opacity:.4">· v13</span>
+        <span style="opacity:.4">· v14</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1786,7 +1812,13 @@
         month: 'per month',
         year: 'per year'
     };
-    const CERT_OPTS = ['STCW Basic Safety', 'ENG1 Medical', 'PDSD', 'Food Hygiene L2', 'Powerboat L2', 'Yachtmaster Offshore', 'RYA Day Skipper', 'Proficiency in Survival Craft', 'Silver Service', 'WSET Wine L2', 'Culinary Diploma', "Ship's Cook Cert", 'AEC', 'PADI Divemaster'];
+    const CERT_GROUPS = {
+        'All crew — basic safety': ['STCW Basic Safety', 'ENG1 Medical', 'PDSD', 'Proficiency in Survival Craft', 'Medical First Aid'],
+        'Exterior / deck': ['Powerboat L2', 'PWC (Jet Ski) Licence', 'EDH (Efficient Deck Hand)', 'VHF / SRC Radio', 'RYA Day Skipper', 'Yachtmaster Coastal', 'Yachtmaster Offshore', 'Yachtmaster Ocean', 'OOW modules (started)', 'OOW <3000GT', 'GMDSS', 'PADI Divemaster', 'Watersports Instructor'],
+        'Interior': ['Food Hygiene L2', 'Silver Service', 'WSET Wine L2', 'Barista Course', 'Interior Yacht Course', 'Housekeeping & Laundry Course', 'Bartending / Mixology'],
+        'Galley & engineering': ['Culinary Diploma', "Ship's Cook Cert", 'AEC', 'AEC 2']
+    };
+    const CERT_OPTS = Object.values(CERT_GROUPS).flat();
     const VISA_OPTS = ['B1/B2 (USA)', 'Schengen', 'UK', 'Australian MCV', "Seaman's Book"];
     const POSITIONS = ['Captain', 'Chase Boat Captain', 'Chief Officer', '1st Mate', '2nd Officer', '3rd Officer', 'Bosun', 'Lead Deckhand', 'Deckhand', 'Deck/Engineer', 'Purser', 'Chief Steward/ess', 'Head of Service', 'Head of Housekeeping', 'Sole Steward/ess', '2nd Steward/ess', '3rd Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer'];
     const POSITIONS_OLD = ['Deckhand', 'Lead Deckhand', 'Bosun', 'Second Officer', 'Chief Officer', 'Captain', 'Junior Steward/ess', 'Steward/ess', 'Second Steward/ess', 'Chief Steward/ess', 'Head of Housekeeping', 'Laundry Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer', 'Deck/Engineer'];
@@ -2676,7 +2708,7 @@
               <div class="full"><label>Yachting experience</label><select id="pExp">${['Green / no experience', 'Under 1 season', '1–2 seasons', '2–4 years', '5+ years'].map(x => `<option ${c.experience === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
               <div class="full"><label>About me</label><textarea id="pBio" placeholder="Skills, hobbies, languages, previous hospitality work…">${esc(c.bio || '')}</textarea></div>
             </div></div>
-            <div class="panel"><h3>Qualified certificates</h3>${checkBoxes('pCert', CERT_OPTS, c.certs)}
+            <div class="panel"><h3>Qualified certificates</h3>${certGroupsHTML(c)}
               <div style="margin-top:12px"><label>Other certificates (comma separated)</label><input id="pCertOther" value="${esc(list(c.certs).filter(x => !CERT_OPTS.includes(x)).join(', '))}"></div>
               <h3 style="margin-top:20px">Visas held</h3>${checkBoxes('pVisa', VISA_OPTS, c.visas)}</div>
             <div class="panel"><h3>My skills</h3><p style="font-size:13px;color:var(--muted);margin-bottom:4px">Rate yourself honestly on each skill — tap again to clear. Novice = never done it, Trained = done the course, Good = done it onboard, Experienced = confident and can teach others.</p><div id="skillBox"></div></div>
@@ -2685,7 +2717,7 @@
               <p style="font-size:13px;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:${hasPolice(c) ? '#f0fdf4' : '#eff6ff'}">${hasPolice(c) ? '✓ Police clearance uploaded' : '🛡 <b>Police clearance (criminal record check):</b> many yachts ask for one. Upload it below by choosing “Police clearance” as the document type.'}</p>
               <div id="docList"></div>
               <div class="form" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
-                <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${CERT_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}<option>${POLICE_DOC}</option><option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
+                <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${Object.entries(CERT_GROUPS).map(([g, a]) => `<optgroup label="${esc(g)}">${a.map(o => `<option>${esc(o)}</option>`).join('')}</optgroup>`).join('')}<option>${POLICE_DOC}</option><option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
                 <div><label>Certificate / course name</label><input id="dName" placeholder="e.g. STCW Basic Safety – STC-SA 2025"></div>
                 <div><label>Expiry date (leave blank if it doesn't expire)</label><input id="dExp" type="date"></div><div></div>
                 <div class="full"><label>File (PDF, photo or Word)</label><input id="dFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"></div>
@@ -2700,6 +2732,9 @@
         drawRefs();
         drawDocs();
         drawPosAndSkills();
+        document.querySelectorAll('input[name=pCert][value="OOW modules (started)"]').forEach(x => x.addEventListener('change', () => {
+            $('oowBox').style.display = x.checked ? '' : 'none';
+        }));
     }
     function appCard(a) {
         const j = JOBS.find(x => x.id === a.job_id) || {
@@ -2876,6 +2911,7 @@
             bio: $('pBio').value.trim(),
             certs,
             visas: checked('pVisa'),
+            oow_modules: $('pOOW') ? $('pOOW').value.trim() : null,
             yacht_refs: REFS.filter(r => r.yacht || r.referee)
         };
     }
@@ -3128,7 +3164,7 @@
                 CAP_J = JOBS.find(j => j.id === SL.job_id) || {};
             }
             else {
-                CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio,dept_pref,position_2,available_from,drivers_license,skills&id=in.(' + ids.join(',') + ')') : [];
+                CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio,dept_pref,position_2,available_from,drivers_license,skills,oow_modules&id=in.(' + ids.join(',') + ')') : [];
                 CAP_J = (await sb('recruit_jobs?select=*&id=eq.' + SL.job_id))[0] || {};
             }
             drawCaptain();
@@ -3456,7 +3492,7 @@
     function extraFacts(c, forCaptain) {
         const f = (k, v) => v ? `<div class="fact"><small>${k}</small><b>${v}</b></div>` : '';
         return f('Department', esc(c.dept_pref || '')) + f('2nd choice', esc(c.position_2 || '')) + f('Available from', c.available_from ? fdate(c.available_from) : '')
-        + f("Driver's licence", c.drivers_license ? 'Yes ✓' : '') + f('Police clearance', hasPolice(c) ? 'Uploaded ✓' : '')
+        + f('OOW modules done', esc(c.oow_modules || '')) + f("Driver's licence", c.drivers_license ? 'Yes ✓' : '') + f('Police clearance', hasPolice(c) ? 'Uploaded ✓' : '')
         + (forCaptain ? '' : f('LinkedIn', c.linkedin ? `<a href="${esc(socialURL(c.linkedin, 'linkedin'))}" target="_blank">Open profile</a>` : '') + f('Instagram', c.instagram ? `<a href="${esc(socialURL(c.instagram, 'instagram'))}" target="_blank">${esc(c.instagram.startsWith('http') ? 'Open' : '@' + c.instagram.replace(/^@/, ''))}</a>` : ''));
     }
     function socialURL(v, kind) {
@@ -3468,6 +3504,17 @@
         return 'https://' + v.replace(/^\/+/, '');
     }
 
+    function certGroupsHTML(c) {
+        const sel = list(c.certs),
+            d = c.dept_pref || 'Both';
+        const box = (g, arr, hint) => `<div class="certgrp"><h4>${esc(g)}${hint ? ` <span>${hint}</span>` : ''}</h4>${checkBoxes('pCert', arr, c.certs)}</div>`;
+        const ext = box('Exterior / deck', CERT_GROUPS['Exterior / deck'], d === 'Interior' ? '(optional for you)' : '');
+        const int = box('Interior', CERT_GROUPS['Interior'], d === 'Exterior' ? '(optional for you)' : '');
+        return box('All crew — basic safety', CERT_GROUPS['All crew — basic safety'])
+        + `<div class="two" style="margin-top:6px">${d === 'Interior' ? int + ext : ext + int}</div>`
+        + `<div id="oowBox" style="margin-top:10px;${sel.includes('OOW modules (started)') ? '' : 'display:none'}"><label>Which OOW modules have you completed?</label><input id="pOOW" value="${esc(c.oow_modules || '')}" placeholder="e.g. Navigation, Stability, Meteorology"></div>`
+        + box('Galley & engineering', CERT_GROUPS['Galley & engineering']);
+    }
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
             <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
