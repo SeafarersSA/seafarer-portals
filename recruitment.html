@@ -1097,6 +1097,39 @@
         align-items: center
     }
 
+    .skrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+        flex-wrap: wrap
+    }
+
+    .sklv {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap
+    }
+
+    .sklv button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 8px;
+        padding: 5px 9px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted)
+    }
+
+    .sklv button.on {
+        background: var(--navy);
+        border-color: var(--navy);
+        color: #fff
+    }
+
     .sc {
         width: 32px;
         height: 32px;
@@ -1676,6 +1709,12 @@
                             <option>Male</option>
                             <option>Female</option>
                         </select>
+                        <select id="cD" onchange="renderCands()">
+                            <option value="">Interior & exterior</option>
+                            <option value="Interior">Interior</option>
+                            <option value="Exterior">Exterior</option>
+                            <option value="Both">Both</option>
+                        </select>
                     </div>
                     <div class="tbl-wrap">
                         <table>
@@ -1706,7 +1745,7 @@
         <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
          · 
         <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
-        <span style="opacity:.4">· v12</span>
+        <span style="opacity:.4">· v13</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1749,7 +1788,8 @@
     };
     const CERT_OPTS = ['STCW Basic Safety', 'ENG1 Medical', 'PDSD', 'Food Hygiene L2', 'Powerboat L2', 'Yachtmaster Offshore', 'RYA Day Skipper', 'Proficiency in Survival Craft', 'Silver Service', 'WSET Wine L2', 'Culinary Diploma', "Ship's Cook Cert", 'AEC', 'PADI Divemaster'];
     const VISA_OPTS = ['B1/B2 (USA)', 'Schengen', 'UK', 'Australian MCV', "Seaman's Book"];
-    const POSITIONS = ['Deckhand', 'Lead Deckhand', 'Bosun', 'Second Officer', 'Chief Officer', 'Captain', 'Junior Steward/ess', 'Steward/ess', 'Second Steward/ess', 'Chief Steward/ess', 'Head of Housekeeping', 'Laundry Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer', 'Deck/Engineer'];
+    const POSITIONS = ['Captain', 'Chase Boat Captain', 'Chief Officer', '1st Mate', '2nd Officer', '3rd Officer', 'Bosun', 'Lead Deckhand', 'Deckhand', 'Deck/Engineer', 'Purser', 'Chief Steward/ess', 'Head of Service', 'Head of Housekeeping', 'Sole Steward/ess', '2nd Steward/ess', '3rd Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer'];
+    const POSITIONS_OLD = ['Deckhand', 'Lead Deckhand', 'Bosun', 'Second Officer', 'Chief Officer', 'Captain', 'Junior Steward/ess', 'Steward/ess', 'Second Steward/ess', 'Chief Steward/ess', 'Head of Housekeeping', 'Laundry Steward/ess', 'Sole Chef', 'Head Chef', 'Sous Chef', 'Crew Chef', 'Engineer', 'Deck/Engineer'];
     const STAGES = [
     {
         k: 'applied',
@@ -2215,8 +2255,12 @@
             m.push('Gender');
         if (!c.dob)
             m.push('Date of birth');
+        if (!c.dept_pref)
+            m.push('Interior, Exterior or Both');
         if (!c.position_sought)
-            m.push("Position you're looking for");
+            m.push('Desired position (1st choice)');
+        if (!c.available_from)
+            m.push('Date available to start');
         if (!c.certs)
             m.push('Tick your certificates');
         if (!(c.documents || []).length)
@@ -2467,6 +2511,7 @@
               <div class="form">
                 <div><label>Name *</label><input id="rFirst"></div><div><label>Surname *</label><input id="rLast"></div>
                 <div class="full"><label>Email *</label><input id="rEmail" type="email"></div>
+                <div class="full"><label>I want to work in *</label><select id="rDept"><option value="">Select…</option><option value="Interior">Interior (stewardess / steward)</option><option value="Exterior">Exterior (deck)</option><option value="Both">Both interior & exterior</option></select></div>
                 <div><label>Date of birth *</label><input id="rDob" type="date"></div><div><label>WhatsApp / phone</label><input id="rPhone" placeholder="+27…"></div>
                 <div><label>Password *</label><input id="rPass" type="password" autocomplete="new-password"></div><div><label>Confirm password *</label><input id="rPass2" type="password" autocomplete="new-password"></div>
                 <div class="full"><label class="ck" style="align-items:flex-start;padding:12px;line-height:1.45"><input type="checkbox" id="rConsent" style="margin-top:3px"> <span style="font-size:13px">I agree that Seafarer Maritime Career Consultancy may store my personal information and documents, and share my profile with yachts and captains for recruitment, as set out in the <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>. *</span></label></div>
@@ -2484,8 +2529,8 @@
             p = $('rPass').value,
             p2 = $('rPass2').value;
         const err = m => authMsg(esc(m));
-        if (!f || !l || !e || !d || !p)
-            return err('Please fill in all required fields.');
+        if (!f || !l || !e || !d || !p || !$('rDept').value)
+            return err('Please fill in all required fields, including Interior / Exterior.');
         if (!/^\S+@\S+\.\S+$/.test(e))
             return err('Please enter a valid email.');
         if (p.length < 6)
@@ -2508,6 +2553,7 @@
                 phone: $('rPhone').value.trim(),
                 pass_hash: await hash(e, p),
                 yacht_refs: [],
+                dept_pref: $('rDept').value,
                 popia_consent: new Date().toISOString()
             });
             store('sr_cand', ME.id);
@@ -2596,13 +2642,14 @@
     }
 
     function completeness(c) {
-        const total = 9,
+        const total = 11,
             miss = missingForApply(c).length;
         return Math.round((total - miss) / total * 100);
     }
     function renderProfile(justRegistered) {
         const c = ME;
         REFS = JSON.parse(JSON.stringify(c.yacht_refs || []));
+        SKILLS = JSON.parse(JSON.stringify(c.skills || {}));
         const mine = APPS.filter(a => a.candidate_id === c.id).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         const pct = completeness(c);
         $('meBox').innerHTML = `
@@ -2620,18 +2667,25 @@
               <div><label>Email</label><input value="${esc(c.email)}" disabled></div><div><label>Date of birth</label><input id="pDob" type="date" value="${esc(c.dob || '')}"></div>
               <div><label>WhatsApp / phone</label><input id="pPhone" value="${esc(c.phone || '')}"></div><div><label>Nationality</label><input id="pNat" value="${esc(c.nationality || '')}"></div>
               <div><label>Gender</label><select id="pGender"><option value="">Select</option>${['Male', 'Female'].map(g => `<option ${c.gender === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div>
-              <div><label>Position I'm looking for</label><input id="pPos" list="posList" value="${esc(c.position_sought || '')}"><datalist id="posList">${POSITIONS.map(p => `<option>${p}</option>`).join('')}</datalist></div>
+              <div><label>I want to work in *</label><select id="pDept" onchange="drawPosAndSkills()"><option value="">Select…</option>${[['Interior', 'Interior'], ['Exterior', 'Exterior (deck)'], ['Both', 'Both interior & exterior']].map(([v, t]) => `<option value="${v}" ${c.dept_pref === v ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+              <div class="full form" id="posBox" style="padding:0"></div>
+              <div><label>Available to start from *</label><input id="pAvail" type="date" value="${esc(c.available_from || '')}"></div>
+              <div><label>Driver's licence</label><label class="ck"><input type="checkbox" id="pLic" ${c.drivers_license ? 'checked' : ''}> I have a valid driver's licence</label></div>
+              <div><label>LinkedIn profile (optional)</label><input id="pLinked" value="${esc(c.linkedin || '')}" placeholder="linkedin.com/in/yourname"></div>
+              <div><label>Instagram (optional)</label><input id="pInsta" value="${esc(c.instagram || '')}" placeholder="@yourname"></div>
               <div class="full"><label>Yachting experience</label><select id="pExp">${['Green / no experience', 'Under 1 season', '1–2 seasons', '2–4 years', '5+ years'].map(x => `<option ${c.experience === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
               <div class="full"><label>About me</label><textarea id="pBio" placeholder="Skills, hobbies, languages, previous hospitality work…">${esc(c.bio || '')}</textarea></div>
             </div></div>
             <div class="panel"><h3>Qualified certificates</h3>${checkBoxes('pCert', CERT_OPTS, c.certs)}
               <div style="margin-top:12px"><label>Other certificates (comma separated)</label><input id="pCertOther" value="${esc(list(c.certs).filter(x => !CERT_OPTS.includes(x)).join(', '))}"></div>
               <h3 style="margin-top:20px">Visas held</h3>${checkBoxes('pVisa', VISA_OPTS, c.visas)}</div>
+            <div class="panel"><h3>My skills</h3><p style="font-size:13px;color:var(--muted);margin-bottom:4px">Rate yourself honestly on each skill — tap again to clear. Novice = never done it, Trained = done the course, Good = done it onboard, Experienced = confident and can teach others.</p><div id="skillBox"></div></div>
             <div class="panel"><h3>Course certificates & documents</h3>
               <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Upload your certificates one by one, or all of them combined in one file. Choose what each document is so we can check it quickly.</p>
+              <p style="font-size:13px;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:${hasPolice(c) ? '#f0fdf4' : '#eff6ff'}">${hasPolice(c) ? '✓ Police clearance uploaded' : '🛡 <b>Police clearance (criminal record check):</b> many yachts ask for one. Upload it below by choosing “Police clearance” as the document type.'}</p>
               <div id="docList"></div>
               <div class="form" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
-                <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${CERT_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}<option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
+                <div><label>What is this document?</label><select id="dType" onchange="$('dName').value=this.value==='Other'?'':this.value;$('dName').focus()"><option value="">Select…</option><option>All certificates (one file)</option>${CERT_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}<option>${POLICE_DOC}</option><option>Passport</option><option>Seaman's Book</option><option>Visa</option><option>Other</option></select></div>
                 <div><label>Certificate / course name</label><input id="dName" placeholder="e.g. STCW Basic Safety – STC-SA 2025"></div>
                 <div><label>Expiry date (leave blank if it doesn't expire)</label><input id="dExp" type="date"></div><div></div>
                 <div class="full"><label>File (PDF, photo or Word)</label><input id="dFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"></div>
@@ -2645,6 +2699,7 @@
             <div style="display:flex;gap:10px;align-items:center"><button class="btn btn-g" id="pSave" style="padding:13px 28px" onclick="saveProfile()">Save profile</button><span id="pMsg" style="font-size:13px;color:var(--muted)"></span></div>`;
         drawRefs();
         drawDocs();
+        drawPosAndSkills();
     }
     function appCard(a) {
         const j = JOBS.find(x => x.id === a.job_id) || {
@@ -2685,6 +2740,7 @@
         try {
             const url = await uploadCV(f, 'photo');
             ME = await db.patchCand(ME.id, {
+                ...formValues(),
                 photo_url: url
             });
             toast('Photo uploaded');
@@ -2743,6 +2799,7 @@
                 uploaded: new Date().toISOString().slice(0, 10)
             }]);
             ME = await db.patchCand(ME.id, {
+                ...formValues(),
                 documents: docs
             });
             $('dType').value = '';
@@ -2762,6 +2819,7 @@
         docs.splice(i, 1);
         try {
             ME = await db.patchCand(ME.id, {
+                ...formValues(),
                 documents: docs
             });
             renderProfile();
@@ -2780,21 +2838,7 @@
         try {
             const file = $('pCV').files[0];
             const cv = file ? await uploadCV(file) : null;
-            const certs = [...checked('pCert').split(', ').filter(Boolean), ...list($('pCertOther').value)].join(', ');
-            const f = {
-                first_name: $('pFirst').value.trim() || ME.first_name,
-                last_name: $('pLast').value.trim() || ME.last_name,
-                dob: $('pDob').value || null,
-                phone: $('pPhone').value.trim(),
-                nationality: $('pNat').value.trim(),
-                gender: $('pGender').value,
-                position_sought: $('pPos').value.trim(),
-                experience: $('pExp').value,
-                bio: $('pBio').value.trim(),
-                certs,
-                visas: checked('pVisa'),
-                yacht_refs: REFS.filter(r => r.yacht || r.referee)
-            };
+            const f = formValues();
             if (cv)
                 f.cv_url = cv;
             ME = await db.patchCand(ME.id, f);
@@ -2807,6 +2851,33 @@
             $('pMsg').textContent = 'Error: ' + e.message;
             b.disabled = false;
         }
+    }
+    // everything typed on the profile page (so photo / document uploads never lose unsaved edits)
+    function formValues() {
+        if (!$('pFirst'))
+            return {};
+        const certs = [...checked('pCert').split(', ').filter(Boolean), ...list($('pCertOther').value)].join(', ');
+        return {
+            first_name: $('pFirst').value.trim() || ME.first_name,
+            last_name: $('pLast').value.trim() || ME.last_name,
+            dob: $('pDob').value || null,
+            phone: $('pPhone').value.trim(),
+            nationality: $('pNat').value.trim(),
+            gender: $('pGender').value,
+            position_sought: $('pPos').value,
+            position_2: $('pPos2').value,
+            dept_pref: $('pDept').value,
+            available_from: $('pAvail').value || null,
+            drivers_license: $('pLic').checked,
+            linkedin: $('pLinked').value.trim(),
+            instagram: $('pInsta').value.trim(),
+            skills: SKILLS,
+            experience: $('pExp').value,
+            bio: $('pBio').value.trim(),
+            certs,
+            visas: checked('pVisa'),
+            yacht_refs: REFS.filter(r => r.yacht || r.referee)
+        };
     }
 
     /* ---------------- admin ---------------- */
@@ -3057,7 +3128,7 @@
                 CAP_J = JOBS.find(j => j.id === SL.job_id) || {};
             }
             else {
-                CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio&id=in.(' + ids.join(',') + ')') : [];
+                CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio,dept_pref,position_2,available_from,drivers_license,skills&id=in.(' + ids.join(',') + ')') : [];
                 CAP_J = (await sb('recruit_jobs?select=*&id=eq.' + SL.job_id))[0] || {};
             }
             drawCaptain();
@@ -3078,7 +3149,9 @@
                     <div style="color:var(--muted);font-size:14px">${esc(c.position_sought || '')}${c.experience ? ' · ' + esc(c.experience) : ''}</div>
                     <div style="font-size:14px;margin-top:2px">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + esc(c.gender) : ''}${c.visas ? ' · Visas: ' + esc(c.visas) : ''}</div></div>
                     <div style="margin-left:auto">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}</div></div>
+                    <div class="facts" style="margin-bottom:12px">${extraFacts(c, true)}</div>
                     ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
+                    ${skillsHTML(c)}
                     <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div>
                       ${(c.documents || []).length ? `<div style="margin-top:8px">${c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> ${expBadge(x)}</div>`).join('')}</div>` : ''}</div>
                     ${(c.yacht_refs || []).length ? `<div class="sec"><h4>Previous yachts & references</h4><div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
@@ -3124,7 +3197,7 @@
         if (APPS.some(a => a.job_id === j.id && a.candidate_id === c.id))
             return null; // already applied
         const jw = posWords(j.position),
-            cw = posWords(c.position_sought);
+            cw = posWords((c.position_sought || '') + ' ' + (c.position_2 || ''));
         const posHit = jw.length && cw.some(w => jw.some(x => x.startsWith(w.slice(0, 5)) || w.startsWith(x.slice(0, 5))));
         const need = list(j.certs),
             have = list(c.certs).concat((c.documents || []).map(d => d.type));
@@ -3315,6 +3388,86 @@
         : '<tr><td colspan="8" class="empty">No placements yet. When you move a candidate to "Accepted", you can record the yacht and your fee here.</td></tr>';
     }
 
+    /* ---------- crew profile v13: department, 2 positions, skills, socials ---------- */
+    const DECK_POS = ['Captain', 'Chase Boat Captain', 'Chief Officer', '1st Mate', '2nd Officer', '3rd Officer', 'Bosun', 'Lead Deckhand', 'Deckhand', 'Deck/Engineer'];
+    const INT_POS = ['Purser', 'Chief Steward/ess', 'Head of Service', 'Head of Housekeeping', 'Sole Steward/ess', '2nd Steward/ess', '3rd Steward/ess'];
+    const SKILL_LEVELS = ['Novice', 'Trained', 'Good', 'Experienced'];
+    const DECK_SKILLS = ['Watchkeeping', 'Anchoring', 'Mooring & line handling', 'Boat handling / tender driving', 'Splicing & ropework', 'Working aloft', 'Carpentry', 'Painting', 'Varnishing', 'Teak care', 'Washdowns & detailing', 'Watersports instructing', 'Fishing', 'Diving'];
+    const INT_SKILLS = ['Housekeeping', 'Laundry & ironing', 'Cabin set-up', 'Service', 'Charter service', 'Silver service', 'Table setting & styling', 'Wine & cocktails', 'Barista coffee', 'Floral arrangements', 'Damage prevention', 'Galley assistance', 'Guest relations', 'Inventory & provisioning', 'Childcare'];
+    const POLICE_DOC = 'Police clearance (criminal record check)';
+    let SKILLS = {};
+    function deptPositions(d) {
+        return d === 'Exterior' ? DECK_POS : d === 'Interior' ? INT_POS : DECK_POS.concat(INT_POS);
+    }
+    function deptSkills(d) {
+        return d === 'Exterior' ? DECK_SKILLS : d === 'Interior' ? INT_SKILLS : d === 'Both' ? DECK_SKILLS.concat(INT_SKILLS) : [];
+    }
+    function posSelect(id, val, d) {
+        const g = (label, arr) => `<optgroup label="${label}">${arr.map(p => `<option ${p === val ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
+        const known = DECK_POS.concat(INT_POS).includes(val);
+        return `<select id="${id}"><option value="">Select…</option>${d !== 'Interior' ? g('Exterior / Deck', DECK_POS) : ''}${d !== 'Exterior' ? g('Interior', INT_POS) : ''}${val && !known ? `<option selected>${esc(val)}</option>` : ''}</select>`;
+    }
+    function hasPolice(c) {
+        return (c.documents || []).some(d => d.type === POLICE_DOC);
+    }
+    function drawPosAndSkills() {
+        const d = $('pDept').value;
+        const v1 = $('pPos') ? $('pPos').value : ME.position_sought,
+            v2 = $('pPos2') ? $('pPos2').value : ME.position_2;
+        $('posBox').innerHTML = `<div><label>Desired position — 1st choice *</label>${posSelect('pPos', v1, d)}</div><div><label>Desired position — 2nd choice</label>${posSelect('pPos2', v2, d)}</div>`;
+        drawSkills();
+    }
+    function drawSkills() {
+        const d = $('pDept').value,
+            list_ = deptSkills(d);
+        if (!list_.length) {
+            $('skillBox').innerHTML = '<p style="color:var(--muted);font-size:14px">Choose Interior, Exterior or Both above to rate your skills.</p>';
+            return;
+        }
+        const sec = (title, arr) => `<h4 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--sea);margin:14px 0 6px">${title}</h4>` + arr.map(sk => `
+            <div class="skrow"><span>${sk}</span><span class="sklv">${SKILL_LEVELS.map(l => `<button type="button" class="${SKILLS[sk] === l ? 'on' : ''}" onclick="setSkill('${sk.replace(/'/g, "\\'")}','${l}')">${l}</button>`).join('')}</span></div>`).join('');
+        $('skillBox').innerHTML = (d !== 'Interior' ? sec('Deck skills', DECK_SKILLS) : '') + (d !== 'Exterior' ? sec('Interior skills', INT_SKILLS) : '');
+    }
+    function setSkill(sk, l) {
+        if (SKILLS[sk] === l)
+            delete SKILLS[sk];
+        else
+            SKILLS[sk] = l;
+        drawSkills();
+    }
+    function skillsHTML(c) {
+        const s = c.skills || {};
+        const ks = Object.keys(s);
+        if (!ks.length)
+            return '';
+        const col = {
+            Novice: '#e2e8f0;color:#475569',
+            Trained: '#e0f2fe;color:#075985',
+            Good: '#fef3c7;color:#92400e',
+            Experienced: '#dcfce7;color:#166534'
+        };
+        const grp = (t, arr) => {
+            const h = arr.filter(k => s[k]);
+            return h.length ? `<div style="font-size:12px;font-weight:700;color:var(--muted);margin:6px 0 4px">${t}</div><div class="tags">${h.map(k => `<span class="tag" style="background:${col[s[k]]}">${esc(k)} · ${s[k]}</span>`).join('')}</div>` : '';
+        };
+        const other = ks.filter(k => !DECK_SKILLS.includes(k) && !INT_SKILLS.includes(k));
+        return `<div class="sec"><h4>Skills</h4>${grp('Deck', DECK_SKILLS)}${grp('Interior', INT_SKILLS)}${grp('Other', other)}</div>`;
+    }
+    function extraFacts(c, forCaptain) {
+        const f = (k, v) => v ? `<div class="fact"><small>${k}</small><b>${v}</b></div>` : '';
+        return f('Department', esc(c.dept_pref || '')) + f('2nd choice', esc(c.position_2 || '')) + f('Available from', c.available_from ? fdate(c.available_from) : '')
+        + f("Driver's licence", c.drivers_license ? 'Yes ✓' : '') + f('Police clearance', hasPolice(c) ? 'Uploaded ✓' : '')
+        + (forCaptain ? '' : f('LinkedIn', c.linkedin ? `<a href="${esc(socialURL(c.linkedin, 'linkedin'))}" target="_blank">Open profile</a>` : '') + f('Instagram', c.instagram ? `<a href="${esc(socialURL(c.instagram, 'instagram'))}" target="_blank">${esc(c.instagram.startsWith('http') ? 'Open' : '@' + c.instagram.replace(/^@/, ''))}</a>` : ''));
+    }
+    function socialURL(v, kind) {
+        v = v.trim();
+        if (/^https?:\/\//i.test(v))
+            return v;
+        if (kind === 'instagram')
+            return 'https://instagram.com/' + v.replace(/^@/, '');
+        return 'https://' + v.replace(/^\/+/, '');
+    }
+
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
             <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
@@ -3331,11 +3484,14 @@
         let cs = CANDS.slice();
         if (g)
             cs = cs.filter(c => c.gender === g);
+        const dd = $('cD').value;
+        if (dd)
+            cs = cs.filter(c => c.dept_pref === dd || (dd !== 'Both' && c.dept_pref === 'Both'));
         if (q)
-            cs = cs.filter(c => [c.first_name, c.last_name, c.nationality, c.position_sought, c.certs, c.email].join(' ').toLowerCase().includes(q));
+            cs = cs.filter(c => [c.first_name, c.last_name, c.nationality, c.position_sought, c.position_2, c.certs, c.email, Object.keys(c.skills || {}).join(' ')].join(' ').toLowerCase().includes(q));
         $('aCandRows').innerHTML = cs.length ? cs.map(c => `<tr>
             <td><div style="display:flex;gap:10px;align-items:center">${av(c, 36)}<div><b>${esc(fullName(c))}</b>${certAlerts(c) ? ` <span class="es es-bad">⚠ ${certAlerts(c)}</span>` : ''}<br><small style="color:var(--muted)">${esc(c.email)} · joined ${ago(c.created_at)}</small></div></div></td>
-            <td>${esc(c.position_sought || '—')}<br><small style="color:var(--muted)">${esc(c.experience || '')}</small></td>
+            <td>${esc(c.position_sought || '—')}${c.position_2 ? `<br><small>2nd: ${esc(c.position_2)}</small>` : ''}<br><small style="color:var(--muted)">${esc(c.dept_pref || '')}${c.available_from ? ' · from ' + fdate(c.available_from) : ''}</small></td>
             <td>${esc(c.nationality || '—')}</td><td>${c.dob ? age(c.dob) : '—'}</td>
             <td style="max-width:220px;font-size:13px">${esc(c.certs || '—')}</td><td>${(c.documents || []).length}</td><td>${(c.yacht_refs || []).length}</td>
             <td>${c.cv_url ? `<a href="${esc(c.cv_url)}" target="_blank">CV</a>` : '—'}</td>
@@ -3353,8 +3509,9 @@
         const wa = (c.phone || '').replace(/\D/g, '');
         openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(c.position_sought || 'Crew')} · ${esc(c.experience || '')}</div><div style="display:flex;gap:14px;align-items:center;margin-top:6px">${av(c, 64)}<h2>${esc(fullName(c))}</h2></div></div>
           <div class="m-body">
-            <div class="facts">${fact('Email', c.email)}${fact('Phone', c.phone)}${fact('Nationality', c.nationality)}${fact('Gender', c.gender)}${fact('Date of birth', c.dob ? fdate(c.dob) + ' (' + age(c.dob) + ')' : '')}${fact('Visas', c.visas)}</div>
+            <div class="facts">${fact('Email', c.email)}${fact('Phone', c.phone)}${fact('Nationality', c.nationality)}${fact('Gender', c.gender)}${fact('Date of birth', c.dob ? fdate(c.dob) + ' (' + age(c.dob) + ')' : '')}${fact('Visas', c.visas)}${extraFacts(c, false)}</div>
             <div class="sec"><h4>Certificates</h4><div class="tags">${list(c.certs).map(x => `<span class="tag">${esc(x)}</span>`).join('') || '—'}</div></div>
+            ${skillsHTML(c)}
             ${c.bio ? `<div class="sec"><h4>About</h4><p>${esc(c.bio)}</p></div>` : ''}
             <div class="sec"><h4>Certificates & documents uploaded</h4>${(c.documents || []).length ? c.documents.map(x => `<div style="font-size:14px;margin-bottom:4px">📄 <a href="${esc(x.url)}" target="_blank">${esc(x.name)}</a> ${expBadge(x)} <span class="ref">${esc(x.type || '')} · ${fdate(x.uploaded)}</span></div>`).join('') : '<p>None uploaded</p>'}</div>
             <div class="sec"><h4>Superyacht references</h4>${(c.yacht_refs || []).length ? `<div class="tbl-wrap"><table><thead><tr><th>Yacht</th><th>Position</th><th>Dates</th><th>Referee</th><th>Contact</th></tr></thead><tbody>${c.yacht_refs.map(r => `<tr><td>${esc(r.yacht || '')} ${r.size ? esc(r.size) + 'm' : ''}</td><td>${esc(r.position || '')}</td><td>${esc(r.from || '')} – ${esc(r.to || '')}</td><td>${esc(r.referee || '')}</td><td>${esc(r.contact || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p>None added</p>'}</div>
