@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Superyacht crew jobs — deckhand, stewardess, chef, bosun and more. Register your crew profile once and apply in one click. Seafarer Maritime Career Consultancy, Cape Town.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Seafarer Recruitment">
+    <meta property="og:title" content="Seafarer Recruitment — Superyacht Crew Jobs">
+    <meta property="og:description" content="Deck, interior and galley positions on private and charter yachts. Register once, apply in one click.">
+    <meta property="og:url" content="https://seafarerssa.github.io/seafarer-portals/recruitment.html">
+    <meta property="og:image" content="https://seafarerssa.github.io/seafarer-portals/seafarer-share.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#011950">
     <title>Seafarer Recruitment — Superyacht Crew Jobs</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8 L90 92 L50 70 Z' fill='%23e82b30'/%3E%3Cpath d='M50 8 L10 92 L50 70 Z' fill='%23011950'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1086,6 +1097,33 @@
         align-items: center
     }
 
+    .sc {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-weight: 700;
+        color: var(--muted)
+    }
+
+    .sc.on {
+        background: var(--navy);
+        color: #fff;
+        border-color: var(--navy)
+    }
+
+    .stot {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+        background: #e0e7ff;
+        color: #3730a3;
+        display: inline-block;
+        margin-top: 4px
+    }
+
     .es {
         font-size: 11px;
         font-weight: 700;
@@ -1240,6 +1278,106 @@
 
     .hide {
         display: none !important
+    }
+
+    @media (max-width: 560px) {
+        header .wrap {
+            min-height: 56px;
+            padding: 0 12px;
+            flex-wrap: nowrap
+        }
+
+        .logo img {
+            height:38px
+        }
+
+        .logo {
+            font-size: 0;
+            gap: 0
+        }
+
+        nav button {
+            padding: 7px 9px;
+            font-size:13px
+        }
+
+        .who {
+            display: none
+        }
+
+        .hero {
+            padding:30px 0 76px
+        }
+
+        .hero h1 {
+            font-size:27px
+        }
+
+        .hero p {
+            font-size: 15px
+        }
+
+        .hero .stats {
+            gap:18px
+        }
+
+        .hero .stats b {
+            font-size:20px
+        }
+
+        .hero .stats span {
+            font-size: 12px
+        }
+
+        .wrap {
+            padding:0 14px
+        }
+
+        .m-body {
+            padding:18px 16px
+        }
+
+        .m-head {
+            padding:18px 16px
+        }
+
+        .m-head h2 {
+            font-size: 22px
+        }
+
+        .panel {
+            padding:18px 16px
+        }
+
+        .page {
+            padding:22px 0 40px
+        }
+
+        .page h2.t {
+            font-size: 25px
+        }
+
+        .kpi b {
+            font-size:21px
+        }
+
+        .a-top h2 {
+            font-size: 23px
+        }
+
+        .slc {
+            padding:16px
+        }
+
+        .slc .hd > div:last-child {
+            margin-left: 0 !important;
+            width: 100%
+        }
+
+        footer {
+            font-size: 12px;
+            padding: 20px 14px
+        }
     }
 
     @media (max-width: 860px) {
@@ -1476,6 +1614,7 @@
                     <button id="t-pipe" class="on" onclick="aTab('pipe')">Pipeline</button>
                     <button id="t-jobs" onclick="aTab('jobs')">Jobs</button>
                     <button id="t-cand" onclick="aTab('cand')">Registered crew</button>
+                    <button id="t-plc" onclick="aTab('plc')">Placements & fees</button>
                 </div>
 
                 <div id="a-pipe">
@@ -1509,6 +1648,26 @@
                     </div>
                 </div>
 
+                <div id="a-plc" class="hide">
+                    <div class="kpis" id="plKpis"></div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Crew</th>
+                                    <th>Position</th>
+                                    <th>Yacht</th>
+                                    <th>Start</th>
+                                    <th>Salary</th>
+                                    <th>Our fee</th>
+                                    <th>Payment</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="plRows"></tbody>
+                        </table>
+                    </div>
+                </div>
                 <div id="a-cand" class="hide">
                     <div class="a-bar">
                         <input id="cQ" placeholder="Search name, nationality, position, cert…" oninput="renderCands()">
@@ -1545,7 +1704,9 @@
     <footer>
         Seafarer Maritime Career Consultancy · Cape Town, South Africa · Visa support via 
         <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
-        <span style="opacity:.4">· v9</span>
+         · 
+        <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
+        <span style="opacity:.4">· v12</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1573,6 +1734,7 @@
     },
     ];
     const SHORTLIST_MAX = 10;
+    const SUPPORT_WA = '27647872215'; // ← Seafarer WhatsApp number for password resets (country code, no + or spaces)
 
     const DEMO = !SB_KEY.startsWith('eyJ');
     const DEPTS = ['Deck', 'Interior', 'Galley', 'Engineering', 'Specialist'];
@@ -1606,8 +1768,8 @@
     },
     {
         k: 'shortlist',
-        t: 'Final 10',
-        s: 'Phase 3 — Shortlisted'
+        t: 'Final interview',
+        s: 'Phase 3 — Final interview'
     },
     {
         k: 'accepted',
@@ -1630,7 +1792,13 @@
         isAdmin = false,
         deptFilter = '',
         aCur = 'pipe',
-        authMode = 'register',
+        authMode = (function() {
+            try {
+                return localStorage.getItem('sr_last_email') ? 'login' : 'register'
+            } catch (e) {
+                return 'register'
+            }
+        })(),
         REFS = [];
 
     /* ---------------- data layer ---------------- */
@@ -1726,20 +1894,24 @@
                     j.created_at = new Date().toISOString();
                     JOBS.unshift(j);
                 }
-                return;
+                return j;
             }
             const id = j.id;
             delete j.id;
-            if (id)
+            if (id) {
                 await sb('recruit_jobs?id=eq.' + id, {
                     method: 'PATCH',
                     body: JSON.stringify(j)
                 });
-            else
-                await sb('recruit_jobs', {
-                    method: 'POST',
-                    body: JSON.stringify(j)
-                });
+                return {
+                    id
+                };
+            }
+            const r = await sb('recruit_jobs', {
+                method: 'POST',
+                body: JSON.stringify(j)
+            });
+            return r[0];
         },
         async delJob(id) {
             if (DEMO) {
@@ -1810,9 +1982,44 @@
             Object.assign(APPS.find(a => a.id === id), f);
         }
     };
-    async function uploadCV(file) {
+    // Shrinks photos before upload (iPhone photos are 3–5 MB). PDFs and Word files are uploaded as they are.
+    async function shrinkImage(file, maxDim, quality) {
+        if (!file || !/^image\/(jpeg|png|heic|heif|webp)$/i.test(file.type) && !/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name))
+            return file;
+        try {
+            const url = URL.createObjectURL(file);
+            const img = await new Promise((ok, bad) => {
+                const i = new Image();
+                i.onload = () => ok(i);
+                i.onerror = bad;
+                i.src = url;
+            });
+            const k = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+            const c = document.createElement('canvas');
+            c.width = Math.round(img.naturalWidth * k);
+            c.height = Math.round(img.naturalHeight * k);
+            const g = c.getContext('2d');
+            g.fillStyle = '#fff';
+            g.fillRect(0, 0, c.width, c.height);
+            g.drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', quality));
+            if (!blob || blob.size >= file.size)
+                return file;
+            return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
+                type: 'image/jpeg'
+            });
+        } catch (e) {
+            console.warn('shrink skipped', e);
+            return file;
+        }
+    }
+    async function uploadCV(file, kind) {
         if (!file)
             return null;
+        file = await shrinkImage(file, kind === 'photo' ? 900 : 2000, kind === 'photo' ? 0.85 : 0.8);
+        if (file.size > 10 * 1024 * 1024)
+            throw new Error('File is too big (max 10 MB). Please upload a smaller PDF or photo.');
         if (DEMO)
             return URL.createObjectURL(file);
         const name = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -2251,18 +2458,22 @@
             <h2 class="t" style="text-align:center">Crew profile</h2><p class="sub" style="text-align:center">Register once and apply to any job in one click.</p>
             <div class="switch"><button id="sw-register" class="${authMode === 'register' ? 'on' : ''}" onclick="authMode='register';renderMe()">Register</button><button id="sw-login" class="${authMode === 'login' ? 'on' : ''}" onclick="authMode='login';renderMe()">Log in</button></div>
             <div class="panel">${authMode === 'login' ? `
-              <div style="margin-bottom:12px"><label>Email</label><input id="lEmail" type="email"></div>
-              <div style="margin-bottom:16px"><label>Password</label><input id="lPass" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
-              <button class="btn btn-p" style="width:100%" onclick="doLogin()">Log in</button>` : `
+              <form onsubmit="event.preventDefault();doLogin()" autocomplete="on">
+              <div style="margin-bottom:12px"><label>Email</label><input id="lEmail" type="email" name="email" autocomplete="username" autocapitalize="off" value="${esc(read('sr_last_email') || '')}"></div>
+              <div style="margin-bottom:16px"><label>Password</label><input id="lPass" type="password" name="password" autocomplete="current-password"></div>
+              <button type="submit" id="lBtn" class="btn btn-p" style="width:100%;padding:13px">Log in</button></form>
+              <p style="text-align:center;margin-top:12px;font-size:14px"><a href="#" onclick="forgotPw();return false">Forgot your password?</a></p>
+              <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:6px">Seafarer student? This crew portal has its own login — please <a href="#" onclick="authMode='register';renderMe();return false">register here</a> once with the same email.</p>` : `
               <div class="form">
                 <div><label>Name *</label><input id="rFirst"></div><div><label>Surname *</label><input id="rLast"></div>
                 <div class="full"><label>Email *</label><input id="rEmail" type="email"></div>
                 <div><label>Date of birth *</label><input id="rDob" type="date"></div><div><label>WhatsApp / phone</label><input id="rPhone" placeholder="+27…"></div>
-                <div><label>Password *</label><input id="rPass" type="password"></div><div><label>Confirm password *</label><input id="rPass2" type="password"></div>
+                <div><label>Password *</label><input id="rPass" type="password" autocomplete="new-password"></div><div><label>Confirm password *</label><input id="rPass2" type="password" autocomplete="new-password"></div>
+                <div class="full"><label class="ck" style="align-items:flex-start;padding:12px;line-height:1.45"><input type="checkbox" id="rConsent" style="margin-top:3px"> <span style="font-size:13px">I agree that Seafarer Maritime Career Consultancy may store my personal information and documents, and share my profile with yachts and captains for recruitment, as set out in the <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>. *</span></label></div>
               </div>
               <button class="btn btn-g" style="width:100%;margin-top:16px;padding:13px" id="rBtn" onclick="doRegister()">Create profile</button>
               <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">Next you'll add certificates, CV and yacht references.</p>`}
-              <p id="authErr" style="color:var(--bad);font-size:13px;margin-top:10px"></p>
+              <div id="authErr" style="display:none;margin-top:12px;padding:12px 14px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:14px;font-weight:500"></div>
             </div></div>`;
     }
     async function doRegister() {
@@ -2272,7 +2483,7 @@
             d = $('rDob').value,
             p = $('rPass').value,
             p2 = $('rPass2').value;
-        const err = m => $('authErr').textContent = m;
+        const err = m => authMsg(esc(m));
         if (!f || !l || !e || !d || !p)
             return err('Please fill in all required fields.');
         if (!/^\S+@\S+\.\S+$/.test(e))
@@ -2281,11 +2492,13 @@
             return err('Password must be at least 6 characters.');
         if (p !== p2)
             return err('Passwords do not match.');
+        if (!$('rConsent').checked)
+            return err('Please tick the box to agree to the Privacy Notice.');
         $('rBtn').disabled = true;
         try {
             if (await db.findCand(e)) {
                 $('rBtn').disabled = false;
-                return err('This email is already registered — please log in.');
+                return authMsg('This email is already registered. <a href="#" onclick="authMode=\'login\';renderMe();return false" style="color:#991b1b;font-weight:700">Log in instead →</a>');
             }
             ME = await db.addCand({
                 first_name: f,
@@ -2294,9 +2507,11 @@
                 dob: d,
                 phone: $('rPhone').value.trim(),
                 pass_hash: await hash(e, p),
-                yacht_refs: []
+                yacht_refs: [],
+                popia_consent: new Date().toISOString()
             });
             store('sr_cand', ME.id);
+            store('sr_last_email', e);
             setWho();
             toast('Welcome aboard, ' + f + '! Now complete your profile.');
             renderProfile(true);
@@ -2305,26 +2520,63 @@
             $('rBtn').disabled = false;
         }
     }
+    function authMsg(html) {
+        const el = $('authErr');
+        if (!el)
+            return toast(html.replace(/<[^>]+>/g, ''));
+        el.innerHTML = html;
+        el.style.display = html ? 'block' : 'none';
+    }
     async function doLogin() {
+        const btn = $('lBtn');
         const e = $('lEmail').value.trim().toLowerCase(),
             p = $('lPass').value;
-        const h = await hash(e, p);
-        if (ADMINS.some(a => a.email === e && a.hash === h) || (DEMO && p === 'demo')) {
-            enterAdmin();
-            return show('admin');
-        }
+        authMsg('');
+        if (!e || !p)
+            return authMsg('Please enter your email and password.');
+        btn.disabled = true;
+        btn.textContent = 'Logging in…';
         try {
+            const h = await hash(e, p);
+            if (ADMINS.some(a => a.email === e && a.hash === h) || (DEMO && p === 'demo')) {
+                enterAdmin();
+                return show('admin');
+            }
             const c = await db.findCand(e);
-            if (!c || c.pass_hash !== await hash(e, p))
-                return $('authErr').textContent = 'Incorrect email or password.';
+            if (!c)
+                return authMsg(`No crew profile found for <b>${esc(e)}</b>.<br>New here or a Seafarer student? <a href="#" onclick="authMode='register';renderMe();return false" style="color:#991b1b;font-weight:700">Register your crew profile →</a>`);
+            if (c.pass_hash !== h)
+                return authMsg('Wrong password for this email. Try again, or tap <b>Forgot your password?</b> below.');
             ME = c;
             store('sr_cand', c.id);
-            await db.myApps(c.id);
+            store('sr_last_email', e);
+            try {
+                await db.myApps(c.id);
+            } catch (x) {
+                console.warn(x);
+            }
             setWho();
+            toast('Welcome back, ' + (c.first_name || ''));
             afterLogin();
         } catch (x) {
-            $('authErr').textContent = 'Error: ' + x.message;
+            console.error(x);
+            authMsg('Could not log in: ' + esc(x.message) + '<br>Check your internet connection and try again.');
         }
+        finally {
+            if ($('lBtn')) {
+                $('lBtn').disabled = false;
+                $('lBtn').textContent = 'Log in';
+            }
+        }
+    }
+    function forgotPw() {
+        const e = ($('lEmail') && $('lEmail').value.trim()) || '';
+        const txt = `Hi Seafarer, I forgot my crew portal password. My email is ${e || '…'}. Please reset it for me.`;
+        authMsg(`No problem — send us a message and we'll reset it for you:<br><br>
+            <a class="btn btn-sm" style="background:#25D366;color:#fff" target="_blank" href="https://api.whatsapp.com/send?phone=${SUPPORT_WA}&text=${encodeURIComponent(txt)}">WhatsApp Seafarer</a>
+            <a class="btn btn-o btn-sm" href="mailto:info@seafarers.co.za?subject=Password%20reset&body=${encodeURIComponent(txt)}">Email us</a>`);
+        $('authErr').style.background = '#eff6ff';
+        $('authErr').style.color = 'var(--navy)';
     }
     function afterLogin() {
         if (PENDING_JOB) {
@@ -2338,6 +2590,7 @@
     function logoutMe() {
         ME = null;
         store('sr_cand', null);
+        authMode = 'login';
         setWho();
         renderMe();
     }
@@ -2413,6 +2666,16 @@
             <span class="st" style="background:${denied ? '#fee2e2' : a.stage === 'accepted' ? '#dcfce7' : '#fef3c7'};color:${denied ? '#991b1b' : a.stage === 'accepted' ? '#166534' : '#92400e'}">${STAGES[i].s}</span></div>
             <div class="track">${denied ? `<div class="s bad" style="flex:5"><i></i>Not successful this time — keep applying, new roles weekly</div>` : steps}</div></div>`;
     }
+    function showPrivacy() {
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><h2>Privacy Notice</h2></div><div class="m-body" style="font-size:14px;line-height:1.6">
+          <p><b>Seafarer Maritime Career Consultancy</b> (Cape Town, South Africa) runs this crew recruitment portal. We respect your privacy and process your personal information in line with the Protection of Personal Information Act (POPIA).</p>
+          <div class="sec" style="margin-top:14px"><h4>What we collect</h4><p>Your name, contact details, date of birth, nationality, gender, photo, CV, certificates and other documents, visas, yacht experience and references, and the jobs you apply for.</p></div>
+          <div class="sec"><h4>Why we use it</h4><p>To assess you for superyacht positions, interview you, and put you forward to yachts, captains and their management companies. We may contact you by WhatsApp, phone or email about jobs and training that suit your profile.</p></div>
+          <div class="sec"><h4>Who we share it with</h4><p>Only yachts, captains and yacht management companies you are being considered for. When we share your profile with a yacht we hide your phone number and email. Please note that your uploaded CV and documents are shared as you provide them. We do not sell your information.</p></div>
+          <div class="sec"><h4>How long we keep it</h4><p>While your profile is active, and for up to 2 years after your last activity, unless you ask us to delete it sooner.</p></div>
+          <div class="sec"><h4>Your rights</h4><p>You may ask to see, correct or delete your information, or withdraw your consent, at any time. Contact <a href="mailto:info@seafarers.co.za">info@seafarers.co.za</a> or WhatsApp <a href="https://api.whatsapp.com/send?phone=${SUPPORT_WA}" target="_blank">+27 64 787 2215</a>. You may also complain to the Information Regulator of South Africa.</p></div>
+          </div>`);
+    }
     async function uploadPhoto() {
         const f = $('phFile').files[0];
         if (!f)
@@ -2420,7 +2683,7 @@
         $('phBtn').disabled = true;
         $('phBtn').textContent = 'Uploading…';
         try {
-            const url = await uploadCV(f);
+            const url = await uploadCV(f, 'photo');
             ME = await db.patchCand(ME.id, {
                 photo_url: url
             });
@@ -2581,7 +2844,7 @@
     }
     function aTab(t) {
         aCur = t;
-        ['pipe', 'jobs', 'cand'].forEach(x => {
+        ['pipe', 'jobs', 'cand', 'plc'].forEach(x => {
             $('a-' + x).classList.toggle('hide', x !== t);
             $('t-' + x).classList.toggle('on', x === t);
         });
@@ -2610,6 +2873,8 @@
             renderAJobs();
         if (aCur === 'cand')
             renderCands();
+        if (aCur === 'plc')
+            renderPlacements();
     }
     function renderPipe() {
         const jid = $('pJob').value;
@@ -2622,16 +2887,16 @@
         const as = APPS.filter(a => a.job_id === jid);
         $('pInfo').textContent = `${as.length} applicant${as.length === 1 ? '' : 's'} · ${money(j)} ${j.currency} · ${genderLabel(j.gender)}`;
         $('board').innerHTML = STAGES.map((s, i) => {
-            const cs = as.filter(a => a.stage === s.k);
+            const cs = as.filter(a => a.stage === s.k).sort((x, y) => (scoreTotal(y) ?? -1) - (scoreTotal(x) ?? -1));
             const full = s.k === 'shortlist' && cs.length >= SHORTLIST_MAX;
             return `<div class="col col-${s.k} ${full ? 'full' : ''}"><h5>${s.t}<span>${cs.length}${s.k === 'shortlist' ? '/' + SHORTLIST_MAX : ''}</span></h5>
-                  ${cs.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};const wa = (c.phone || '').replace(/\D/g, '');const next = STAGES[i + 1];const canNext = i < 4 && next && next.k !== 'denied';const cd = capDecision(a.id),al = certAlerts(c);return `<div class="kc"><div class="who">${av(c, 34)}<div><b onclick="openCand('${c.id}','${a.id}')">${esc(fullName(c))}</b>${al ? `<span class="es es-bad" title="Expired or expiring certificates">⚠ ${al} cert${al > 1 ? 's' : ''}</span>` : ''}${cd ? `<br><span class="dec dec-${cd.decision || 'pending'}">${DEC[cd.decision || 'pending']}</span>` : ''}</div></div>
+                  ${cs.map(a => {const c = CANDS.find(x => x.id === a.candidate_id) || {};const wa = (c.phone || '').replace(/\D/g, '');const next = STAGES[i + 1];const canNext = i < 4 && next && next.k !== 'denied';const cd = capDecision(a.id),al = certAlerts(c);return `<div class="kc"><div class="who">${av(c, 34)}<div><b onclick="openCand('${c.id}','${a.id}')">${esc(fullName(c))}</b>${al ? `<span class="es es-bad" title="Expired or expiring certificates">⚠ ${al} cert${al > 1 ? 's' : ''}</span>` : ''}${scoreTotal(a) !== null ? `<br><span class="stot">★ ${scoreTotal(a)}/25</span>` : ''}${cd ? `<br><span class="dec dec-${cd.decision || 'pending'}">${DEC[cd.decision || 'pending']}</span>` : ''}</div></div>
                           <div class="m">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + c.gender : ''}<br>${esc(c.experience || '')}</div>
                           <div class="acts">
                             ${i > 0 && i < 5 ? `<button class="btn-o" onclick="move('${a.id}',-1)" title="Move back">←</button>` : ''}
                             ${canNext ? `<button class="btn-ok" onclick="move('${a.id}',1)">${i === 3 ? 'Accept ✓' : 'Pass →'}</button>` : ''}
                             ${i < 4 ? `<button class="btn-d" onclick="deny('${a.id}')">Deny</button>` : ''}
-                            ${s.k === 'denied' || s.k === 'accepted' ? `<button class="btn-o" onclick="reopen('${a.id}')">Reopen</button>` : ''}
+                            ${s.k === 'accepted' ? `<button class="btn-ok" onclick="openPlacement('${a.id}')">${a.placement ? 'Placement' : '+ Fee'}</button>` : ''}${s.k === 'denied' || s.k === 'accepted' ? `<button class="btn-o" onclick="reopen('${a.id}')">Reopen</button>` : ''}
                             ${wa ? `<a class="btn-o" style="font-size:11px;padding:4px 8px;border-radius:6px;font-weight:600;text-decoration:none;color:var(--ink);border:1px solid var(--line)" target="_blank" href="https://wa.me/${wa}?text=${encodeURIComponent(waMsg(c, j, a.stage))}">WA</a>` : ''}
                           </div></div>`;}).join('') || '<p style="font-size:12px;color:var(--muted);padding:4px">—</p>'}
                 </div>`;
@@ -2642,7 +2907,7 @@
         const m = {
             applied: `Hi ${n}, thanks for applying for ${j.position} (${j.ref}) with Seafarer Recruitment. We'd like to book your first interview with us — when are you available?`,
             interview_us: `Hi ${n}, great news — you've passed your interview with us for ${j.position} (${j.ref}). Next step is an interview with the yacht. We'll send times shortly.`,
-            interview_yacht: `Hi ${n}, update on ${j.position} (${j.ref}): you're through to the final shortlist. We'll be in touch with the outcome soon.`,
+            interview_yacht: `Hi ${n}, update on ${j.position} (${j.ref}): you're through to the final interview. We'll be in touch with the details soon.`,
             shortlist: `Hi ${n}, regarding ${j.position} (${j.ref})…`,
             accepted: `Hi ${n}, congratulations! You've been accepted for ${j.position} (${j.ref}).`,
             denied: `Hi ${n}, thank you for applying for ${j.position} (${j.ref}).`
@@ -2653,7 +2918,7 @@
         const a = APPS.find(x => x.id === appId);
         const i = SIDX[a.stage] + dir;
         const to = STAGES[i].k;
-        if (to === 'shortlist' && APPS.filter(x => x.job_id === a.job_id && x.stage === 'shortlist').length >= SHORTLIST_MAX && !confirm(`The final shortlist already has ${SHORTLIST_MAX} candidates. Add anyway?`))
+        if (to === 'shortlist' && APPS.filter(x => x.job_id === a.job_id && x.stage === 'shortlist').length >= SHORTLIST_MAX && !confirm(`Final interview already has ${SHORTLIST_MAX} candidates. Add anyway?`))
             return;
         try {
             await db.patchApp(appId, {
@@ -2662,6 +2927,8 @@
             toast('Moved to ' + STAGES[i].t);
             renderPipe();
             drawKpis();
+            if (to === 'accepted')
+                openPlacement(appId, true);
         } catch (e) {
             toast('Error: ' + e.message);
         }
@@ -2844,6 +3111,210 @@
         }
     }
 
+    /* ---------- 1. MATCHING CREW / JOB ALERTS ---------- */
+    function jobLink(id) {
+        return (location.protocol.startsWith('http') ? location.origin + location.pathname : LIVE_URL) + '?job=' + id;
+    }
+    function posWords(p) {
+        return (p || '').toLowerCase().replace(/[^a-z ]/g, ' ').split(' ').filter(w => w.length > 2 && !['and', 'the', 'ess'].includes(w));
+    }
+    function matchCand(j, c) {
+        if (j.gender && j.gender !== 'Any' && c.gender && c.gender !== j.gender)
+            return null; // cabin rule
+        if (APPS.some(a => a.job_id === j.id && a.candidate_id === c.id))
+            return null; // already applied
+        const jw = posWords(j.position),
+            cw = posWords(c.position_sought);
+        const posHit = jw.length && cw.some(w => jw.some(x => x.startsWith(w.slice(0, 5)) || w.startsWith(x.slice(0, 5))));
+        const need = list(j.certs),
+            have = list(c.certs).concat((c.documents || []).map(d => d.type));
+        const certHit = need.filter(x => have.includes(x)),
+            certMiss = need.filter(x => !have.includes(x));
+        const vneed = list(j.visas),
+            vhave = list(c.visas),
+            visaMiss = vneed.filter(x => !vhave.includes(x));
+        let score = (posHit ? 50 : 0) + (need.length ? 30 * certHit.length / need.length : 30) + (vneed.length ? 20 * (vneed.length - visaMiss.length) / vneed.length : 20);
+        return {
+            c,
+            score: Math.round(score),
+            posHit,
+            certMiss,
+            visaMiss
+        };
+    }
+    function openMatches(jid) {
+        const j = JOBS.find(x => x.id === jid);
+        if (!j)
+            return;
+        const inv = j.invited || [];
+        const ms = CANDS.map(c => matchCand(j, c)).filter(m => m && m.score >= 40).sort((a, b) => b.score - a.score);
+        const msg = c => `Hi ${c.first_name}, Seafarer Recruitment here. We have a new ${j.position} position${j.yacht_size ? ' on a ' + j.yacht_size + 'm ' + (j.yacht_type || '') + ' yacht' : ''}${j.location ? ' (' + j.location + ')' : ''} that matches your profile. Have a look and apply here: ${jobLink(j.id)}`;
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.position)}</div><h2>Matching crew</h2></div>
+          <div class="m-body">
+            <p style="color:var(--muted);font-size:14px;margin-bottom:14px">Registered crew who fit this job (position, ${j.gender && j.gender !== 'Any' ? j.gender.toLowerCase() + ' cabin, ' : ''}certificates, visas) and haven't applied yet. Tap WhatsApp to invite them — the message includes a link straight to the job.</p>
+            ${ms.length ? ms.map(m => {const c = m.c,wa = (c.phone || '').replace(/\D/g, '').replace(/^0/, '27'),done = inv.includes(c.id);return `<div style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;${done ? 'opacity:.6' : ''}">
+                    ${av(c, 42)}<div style="flex:1;min-width:0"><b>${esc(fullName(c))}</b> <span class="es ${m.score >= 80 ? 'es-ok' : m.score >= 60 ? 'es-warn' : 'es-bad'}">${m.score}% match</span>${done ? ' <span class="dec dec-pending">Invited</span>' : ''}
+                      <div style="font-size:13px;color:var(--muted)">${esc(c.position_sought || '—')} · ${esc(c.experience || '')} · ${esc(c.nationality || '')}${c.gender ? ' · ' + esc(c.gender) : ''}</div>
+                      ${m.certMiss.length || m.visaMiss.length ? `<div style="font-size:12px;color:var(--bad)">Missing: ${esc(m.certMiss.concat(m.visaMiss).join(', '))}</div>` : '<div style="font-size:12px;color:var(--ok)">Has all required certificates & visas</div>'}</div>
+                    ${wa ? `<button class="btn btn-sm" style="background:#25D366;color:#fff" onclick="inviteCand('${j.id}','${c.id}',this.dataset.u)" data-u="${esc(waURL(wa, msg(c)))}">WhatsApp</button>` : '<span class="ref">No phone</span>'}
+                  </div>`;}).join('') : '<p>No matching crew registered yet. Share the job link on your WhatsApp groups and Instagram instead.</p>'}
+            <div class="hr"></div>
+            <label>Job link to share anywhere</label><div style="display:flex;gap:8px"><input value="${esc(jobLink(j.id))}" readonly onclick="this.select()"><button class="btn btn-o btn-sm" onclick="copyText('${jobLink(j.id)}')">Copy</button></div>
+          </div>`);
+    }
+    async function inviteCand(jid, cid, url) {
+        window.open(url, '_blank');
+        const j = JOBS.find(x => x.id === jid);
+        const inv = Array.from(new Set((j.invited || []).concat(cid)));
+        try {
+            await db.saveJob({
+                id: jid,
+                invited: inv
+            });
+            j.invited = inv;
+            openMatches(jid);
+        } catch (e) {
+            console.warn(e);
+        }
+    }
+
+    /* ---------- 2. PHASE 1 INTERVIEW SCORECARD ---------- */
+    const SCORE_KEYS = [['presentation', 'Presentation & grooming'], ['attitude', 'Attitude & personality'], ['experience', 'Experience & skills'], ['english', 'English & communication'], ['confidence', 'Confidence & teamwork']];
+    function scoreTotal(a) {
+        const s = a.score || {};
+        const v = SCORE_KEYS.map(([k]) => Number(s[k]) || 0);
+        return v.some(Boolean) ? v.reduce((x, y) => x + y, 0) : null;
+    }
+    function scoreHTML(a) {
+        const s = a.score || {};
+        return `<div class="sec"><h4>Phase 1 interview scorecard</h4>
+            ${SCORE_KEYS.map(([k, t]) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)">
+              <span style="font-size:14px">${t}</span><span style="display:flex;gap:4px">${[1, 2, 3, 4, 5].map(n => `<button class="sc ${Number(s[k]) === n ? 'on' : ''}" data-k="${k}" data-n="${n}" onclick="pickScore(this)">${n}</button>`).join('')}</span></div>`).join('')}
+            <div style="margin-top:8px;font-weight:700">Total: <span id="scTot">${scoreTotal(a) ?? 0}</span> / 25</div></div>`;
+    }
+    function pickScore(b) {
+        document.querySelectorAll(`.sc[data-k="${b.dataset.k}"]`).forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        let t = 0;
+        document.querySelectorAll('.sc.on').forEach(x => t += Number(x.dataset.n));
+        $('scTot').textContent = t;
+    }
+    function readScore() {
+        const s = {};
+        document.querySelectorAll('.sc.on').forEach(x => s[x.dataset.k] = Number(x.dataset.n));
+        return s;
+    }
+
+    /* ---------- 3. PLACEMENT TRACKER ---------- */
+    function openPlacement(appId, afterAccept) {
+        const a = APPS.find(x => x.id === appId),
+            c = CANDS.find(x => x.id === a.candidate_id) || {},
+            j = JOBS.find(x => x.id === a.job_id) || {};
+        const p = a.placement || {
+            yacht: '',
+            start: j.start_date || '',
+            salary: j.salary_max || j.salary_min || '',
+            currency: j.currency || 'EUR',
+            fee: '',
+            fee_currency: 'EUR',
+            status: 'invoiced',
+            invoice: '',
+            paid_date: ''
+        };
+        const cur = v => ['EUR', 'USD', 'GBP', 'ZAR'].map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('');
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.position || '')}</div><h2>${afterAccept ? '🎉 Placed: ' : 'Placement: '}${esc(fullName(c))}</h2></div>
+          <div class="m-body"><div class="form">
+            <div><label>Yacht</label><input id="plY" value="${esc(p.yacht)}" placeholder="M/Y …"></div><div><label>Start date</label><input id="plS" type="date" value="${esc(p.start || '')}"></div>
+            <div><label>Crew salary (per month)</label><input id="plSal" type="number" value="${esc(p.salary)}"></div><div><label>Salary currency</label><select id="plSalC">${cur(p.currency)}</select></div>
+            <div><label>Our placement fee</label><input id="plF" type="number" value="${esc(p.fee)}"></div><div><label>Fee currency</label><select id="plFC">${cur(p.fee_currency)}</select></div>
+            <div><label>Invoice number</label><input id="plInv" value="${esc(p.invoice || '')}"></div>
+            <div><label>Payment status</label><select id="plSt">${[['not_invoiced', 'Not invoiced yet'], ['invoiced', 'Invoiced – waiting'], ['paid', 'Paid ✓']].map(([k, t]) => `<option value="${k}" ${p.status === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+            <div><label>Date paid</label><input id="plPD" type="date" value="${esc(p.paid_date || '')}"></div><div></div>
+            <div class="full"><button class="btn btn-g" onclick="savePlacement('${appId}')">Save placement</button></div>
+          </div></div>`);
+    }
+    async function savePlacement(appId) {
+        const st = $('plSt').value;
+        const p = {
+            yacht: $('plY').value.trim(),
+            start: $('plS').value || null,
+            salary: Number($('plSal').value) || null,
+            currency: $('plSalC').value,
+            fee: Number($('plF').value) || null,
+            fee_currency: $('plFC').value,
+            invoice: $('plInv').value.trim(),
+            status: st,
+            paid_date: $('plPD').value || (st === 'paid' ? new Date().toISOString().slice(0, 10) : null)
+        };
+        try {
+            await db.patchApp(appId, {
+                placement: p
+            });
+            closeModal();
+            toast('Placement saved');
+            drawAdmin();
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
+    }
+    function renderPlacements() {
+        const ps = APPS.filter(a => a.stage === 'accepted');
+        const yr = new Date().getFullYear(),
+            mo = new Date().getMonth();
+        const sums = {};
+        const add = (k, cur, v) => {
+            sums[k] = sums[k] || {};
+            sums[k][cur] = (sums[k][cur] || 0) + v;
+        };
+        ps.forEach(a => {
+            const p = a.placement;
+            if (!p || !p.fee)
+                return;
+            const cur = p.fee_currency || 'EUR';
+            if (p.status === 'paid') {
+                const d = new Date(p.paid_date || a.updated_at);
+                if (d.getFullYear() === yr) {
+                    add('year', cur, p.fee);
+                    if (d.getMonth() === mo)
+                        add('month', cur, p.fee);
+                }
+            }
+            else
+                add('owed', cur, p.fee);
+        });
+        const fmt = o => o && Object.keys(o).length ? Object.entries(o).map(([c, v]) => ({
+            EUR: '€',
+            USD: '$',
+            GBP: '£',
+            ZAR: 'R'
+        }[c] || '') + Math.round(v).toLocaleString('en')).join(' + ') : '0';
+        $('plKpis').innerHTML = `<div class="kpi"><small>Placements</small><b>${ps.length}</b></div><div class="kpi"><small>Paid this month</small><b>${fmt(sums.month)}</b></div>
+            <div class="kpi"><small>Paid this year</small><b>${fmt(sums.year)}</b></div><div class="kpi"><small>Outstanding</small><b style="color:var(--gold)">${fmt(sums.owed)}</b></div>`;
+        const ST = {
+            not_invoiced: ['Not invoiced', 'dec-pending'],
+            invoiced: ['Waiting', 'dec-maybe'],
+            paid: ['Paid ✓', 'dec-interview']
+        };
+        $('plRows').innerHTML = ps.length ? ps.map(a => {
+            const c = CANDS.find(x => x.id === a.candidate_id) || {},
+                j = JOBS.find(x => x.id === a.job_id) || {},
+                p = a.placement || {};
+            const sym = x => ({
+                EUR: '€',
+                USD: '$',
+                GBP: '£',
+                ZAR: 'R'
+            }[x] || '');
+            const st = ST[p.status || 'not_invoiced'];
+            return `<tr><td><div style="display:flex;gap:8px;align-items:center">${av(c, 30)}<b>${esc(fullName(c))}</b></div></td><td>${esc(j.position || '')}<br><small class="ref">${esc(j.ref || '')}</small></td>
+                  <td>${esc(p.yacht || '—')}</td><td>${p.start ? fdate(p.start) : '—'}</td><td>${p.salary ? sym(p.currency) + Number(p.salary).toLocaleString('en') : '—'}</td>
+                  <td><b>${p.fee ? sym(p.fee_currency) + Number(p.fee).toLocaleString('en') : '—'}</b>${p.invoice ? `<br><small class="ref">Inv ${esc(p.invoice)}</small>` : ''}</td>
+                  <td><span class="dec ${st[1]}">${st[0]}</span>${p.paid_date && p.status === 'paid' ? `<br><small class="ref">${fdate(p.paid_date)}</small>` : ''}</td>
+                  <td><button class="btn btn-o btn-sm" onclick="openPlacement('${a.id}')">${a.placement ? 'Edit' : 'Add details'}</button></td></tr>`;
+        }).join('')
+        : '<tr><td colspan="8" class="empty">No placements yet. When you move a candidate to "Accepted", you can record the yacht and your fee here.</td></tr>';
+    }
+
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
             <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
@@ -2851,7 +3322,7 @@
             <td>${money(j)} ${esc(j.currency || '')}<br><small style="color:var(--muted)">${per(j)}</small></td><td>${esc(j.gender || 'Any')}${j.couple ? '<br><small>Couple</small>' : ''}</td><td>${fdate(j.start_date)}</td>
             <td><a href="#" onclick="aTab('pipe');$('pJob').value='${j.id}';renderPipe();return false">${APPS.filter(a => a.job_id === j.id).length} →</a></td>
             <td><span class="st st-${j.status}">${j.status}</span></td>
-            <td style="white-space:nowrap"><button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
+            <td style="white-space:nowrap"><button class="btn btn-sm" style="background:#25D366;color:#fff" onclick="openMatches('${j.id}')">Find crew</button> <button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
         : `<tr><td colspan="9" class="empty">No jobs yet — click “Post a job”.</td></tr>`;
     }
     function renderCands() {
@@ -2892,10 +3363,33 @@
             ${a && a.cover_note ? `<div class="sec"><h4>Cover note for this job</h4><p>${esc(a.cover_note)}</p></div>` : ''}
             <div style="display:flex;gap:8px;flex-wrap:wrap">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}${wa ? `<a class="btn btn-o" target="_blank" href="https://wa.me/${wa}">WhatsApp</a>` : ''}<a class="btn btn-o" href="mailto:${esc(c.email)}">Email</a></div>
             <div class="hr"></div>
+            ${a ? scoreHTML(a) : ''}
             ${a ? `<label>Interview notes for this application</label><textarea id="nApp">${esc(a.notes || '')}</textarea>` : ''}
+            <div style="margin:6px 0 12px"><button class="btn btn-o btn-sm" onclick="resetPw('${c.id}')">🔑 Reset password</button></div>
             <label style="margin-top:12px">General notes on candidate (private)</label><textarea id="nCand">${esc(c.admin_notes || '')}</textarea>
-            <button class="btn btn-p" style="margin-top:10px" onclick="saveNotes('${c.id}','${appId || ''}')">Save notes</button>
+            <button class="btn btn-p" style="margin-top:10px" onclick="saveNotes('${c.id}','${appId || ''}')">${a ? 'Save scorecard & notes' : 'Save notes'}</button>
           </div>`);
+    }
+    async function resetPw(cid) {
+        const c = CANDS.find(x => x.id === cid);
+        const np = prompt('New temporary password for ' + fullName(c) + ' (min 6 characters):', 'Crew' + Math.floor(1000 + Math.random() * 9000));
+        if (!np)
+            return;
+        if (np.length < 6)
+            return toast('Password must be at least 6 characters');
+        try {
+            await db.patchCand(cid, {
+                pass_hash: await hash(c.email, np)
+            });
+            const wa = (c.phone || '').replace(/\D/g, '').replace(/^0/, '27');
+            const msg = `Hi ${c.first_name}, your Seafarer crew portal password has been reset. Email: ${c.email} · Temporary password: ${np} · Log in here: ${LIVE_URL}`;
+            if (wa && confirm('Password reset. Send the new password to ' + c.first_name + ' on WhatsApp now?'))
+                window.open(waURL(wa, msg), '_blank');
+            else
+                toast('Password reset to: ' + np);
+        } catch (e) {
+            toast('Error: ' + e.message);
+        }
     }
     async function saveNotes(cid, aid) {
         try {
@@ -2904,10 +3398,13 @@
             });
             if (aid)
                 await db.patchApp(aid, {
-                    notes: $('nApp').value
+                    notes: $('nApp').value,
+                    score: readScore()
                 });
-            toast('Notes saved');
+            toast('Saved');
             closeModal();
+            if (aCur === 'pipe')
+                renderPipe();
         } catch (e) {
             toast('Error: ' + e.message);
         }
@@ -2985,10 +3482,12 @@
         if (id)
             j.id = id;
         try {
-            await db.saveJob(j);
+            const saved = await db.saveJob(j);
             closeModal();
             toast(id ? 'Job updated' : 'Job published');
-            renderAdmin();
+            await renderAdmin();
+            if (!id && saved && saved.id)
+                openMatches(saved.id);
         } catch (e) {
             toast('Error: ' + e.message);
         }
