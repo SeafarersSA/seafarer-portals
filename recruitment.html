@@ -201,6 +201,18 @@
         border-radius: 8px
     }
 
+    .igbtn {
+        color: var(--navy);
+        padding: 8px 10px;
+        border-radius: 8px;
+        display:inline-flex
+    }
+
+    .igbtn:hover {
+        background: #eef2fb;
+        color: #e82b30
+    }
+
     nav button:hover, nav button.on {
         color: var(--navy);
         background: #eef2fb
@@ -1505,6 +1517,13 @@
                 Recruitment
             </div>
             <nav>
+                <a href="https://instagram.com/seafarers_maritimecareer" target="_blank" title="Follow us on Instagram" class="igbtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px">
+                        <rect x="3" y="3" width="18" height="18" rx="5"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+                    </svg>
+                </a>
                 <button id="nav-jobs" class="on" onclick="show('jobs')">Jobs</button>
                 <button id="nav-me" onclick="show('me')">My Profile</button>
                 <button id="nav-admin" class="hide" onclick="show('admin')">Dashboard</button>
@@ -1770,8 +1789,10 @@
         Seafarer Maritime Career Consultancy · Cape Town, South Africa · Visa support via 
         <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>
          · 
+        <a href="https://instagram.com/seafarers_maritimecareer" target="_blank">Instagram @seafarers_maritimecareer</a>
+         · 
         <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
-        <span style="opacity:.4">· v14</span>
+        <span style="opacity:.4">· v15</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -3515,6 +3536,243 @@
         + `<div id="oowBox" style="margin-top:10px;${sel.includes('OOW modules (started)') ? '' : 'display:none'}"><label>Which OOW modules have you completed?</label><input id="pOOW" value="${esc(c.oow_modules || '')}" placeholder="e.g. Navigation, Stability, Meteorology"></div>`
         + box('Galley & engineering', CERT_GROUPS['Galley & engineering']);
     }
+    /* ---------- Instagram job posts ---------- */
+    const IG_HANDLE = 'seafarers_maritimecareer';
+    const IG_URL = 'https://instagram.com/' + IG_HANDLE;
+    const SHORT_URL = 'seafarerssa.github.io/seafarer-portals/recruitment'; // ← change here if you get a shorter link (e.g. jobs.seafarers.co.za)
+    let IG_FMT = 'square';
+    function igCaption(j) {
+        const tagsByDept = {
+            Deck: '#deckhand #deckhandjobs #bosun #yachtdeckhand',
+            Interior: '#stewardess #yachtstewardess #yachtstew #chiefstew',
+            Galley: '#yachtchef #superyachtchef #privatechef',
+            Engineering: '#yachtengineer #marineengineer',
+            Specialist: '#yachtjobs'
+        };
+        const L = [];
+        L.push((j.urgent ? '🚨 URGENT — ' : '⚓ NOW HIRING — ') + j.position.toUpperCase());
+        L.push('');
+        if (j.yacht_size || j.yacht_type)
+            L.push(`🛥 ${j.yacht_size ? j.yacht_size + 'm ' : ''}${j.yacht_type || ''} Yacht${j.usage ? ' · ' + j.usage : ''}`);
+        if (j.location)
+            L.push('📍 ' + j.location);
+        if (j.salary_min || j.salary_max)
+            L.push(`💶 ${money(j)} ${j.currency || ''} ${per(j)}`);
+        L.push('📅 Start: ' + fdate(j.start_date));
+        if (j.contract)
+            L.push('📝 ' + j.contract + (j.rotation ? ' · ' + j.rotation : ''));
+        if (j.gender && j.gender !== 'Any')
+            L.push('🛏 ' + j.gender + ' cabin');
+        if (j.couple)
+            L.push('💑 Couple position');
+        if (j.experience)
+            L.push('⭐ ' + j.experience);
+        if (list(j.certs).length)
+            L.push('📜 ' + list(j.certs).join(', '));
+        L.push('');
+        if (j.profile) {
+            L.push(j.profile);
+            L.push('');
+        }
+        L.push('👉 Apply via the link in our bio — register your crew profile once and apply in one click.');
+        L.push('Ref: ' + (j.ref || ''));
+        L.push('');
+        L.push(`#yachtjobs #superyachtjobs #yachtcrew #superyachtcrew #crewlife #yachtlife ${tagsByDept[j.department] || ''} #capetown #southafrica #seafarer`);
+        return L.join('\n');
+    }
+    function wrapText(g, text, maxW) {
+        const words = String(text).split(' ');
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+            const t = cur ? cur + ' ' + w : w;
+            if (g.measureText(t).width > maxW && cur) {
+                lines.push(cur);
+                cur = w;
+            } else
+                cur = t;
+        });
+        if (cur)
+            lines.push(cur);
+        return lines;
+    }
+    async function drawJobCard(j, fmt) {
+        const W = 1080,
+            H = fmt === 'story' ? 1920 : 1080,
+            c = document.createElement('canvas');
+        c.width = W;
+        c.height = H;
+        const g = c.getContext('2d');
+        try {
+            await document.fonts.ready;
+        } catch (e) {}
+        const F = (w, s) => `${w} ${s}px Inter, "Helvetica Neue", Arial, sans-serif`;
+        const top = fmt === 'story' ? 260 : 190;
+        // white header with logo
+        g.fillStyle = '#fff';
+        g.fillRect(0, 0, W, top);
+        const logo = document.querySelector('.logo img');
+        if (logo && logo.complete) {
+            const lh = fmt === 'story' ? 170 : 130,
+                lw = lh * logo.naturalWidth / logo.naturalHeight;
+            g.drawImage(logo, (W - lw) / 2, (top - lh) / 2, lw, lh);
+        }
+        g.fillStyle = '#e82b30';
+        g.fillRect(0, top, W, 8);
+        // navy body with soft gradient
+        const gr = g.createLinearGradient(0, top, W, H);
+        gr.addColorStop(0, '#011950');
+        gr.addColorStop(1, '#0d2a6b');
+        g.fillStyle = gr;
+        g.fillRect(0, top + 8, W, H - top - 8);
+        const ST = fmt === 'story';
+        const pad = 80;
+        let y = top + (ST ? 230 : 95);
+        // badge
+        g.font = F(800, 30);
+        g.fillStyle = '#e82b30';
+        g.textBaseline = 'alphabetic';
+        const badge = j.urgent ? 'URGENT · NOW HIRING' : 'NOW HIRING';
+        if (j.urgent) {
+            const bw = g.measureText(badge).width + 44;
+            g.beginPath();
+            g.roundRect ? g.roundRect(pad, y - 38, bw, 54, 27) : g.rect(pad, y - 38, bw, 54);
+            g.fill();
+            g.fillStyle = '#fff';
+            g.fillText(badge, pad + 22, y);
+        }
+        else {
+            g.fillText(badge, pad, y);
+        }
+        y += ST ? 140 : 105;
+        // position
+        g.fillStyle = '#fff';
+        g.font = F(800, ST ? 118 : 84);
+        wrapText(g, j.position, W - pad * 2).slice(0, 2).forEach(l => {
+            g.fillText(l, pad, y);
+            y += ST ? 128 : 92;
+        });
+        // yacht line
+        g.font = F(500, ST ? 50 : 40);
+        g.fillStyle = '#cbd5e1';
+        const yl = [j.yacht_size ? ft(j.yacht_size) : '', j.yacht_type ? j.yacht_type + ' Yacht' : '', j.usage || ''].filter(Boolean).join('  ·  ');
+        if (yl) {
+            wrapText(g, yl, W - pad * 2).slice(0, 2).forEach((l, i) => {
+                g.fillText(l, pad, y + 6);
+                y += ST ? 64 : 52;
+            });
+            y += ST ? 56 : 18;
+        }
+        // salary
+        if (j.salary_min || j.salary_max) {
+            g.font = F(800, ST ? 96 : 62);
+            g.fillStyle = '#e82b30';
+            g.fillText(money(j), pad, y + 40);
+            const sw = g.measureText(money(j)).width;
+            g.font = F(500, ST ? 42 : 34);
+            g.fillStyle = '#cbd5e1';
+            const suf = ' ' + (j.currency || '') + ' ' + per(j);
+            if (pad + sw + g.measureText(suf).width > W - pad) {
+                g.fillText(suf.trim(), pad, y + 40 + (ST ? 60 : 48));
+                y += ST ? 60 : 48;
+            } else
+                g.fillText(suf, pad + sw, y + 40);
+            y += ST ? 150 : 105;
+        }
+        // details
+        const rows = [['📍', j.location], ['📅', 'Start: ' + fdate(j.start_date)], ['📝', (j.contract || '') + (j.rotation ? ' · ' + j.rotation : '')], ['🛏', j.couple ? 'Couple position' : (j.gender && j.gender !== 'Any' ? j.gender + ' cabin' : 'Male or female')]].filter(r => r[1]);
+        g.font = F(500, ST ? 50 : 38);
+        g.fillStyle = '#fff';
+        rows.forEach(([ic, t]) => {
+            const ls = wrapText(g, t, W - pad * 2 - 70).slice(0, 1);
+            g.fillText(ic, pad, y);
+            g.fillText(ls[0], pad + (ST ? 84 : 66), y);
+            y += ST ? 92 : 60;
+        });
+        const fy0 = H - (ST ? 260 : 120);
+        if (ST && j.profile) {
+            y += 50;
+            g.font = F(400, 42);
+            g.fillStyle = '#cbd5e1';
+            for (const l of wrapText(g, j.profile, W - pad * 2)) {
+                if (y > fy0 - 140)
+                    break;
+                g.fillText(l, pad, y);
+                y += 60;
+            }
+        }
+        // footer
+        const fy = H - (ST ? 260 : 120);
+        g.fillStyle = 'rgba(255,255,255,.12)';
+        g.fillRect(pad, fy - 62, W - pad * 2, 2);
+        g.font = F(800, ST ? 52 : 38);
+        g.fillStyle = '#fff';
+        g.fillText(ST ? 'Tap the link to apply' : 'Apply via link in bio', pad, fy);
+        g.font = F(500, ST ? 38 : 30);
+        g.fillStyle = '#cbd5e1';
+        g.fillText('@' + IG_HANDLE + '  ·  Ref ' + (j.ref || ''), pad, fy + (ST ? 62 : 48));
+        return c;
+    }
+    async function openIgPost(jid, fmt) {
+        IG_FMT = fmt || IG_FMT;
+        const j = JOBS.find(x => x.id === jid);
+        if (!j)
+            return;
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.position)}</div><h2>Instagram post</h2></div>
+          <div class="m-body">
+            <div class="tabs" style="margin-bottom:12px"><button class="${IG_FMT === 'square' ? 'on' : ''}" onclick="openIgPost('${jid}','square')">Post (square)</button><button class="${IG_FMT === 'story' ? 'on' : ''}" onclick="openIgPost('${jid}','story')">Story</button></div>
+            <div id="igPrev" style="text-align:center;color:var(--muted)">Drawing…</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0"><button class="btn btn-g" onclick="igSave()">⬇ Save image</button><button class="btn btn-p hide" id="igShare" onclick="igShare()">Share to Instagram…</button>
+              <a class="btn btn-o" href="${IG_URL}" target="_blank">Open Instagram</a></div>
+            <label>Caption — copy and paste into Instagram</label><textarea id="igCap" style="min-height:220px;font-size:13px">${esc(igCaption(j))}</textarea>
+            <button class="btn btn-o btn-sm" style="margin-top:8px" onclick="copyText($('igCap').value)">Copy caption</button>
+            ${IG_FMT === 'story' ? `<p style="font-size:13px;color:var(--muted);margin-top:12px">For stories: add a <b>Link sticker</b> with this job link:<br><input value="${esc(jobLink(j.id))}" readonly onclick="this.select()" style="margin-top:6px"></p>` : ''}
+          </div>`);
+        const cv = await drawJobCard(j, IG_FMT);
+        window._igCanvas = cv;
+        window._igName = (j.ref || 'job') + '-' + j.position.replace(/[^a-z0-9]+/gi, '-') + (IG_FMT === 'story' ? '-story' : '') + '.png';
+        cv.style.width = IG_FMT === 'story' ? '260px' : '100%';
+        cv.style.maxWidth = '420px';
+        cv.style.borderRadius = '12px';
+        cv.style.boxShadow = '0 6px 20px rgba(0,0,0,.15)';
+        $('igPrev').innerHTML = '';
+        $('igPrev').appendChild(cv);
+        try {
+            const f = new File([await new Promise(ok => cv.toBlob(ok, 'image/png'))], window._igName, {
+                type: 'image/png'
+            });
+            if (navigator.canShare && navigator.canShare({
+                files: [f]
+            })) {
+                window._igFile = f;
+                $('igShare').classList.remove('hide');
+            }
+        } catch (e) {}
+    }
+    function igSave() {
+        window._igCanvas.toBlob(b => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = window._igName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            toast('Image saved');
+        }, 'image/png');
+    }
+    async function igShare() {
+        try {
+            await navigator.clipboard.writeText($('igCap').value).catch(() => {});
+            await navigator.share({
+                files: [window._igFile],
+                text: $('igCap').value
+            });
+        } catch (e) {
+            if (e.name !== 'AbortError')
+                toast('Sharing not available — use Save image');
+        }
+    }
+
     function renderAJobs() {
         $('aJobRows').innerHTML = JOBS.length ? JOBS.map(j => `<tr>
             <td>${esc(j.ref || '')}</td><td>${j.urgent ? '<span class="badge b-urgent">Urgent</span>' : ''}${j.featured ? '<span class="badge b-featured">★</span>' : ''}<b>${esc(j.position)}</b><br><small style="color:var(--muted)">${esc(j.department || '')}</small></td>
@@ -3522,7 +3780,7 @@
             <td>${money(j)} ${esc(j.currency || '')}<br><small style="color:var(--muted)">${per(j)}</small></td><td>${esc(j.gender || 'Any')}${j.couple ? '<br><small>Couple</small>' : ''}</td><td>${fdate(j.start_date)}</td>
             <td><a href="#" onclick="aTab('pipe');$('pJob').value='${j.id}';renderPipe();return false">${APPS.filter(a => a.job_id === j.id).length} →</a></td>
             <td><span class="st st-${j.status}">${j.status}</span></td>
-            <td style="white-space:nowrap"><button class="btn btn-sm" style="background:#25D366;color:#fff" onclick="openMatches('${j.id}')">Find crew</button> <button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
+            <td style="white-space:nowrap"><button class="btn btn-sm" style="background:#25D366;color:#fff" onclick="openMatches('${j.id}')">Find crew</button> <button class="btn btn-sm" style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);color:#fff" onclick="openIgPost('${j.id}','square')">📸 Post</button> <button class="btn btn-o btn-sm" onclick="openJobForm('${j.id}')">Edit</button> <button class="btn btn-o btn-sm" onclick="toggleJob('${j.id}')">${j.status === 'open' ? 'Close' : 'Reopen'}</button> <button class="btn btn-d btn-sm" onclick="removeJob('${j.id}')">Delete</button></td></tr>`).join('')
         : `<tr><td colspan="9" class="empty">No jobs yet — click “Post a job”.</td></tr>`;
     }
     function renderCands() {
