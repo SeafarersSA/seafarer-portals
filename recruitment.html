@@ -1135,6 +1135,49 @@
         background: #fff
     }
 
+    .rec {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px
+    }
+
+    .rec .rc {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px;
+        background: #fff
+    }
+
+    .rec .rc.mine {
+        border-color: var(--navy);
+        box-shadow: 0 0 0 1px var(--navy) inset
+    }
+
+    .rec .rc h4 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--gold);
+        margin-bottom: 2px
+    }
+
+    .rec .rc b {
+        font-size: 17px;
+        color:var(--navy)
+    }
+
+    .rec .rc p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 4px 0 10px
+    }
+
+    @media (max-width: 560px) {
+        .rec {
+            grid-template-columns: 1fr
+        }
+    }
+
     .skrow {
         display: flex;
         justify-content: space-between;
@@ -1525,6 +1568,7 @@
                     </svg>
                 </a>
                 <button id="nav-jobs" class="on" onclick="show('jobs')">Jobs</button>
+                <button onclick="showRecruiters()">Contact</button>
                 <button id="nav-me" onclick="show('me')">My Profile</button>
                 <button id="nav-admin" class="hide" onclick="show('admin')">Dashboard</button>
                 <span class="who" id="whoLbl"></span>
@@ -1727,6 +1771,9 @@
                 </div>
 
                 <div id="a-plc" class="hide">
+                    <div class="a-bar">
+                        <span style="font-size:14px;color:var(--muted)">Fee: 90% of the crew member's first month's salary · Invoices are raised in Xero by accounts</span>
+                    </div>
                     <div class="kpis" id="plKpis"></div>
                     <div class="tbl-wrap">
                         <table>
@@ -1791,8 +1838,10 @@
          · 
         <a href="https://instagram.com/seafarers_maritimecareer" target="_blank">Instagram @seafarers_maritimecareer</a>
          · 
+        <a href="#" onclick="event.preventDefault();showRecruiters()">Contact a recruiter</a>
+         · 
         <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
-        <span style="opacity:.4">· v15</span>
+        <span style="opacity:.4">· v18</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1820,6 +1869,23 @@
     },
     ];
     const SHORTLIST_MAX = 10;
+    // ── RECRUITERS ── fill in names / numbers / emails later (phone: country code, no + or spaces)
+    const RECRUITERS = {
+        Interior: {
+            title: 'Interior Recruiter',
+            name: '',
+            phone: '27647872215',
+            email: 'info@seafarers.co.za',
+            covers: 'Stewards/esses, Purser, Chief Stew, Head of Service & Housekeeping, Galley'
+        },
+        Exterior: {
+            title: 'Exterior Recruiter',
+            name: '',
+            phone: '27647872215',
+            email: 'info@seafarers.co.za',
+            covers: 'Captain, Officers, Bosun, Deckhands, Deck/Engineer, Chase Boat'
+        }
+    };
     const SUPPORT_WA = '27647872215'; // ← Seafarer WhatsApp number for password resets (country code, no + or spaces)
 
     const DEMO = !SB_KEY.startsWith('eyJ');
@@ -2524,6 +2590,8 @@
               ${j.description ? `<div class="sec"><h4>About the role</h4><p>${esc(j.description)}</p></div>` : ''}
               ${list(j.certs).length ? `<div class="sec"><h4>Required certificates</h4><div class="tags">${list(j.certs).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div></div>` : ''}
               ${list(j.visas).length ? `<div class="sec"><h4>Visas required</h4><div class="tags">${list(j.visas).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</div><p style="font-size:13px;margin-top:6px;color:var(--muted)">Need a visa? We can help through <a href="https://www.excite2gotravel.com" target="_blank">Excite2Go Travel</a>.</p></div>` : ''}
+              <div class="sec"><h4>Questions about this job?</h4>
+                <div class="rec" style="grid-template-columns:1fr">${recCard(recFor(j.department), false, 'I have a question about the ' + j.position + ' job (' + (j.ref || '') + ').')}</div></div>
               <div class="hr"></div>${applyBox}
             </div>`);
     }
@@ -2710,6 +2778,7 @@
               <div style="display:flex;gap:8px"><button class="btn btn-p" onclick="show('jobs')">Browse jobs</button><button class="btn btn-o" onclick="logoutMe()">Log out</button></div></div>
             ${pct < 100 ? `<div class="panel" style="background:#fff7ed;border-color:#fed7aa"><b>To apply for jobs, complete these:</b><ul class="req">${missingForApply(c).map(x => `<li class="no">✕ ${esc(x)}</li>`).join('')}</ul><span style="font-size:13px;color:var(--muted)">Yacht references and "About me" are optional but help a lot.</span></div>` : ''}
             ${justRegistered && PENDING_JOB ? `<div class="panel" style="background:#fffbeb;border-color:#fde68a">Save your profile below, then you'll be taken back to the job to apply.</div>` : ''}
+            <div class="panel"><h3>Contact a recruiter</h3>${recBox(c.dept_pref)}</div>
             <div class="panel"><h3>My applications</h3>${mine.length ? mine.map(a => appCard(a)).join('') : '<p style="color:var(--muted)">No applications yet. <a href="#" onclick="show(\'jobs\');return false">Browse open jobs →</a></p>'}</div>
             <div class="panel"><h3>Profile photo</h3>
               <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">${av(c, 96)}
@@ -3122,6 +3191,7 @@
             <div id="slOut"></div>
             ${prev.length ? `<div class="hr"></div><h4 style="margin-bottom:8px">Links already sent for this job</h4>${prev.map(sl => {const it = sl.items || [];const n = k => it.filter(i => (i.decision || 'pending') === k).length;return `<div style="font-size:14px;margin-bottom:8px;padding:10px;border:1px solid var(--line);border-radius:10px"><b>${esc(sl.yacht || 'Yacht')}</b> <span class="ref">${fdate(sl.created_at)} · ${it.length} candidates</span><br>
                   <span class="dec dec-interview">${n('interview')} interview</span> <span class="dec dec-maybe">${n('maybe')} maybe</span> <span class="dec dec-no">${n('no')} no</span> <span class="dec dec-pending">${n('pending')} waiting</span>
+                  <br><span style="font-size:12px;color:${sl.terms && sl.terms.at ? 'var(--ok)' : 'var(--warn)'}">${sl.terms && sl.terms.at ? '✓ Terms accepted by ' + esc(sl.terms.name) + (sl.terms.role ? ' (' + esc(sl.terms.role) + ')' : '') + ' · ' + fdate(sl.terms.at) : 'Terms not accepted yet'}</span>
                   <br><a href="${slLink(sl.id)}" target="_blank" style="font-size:13px">Open link</a> · <a href="#" onclick="copyText('${slLink(sl.id)}');return false" style="font-size:13px">Copy link</a></div>`;}).join('')}` : ''}
           </div>`);
     }
@@ -3202,7 +3272,7 @@
               <p style="color:#cbd5e1;font-size:14px">${esc(j.ref || '')} · ${j.yacht_size ? ft(j.yacht_size) + ' ' : ''}${esc(j.yacht_type || '')}${j.salary_min || j.salary_max ? ' · ' + money(j) + ' ' + esc(j.currency || '') + ' ' + per(j) : ''}</p>
               ${SL.message ? `<p style="margin-top:10px;white-space:pre-line">${esc(SL.message)}</p>` : ''}
               <p style="margin-top:10px;font-size:13px;color:#cbd5e1">Please mark each candidate below. Questions? <a href="mailto:info@seafarers.co.za" style="color:#fff">info@seafarers.co.za</a></p></div>
-            ${items.map((it, i) => {const c = CAP_C.find(x => x.id === it.candidate_id);if (!c)return '';const d = it.decision;return `<div class="slc"><div class="hd">${av(c, 88)}<div><h3 style="font-size:22px">${esc(c.first_name)} ${esc((c.last_name || '')[0] || '')}.</h3>
+            ${termsGate() || (`<p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">✓ Terms of Business accepted by ${esc(SL.terms.name)} on ${fdate(SL.terms.at)}</p>` + items.map((it, i) => {const c = CAP_C.find(x => x.id === it.candidate_id);if (!c)return '';const d = it.decision;return `<div class="slc"><div class="hd">${av(c, 88)}<div><h3 style="font-size:22px">${esc(c.first_name)} ${esc((c.last_name || '')[0] || '')}.</h3>
                     <div style="color:var(--muted);font-size:14px">${esc(c.position_sought || '')}${c.experience ? ' · ' + esc(c.experience) : ''}</div>
                     <div style="font-size:14px;margin-top:2px">${esc(c.nationality || '')}${c.dob ? ' · ' + age(c.dob) + ' yrs' : ''}${c.gender ? ' · ' + esc(c.gender) : ''}${c.visas ? ' · Visas: ' + esc(c.visas) : ''}</div></div>
                     <div style="margin-left:auto">${c.cv_url ? `<a class="btn btn-p" href="${esc(c.cv_url)}" target="_blank">Open CV</a>` : ''}</div></div>
@@ -3218,7 +3288,7 @@
                       <button class="dbtn maybe ${d === 'maybe' ? 'on' : ''}" onclick="capSet(${i},'maybe')">Maybe</button>
                       <button class="dbtn no ${d === 'no' ? 'on' : ''}" onclick="capSet(${i},'no')">✕ Not for us</button></div>
                     <textarea id="capC${i}" placeholder="Comment for Seafarer (optional)" style="margin-top:10px;min-height:60px" onchange="capSet(${i},null)">${esc(it.comment || '')}</textarea>
-                  </div>`;}).join('')}
+                  </div>`;}).join(''))}
             <p style="text-align:center;color:var(--muted);font-size:13px">Candidates presented by Seafarer Maritime Career Consultancy. Please arrange all interviews through Seafarer.</p>`;
     }
     async function capSet(i, dec) {
@@ -3346,8 +3416,8 @@
             salary: j.salary_max || j.salary_min || '',
             currency: j.currency || 'EUR',
             fee: '',
-            fee_currency: 'EUR',
-            status: 'invoiced',
+            fee_currency: j.currency || 'EUR',
+            status: 'not_invoiced',
             invoice: '',
             paid_date: ''
         };
@@ -3355,17 +3425,19 @@
         openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(j.ref || '')} · ${esc(j.position || '')}</div><h2>${afterAccept ? '🎉 Placed: ' : 'Placement: '}${esc(fullName(c))}</h2></div>
           <div class="m-body"><div class="form">
             <div><label>Yacht</label><input id="plY" value="${esc(p.yacht)}" placeholder="M/Y …"></div><div><label>Start date</label><input id="plS" type="date" value="${esc(p.start || '')}"></div>
-            <div><label>Crew salary (per month)</label><input id="plSal" type="number" value="${esc(p.salary)}"></div><div><label>Salary currency</label><select id="plSalC">${cur(p.currency)}</select></div>
-            <div><label>Our placement fee</label><input id="plF" type="number" value="${esc(p.fee)}"></div><div><label>Fee currency</label><select id="plFC">${cur(p.fee_currency)}</select></div>
-            <div><label>Invoice number</label><input id="plInv" value="${esc(p.invoice || '')}"></div>
-            <div><label>Payment status</label><select id="plSt">${[['not_invoiced', 'Not invoiced yet'], ['invoiced', 'Invoiced – waiting'], ['paid', 'Paid ✓']].map(([k, t]) => `<option value="${k}" ${p.status === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+            <div><label>Crew salary (first month)</label><input id="plSal" type="number" value="${esc(p.salary)}" oninput="$('plF').value=Math.round(this.value*FEE_PCT)/100"></div><div><label>Salary currency</label><select id="plSalC">${cur(p.currency)}</select></div>
+            <div><label>Our placement fee (${FEE_PCT}% of salary)</label><input id="plF" type="number" value="${esc(p.fee || (p.salary ? Math.round(p.salary * FEE_PCT) / 100 : ''))}"></div><div><label>Fee currency</label><select id="plFC">${cur(p.fee_currency)}</select></div>
+            <div><label>Xero invoice number (from accounts)</label><input id="plInv" value="${esc(p.invoice || '')}"></div>
+            <div><label>Payment status</label><select id="plSt">${[['not_invoiced', 'Not sent to accounts'], ['sent', 'Sent to accounts'], ['invoiced', 'Invoiced in Xero – waiting'], ['paid', 'Paid ✓']].map(([k, t]) => `<option value="${k}" ${p.status === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
             <div><label>Date paid</label><input id="plPD" type="date" value="${esc(p.paid_date || '')}"></div><div></div>
-            <div class="full"><button class="btn btn-g" onclick="savePlacement('${appId}')">Save placement</button></div>
+            <div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-g" onclick="savePlacement('${appId}')">Save placement</button><button class="btn btn-p" onclick="savePlacement('${appId}',true)">Save & send to accounts</button></div>
           </div></div>`);
     }
-    async function savePlacement(appId) {
+    async function savePlacement(appId, thenInvoice) {
         const st = $('plSt').value;
+        const a0 = APPS.find(x => x.id === appId);
         const p = {
+            ...(a0.placement || {}),
             yacht: $('plY').value.trim(),
             start: $('plS').value || null,
             salary: Number($('plSal').value) || null,
@@ -3383,6 +3455,8 @@
             closeModal();
             toast('Placement saved');
             drawAdmin();
+            if (thenInvoice)
+                openBilling(appId);
         } catch (e) {
             toast('Error: ' + e.message);
         }
@@ -3421,8 +3495,9 @@
         $('plKpis').innerHTML = `<div class="kpi"><small>Placements</small><b>${ps.length}</b></div><div class="kpi"><small>Paid this month</small><b>${fmt(sums.month)}</b></div>
             <div class="kpi"><small>Paid this year</small><b>${fmt(sums.year)}</b></div><div class="kpi"><small>Outstanding</small><b style="color:var(--gold)">${fmt(sums.owed)}</b></div>`;
         const ST = {
-            not_invoiced: ['Not invoiced', 'dec-pending'],
-            invoiced: ['Waiting', 'dec-maybe'],
+            not_invoiced: ['Not sent', 'dec-pending'],
+            sent: ['With accounts', 'dec-pending'],
+            invoiced: ['Invoiced – waiting', 'dec-maybe'],
             paid: ['Paid ✓', 'dec-interview']
         };
         $('plRows').innerHTML = ps.length ? ps.map(a => {
@@ -3438,9 +3513,9 @@
             const st = ST[p.status || 'not_invoiced'];
             return `<tr><td><div style="display:flex;gap:8px;align-items:center">${av(c, 30)}<b>${esc(fullName(c))}</b></div></td><td>${esc(j.position || '')}<br><small class="ref">${esc(j.ref || '')}</small></td>
                   <td>${esc(p.yacht || '—')}</td><td>${p.start ? fdate(p.start) : '—'}</td><td>${p.salary ? sym(p.currency) + Number(p.salary).toLocaleString('en') : '—'}</td>
-                  <td><b>${p.fee ? sym(p.fee_currency) + Number(p.fee).toLocaleString('en') : '—'}</b>${p.invoice ? `<br><small class="ref">Inv ${esc(p.invoice)}</small>` : ''}</td>
+                  <td><b>${p.fee ? sym(p.fee_currency) + Number(p.fee).toLocaleString('en') : '—'}</b>${p.invoice ? `<br><small class="ref">Xero ${esc(p.invoice)}</small>` : ''}</td>
                   <td><span class="dec ${st[1]}">${st[0]}</span>${p.paid_date && p.status === 'paid' ? `<br><small class="ref">${fdate(p.paid_date)}</small>` : ''}</td>
-                  <td><button class="btn btn-o btn-sm" onclick="openPlacement('${a.id}')">${a.placement ? 'Edit' : 'Add details'}</button></td></tr>`;
+                  <td style="white-space:nowrap"><button class="btn btn-o btn-sm" onclick="openPlacement('${a.id}')">${a.placement ? 'Edit' : 'Add details'}</button> <button class="btn btn-p btn-sm" onclick="openBilling('${a.id}')">${p.bill ? 'Resend to accounts' : 'Send to accounts'}</button></td></tr>`;
         }).join('')
         : '<tr><td colspan="8" class="empty">No placements yet. When you move a candidate to "Accepted", you can record the yacht and your fee here.</td></tr>';
     }
@@ -3770,6 +3845,195 @@
         } catch (e) {
             if (e.name !== 'AbortError')
                 toast('Sharing not available — use Save image');
+        }
+    }
+
+    /* ---------- contact a recruiter ---------- */
+    function recFor(dept) {
+        return (dept === 'Interior' || dept === 'Galley') ? 'Interior' : 'Exterior';
+    }
+    function recCard(k, highlight, ctx) {
+        const r = RECRUITERS[k];
+        const who = r.name || 'Seafarer recruitment team';
+        const msg = `Hi ${r.name || 'Seafarer'}, ${ME ? 'this is ' + fullName(ME) + '. ' : ''}${ctx || "I'd like to speak to the " + k.toLowerCase() + ' recruiter.'}`;
+        return `<div class="rc ${highlight ? 'mine' : ''}"><h4>${esc(r.title)}${highlight ? ' · for you' : ''}</h4><b>${esc(who)}</b><p>${esc(r.covers)}</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-sm" style="background:#25D366;color:#fff" target="_blank" href="https://api.whatsapp.com/send?phone=${r.phone}&text=${encodeURIComponent(msg)}">WhatsApp</a>
+            <a class="btn btn-o btn-sm" href="mailto:${esc(r.email)}?subject=${encodeURIComponent('Crew enquiry – ' + k)}&body=${encodeURIComponent(msg)}">Email</a></div></div>`;
+    }
+    function recBox(dept, ctx) {
+        const mine = dept === 'Interior' ? 'Interior' : dept === 'Exterior' ? 'Exterior' : null;
+        const order = mine === 'Interior' ? ['Interior', 'Exterior'] : ['Exterior', 'Interior'];
+        return `<div class="rec">${order.map(k => recCard(k, k === mine, ctx)).join('')}</div>`;
+    }
+    function showRecruiters() {
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><h2>Contact a recruiter</h2></div><div class="m-body">
+            <p style="color:var(--muted);font-size:14px;margin-bottom:14px">Choose the recruiter for the side of the yacht you want to work on.</p>${recBox(ME ? ME.dept_pref : '')}</div>`);
+    }
+    /* ---------- TERMS OF BUSINESS + INVOICES ---------- */
+    const FEE_PCT = 90; // placement fee = 90% of the crew member's first month's salary
+    const TERMS_TEXT = [
+    `These candidates are introduced to you by Seafarer Maritime Career Consultancy ("Seafarer").`,
+    `If you employ any candidate introduced on this page — in any position, on this vessel or any vessel under the same ownership or management — within 12 months of this introduction, a placement fee of ${FEE_PCT}% of the candidate's first month's gross salary is payable to Seafarer.`,
+    `The fee is invoiced on the candidate's start date and is payable within 7 days of the invoice date.`,
+    `Please arrange all interviews and offers through Seafarer and do not contact candidates directly or pass their details to third parties.`,
+    `Candidate information is shared for recruitment purposes only and must be handled confidentially in line with applicable data-protection law (including POPIA / GDPR).`
+    ];
+    // ── ACCOUNTS (Xero) ── invoices are made in Xero by accounts; the portal sends them the billing details
+    const ACCOUNTS = {
+        name: 'Accounts',
+        email: 'info@seafarers.co.za',
+        whatsapp: ''
+    }; // ← put the accountant's email / WhatsApp here
+    const XERO_ACCOUNT_CODE = '200'; // Xero sales account code (accounts can change this)
+    const XERO_TAX_TYPE = 'Zero Rated'; // e.g. "Zero Rated" / "Exempt" / "Standard Rate 15%" — set by accounts
+    function sym(c) {
+        return {
+                EUR: '€',
+                USD: '$',
+                GBP: '£',
+                ZAR: 'R'
+            }[c] || (c ? c + ' ' : '');
+    }
+    function amt(c, v) {
+        return sym(c) + Number(v || 0).toLocaleString('en', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    function termsFor(a) {
+        for (const sl of SLS) {
+            if ((sl.items || []).some(i => i.app_id === a.id) && sl.terms && sl.terms.at)
+                return sl.terms;
+        }
+        return null;
+    }
+    function billingText(a) {
+        const c = CANDS.find(x => x.id === a.candidate_id) || {},
+            j = JOBS.find(x => x.id === a.job_id) || {},
+            p = a.placement || {},
+            b = p.bill || {},
+            t = termsFor(a);
+        const cur = p.fee_currency || p.currency || 'EUR';
+        return [`NEW PLACEMENT — please invoice in Xero`, ``,
+        `Bill to: ${b.to || p.yacht || ''}`, b.addr ? `Address: ${b.addr}` : '', b.email ? `Accounts email: ${b.email}` : '', b.po ? `Their ref / PO: ${b.po}` : '', ``,
+        `Crew placed: ${fullName(c)}`, `Position: ${j.position || ''}${j.ref ? ' (' + j.ref + ')' : ''}`, `Vessel: ${p.yacht || ''}`, `Start date: ${p.start ? fdate(p.start) : 'TBC'}`, ``,
+        `First month's salary: ${amt(p.currency || cur, p.salary)}`, `Placement fee (${FEE_PCT}%): ${amt(cur, p.fee)}`, `Currency: ${cur}`, `Payment terms: 7 days from invoice`, ``,
+        t ? `Terms of Business accepted by ${t.name}${t.role ? ' (' + t.role + ')' : ''} on ${fdate(t.at)}` : 'Terms of Business: not recorded on portal'
+        ].filter(x => x !== null && x !== false).join('\n').replace(/\n{3,}/g, '\n\n');
+    }
+    function openBilling(appId) {
+        const a = APPS.find(x => x.id === appId),
+            c = CANDS.find(x => x.id === a.candidate_id) || {},
+            j = JOBS.find(x => x.id === a.job_id) || {},
+            p = a.placement || {},
+            b = p.bill || {};
+        if (!p.fee && !p.salary) {
+            toast('Add the salary first');
+            return openPlacement(appId);
+        }
+        const t = termsFor(a);
+        openModal(`<div class="m-head"><button class="x" onclick="closeModal()">×</button><div style="font-size:13px;color:#cbd5e1">${esc(fullName(c))} · ${esc(j.position || '')}</div><h2>Send to accounts (Xero)</h2></div><div class="m-body">
+            <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Fill in who to bill. Accounts gets everything needed to raise the invoice in Xero — bank details come from Xero, not this portal.</p>
+            <div class="form">
+              <div class="full"><label>Bill to (yacht / management company)</label><input id="bl_to" value="${esc(b.to || p.yacht || '')}" placeholder="M/Y … c/o … Yacht Management"></div>
+              <div class="full"><label>Billing address</label><textarea id="bl_addr" style="min-height:60px">${esc(b.addr || '')}</textarea></div>
+              <div><label>Their accounts / captain email</label><input id="bl_email" type="email" value="${esc(b.email || '')}"></div><div><label>Their ref / PO (optional)</label><input id="bl_po" value="${esc(b.po || '')}"></div>
+              <div class="full" style="font-size:14px;background:var(--bg);border-radius:10px;padding:12px">Fee: <b>${amt(p.fee_currency || p.currency, p.fee)}</b> (${FEE_PCT}% of ${amt(p.currency, p.salary)}) · Start ${p.start ? fdate(p.start) : 'TBC'}<br>
+                ${t ? `<span style="color:var(--ok)">✓ Terms accepted by ${esc(t.name)} on ${fdate(t.at)}</span>` : '<span style="color:var(--warn)">No Terms of Business acceptance found for this candidate</span>'}</div>
+              <div class="full" style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-g" onclick="sendBilling('${appId}','email')">✉ Email to accounts</button>
+                ${ACCOUNTS.whatsapp ? `<button class="btn btn-sm" style="background:#25D366;color:#fff;padding:10px 16px" onclick="sendBilling('${appId}','wa')">WhatsApp to accounts</button>` : ''}
+                <button class="btn btn-o" onclick="sendBilling('${appId}','csv')">⬇ Xero import file (CSV)</button>
+                <button class="btn btn-o" onclick="sendBilling('${appId}','copy')">Copy details</button></div>
+            </div></div>`);
+    }
+    async function sendBilling(appId, how) {
+        const a = APPS.find(x => x.id === appId);
+        const p = {
+            ...(a.placement || {})
+        };
+        p.bill = {
+            to: $('bl_to').value.trim(),
+            addr: $('bl_addr').value.trim(),
+            email: $('bl_email').value.trim(),
+            po: $('bl_po').value.trim()
+        };
+        if (!p.bill.to)
+            return toast('Fill in who to bill');
+        if (!p.status || p.status === 'not_invoiced')
+            p.status = 'sent';
+        p.sent_at = p.sent_at || new Date().toISOString();
+        try {
+            await db.patchApp(appId, {
+                placement: p
+            });
+        } catch (e) {
+            return toast('Error: ' + e.message);
+        }
+        const c = CANDS.find(x => x.id === a.candidate_id) || {},
+            j = JOBS.find(x => x.id === a.job_id) || {},
+            txt = billingText(a);
+        if (how === 'email')
+            location.href = `mailto:${ACCOUNTS.email}?subject=${encodeURIComponent('Please invoice: placement of ' + fullName(c) + ' – ' + (j.position || '') + ' – ' + p.bill.to)}&body=${encodeURIComponent(txt)}`;
+        if (how === 'wa')
+            window.open(waURL(ACCOUNTS.whatsapp, txt), '_blank');
+        if (how === 'copy')
+            copyText(txt);
+        if (how === 'csv') {
+            const due = new Date(Date.now() + 7 * 864e5),
+                d = x => x.toLocaleDateString('en-GB');
+            const addr = p.bill.addr.split('\n').map(x => x.trim()).filter(Boolean);
+            const cols = ['*ContactName', 'EmailAddress', 'POAddressLine1', 'POAddressLine2', 'POAddressLine3', 'POCountry', '*InvoiceNumber', 'Reference', '*InvoiceDate', '*DueDate', '*Description', '*Quantity', '*UnitAmount', '*AccountCode', '*TaxType', 'Currency'];
+            const row = [p.bill.to, p.bill.email, addr[0] || '', addr[1] || '', addr[2] || '', addr[3] || '', '', p.bill.po || j.ref || '', d(new Date()), d(due),
+            `Crew placement fee – ${fullName(c)}, ${j.position || ''}${p.yacht ? ' on ' + p.yacht : ''}, start ${p.start ? fdate(p.start) : 'TBC'} (${FEE_PCT}% of first month's salary ${amt(p.currency, p.salary)})`,
+            '1', String(p.fee || 0), XERO_ACCOUNT_CODE, XERO_TAX_TYPE, p.fee_currency || p.currency || 'EUR'];
+            const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+            const blob = new Blob([cols.map(q).join(',') + '\n' + row.map(q).join(',') + '\n'], {
+                type: 'text/csv'
+            });
+            const el = document.createElement('a');
+            el.href = URL.createObjectURL(blob);
+            el.download = 'xero-invoice-' + fullName(c).replace(/\s+/g, '-') + '.csv';
+            document.body.appendChild(el);
+            el.click();
+            el.remove();
+            toast('Xero file downloaded — send it to accounts');
+        }
+        closeModal();
+        drawAdmin();
+    }
+
+    /* captain accepts terms before seeing candidates */
+    function termsGate() {
+        const t = SL.terms;
+        if (t && t.at)
+            return '';
+        return `<div class="panel" id="termsBox" style="border-color:var(--navy)"><h3>Terms of Business</h3>
+            <ol style="font-size:14px;line-height:1.6;padding-left:20px;margin-bottom:14px">${TERMS_TEXT.map(x => `<li style="margin-bottom:6px">${esc(x)}</li>`).join('')}</ol>
+            <div class="form"><div><label>Your name</label><input id="tName" placeholder="e.g. Capt. John Smith"></div><div><label>Position / company</label><input id="tRole" placeholder="Captain, M/Y …"></div></div>
+            <label class="ck" style="margin-top:12px;padding:12px"><input type="checkbox" id="tOk"> <span style="font-size:14px">I accept these Terms of Business on behalf of the vessel / its owners or managers.</span></label>
+            <button class="btn btn-g" style="margin-top:12px" onclick="acceptTerms()">Accept & view candidates</button></div>`;
+    }
+    async function acceptTerms() {
+        if (!$('tName').value.trim())
+            return toast('Please enter your name');
+        if (!$('tOk').checked)
+            return toast('Please tick the box to accept the terms');
+        const terms = {
+            name: $('tName').value.trim(),
+            role: $('tRole').value.trim(),
+            at: new Date().toISOString(),
+            fee_pct: FEE_PCT
+        };
+        try {
+            await db.patchShortlist(SL.id, {
+                terms
+            });
+            SL.terms = terms;
+            toast('Thank you');
+            drawCaptain();
+        } catch (e) {
+            toast('Error: ' + e.message);
         }
     }
 
