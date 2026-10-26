@@ -1841,7 +1841,7 @@
         <a href="#" onclick="event.preventDefault();showRecruiters()">Contact a recruiter</a>
          · 
         <a href="#" onclick="event.preventDefault();showPrivacy()">Privacy Notice</a>
-        <span style="opacity:.4">· v18</span>
+        <span style="opacity:.4">· v19 🔒</span>
     </footer>
 
     <div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
@@ -1856,18 +1856,6 @@
        ============================================================ */
     const SB_URL = 'https://shbjnypgkvxovosjoxyc.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmpueXBna3Z4b3Zvc2pveHljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNjM1ODIsImV4cCI6MjEwMjczOTU4Mn0.Wk4S2JS7OGQZpMlGuFvTKikn54bGqQ_vUJaf60fqy-A';
-    const ADMINS = [// passwords stored as hashes, not readable in page source
-    {
-        email: 'info@seafarers.co.za',
-        name: 'Brandon',
-        hash: 'c9ff15af1bd89af2aa7ac783c19bea406e9e10b17e5b8a96ce73eb0becda3e0c'
-    },
-    {
-        email: 'moolmaneloise@gmail.com',
-        name: 'Eloise',
-        hash: '08892ca4004b5c468b8dabca0dfb86da8e3d95b5101d8aa8f2d8beb46fe9ea84'
-    },
-    ];
     const SHORTLIST_MAX = 10;
     // ── RECRUITERS ── fill in names / numbers / emails later (phone: country code, no + or spaces)
     const RECRUITERS = {
@@ -1961,20 +1949,22 @@
         REFS = [];
 
     /* ---------------- data layer ---------------- */
-    const H = {
-        apikey: SB_KEY,
-        Authorization: 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json'
-    };
-    async function sb(path, opt={}) {
+    async function sb(path, opt={}, retried) {
+        await ensureFresh();
         const r = await fetch(SB_URL + '/rest/v1/' + path, {
             ...opt,
             headers: {
-                ...H,
+                apikey: SB_KEY,
+                Authorization: 'Bearer ' + tok(),
+                'Content-Type': 'application/json',
                 Prefer: 'return=representation',
                 ...(opt.headers || {})
             }
         });
+        if (r.status === 401 && SESS && !retried) {
+            await authRefresh();
+            return sb(path, opt, true);
+        }
         const txt = await r.text();
         if (!r.ok) {
             let m = txt;
@@ -2006,7 +1996,7 @@
                 await db.apps();
                 return;
             }
-            const mine = await sb('recruit_applications?select=*&candidate_id=eq.' + cid);
+            const mine = await rpc('recruit_my_applications');
             APPS = APPS.filter(a => a.candidate_id !== cid).concat(mine);
         },
         async findCand(email) {
@@ -2090,11 +2080,14 @@
                 APPS.unshift(a);
                 return;
             }
-            const r = await sb('recruit_applications', {
+            await sb('recruit_applications', {
                 method: 'POST',
-                body: JSON.stringify(a)
+                body: JSON.stringify(a),
+                headers: {
+                    Prefer: 'return=minimal'
+                }
             });
-            APPS.unshift(r[0]);
+            await db.myApps(a.candidate_id);
         },
         async shortlists() {
             if (DEMO)
@@ -2118,8 +2111,32 @@
         async getShortlist(id) {
             if (DEMO)
                 return SLS.find(x => x.id === id);
-            const r = await sb('recruit_shortlists?select=*&id=eq.' + id);
-            return r[0];
+            return rpc('recruit_get_shortlist', {
+                p_id: id
+            });
+        },
+        async notes() {
+            if (DEMO)
+                return;
+            const r = await sb('recruit_cand_notes?select=*');
+            NOTES = {};
+            r.forEach(n => NOTES[n.candidate_id] = n.notes || '');
+        },
+        async saveNote(cid, t) {
+            NOTES[cid] = t;
+            if (DEMO)
+                return;
+            await sb('recruit_cand_notes?on_conflict=candidate_id', {
+                method: 'POST',
+                body: JSON.stringify({
+                    candidate_id: cid,
+                    notes: t,
+                    updated_at: new Date().toISOString()
+                }),
+                headers: {
+                    Prefer: 'resolution=merge-duplicates,return=minimal'
+                }
+            });
         },
         async patchShortlist(id, f) {
             if (DEMO) {
@@ -2141,6 +2158,255 @@
             Object.assign(APPS.find(a => a.id === id), f);
         }
     };
+    /* ---------------- secure logins (Supabase Auth) ---------------- */
+    let SESS = null,
+        NOTES = {};
+    function loadSess() {
+        try {
+            SESS = JSON.parse(localStorage.getItem('sr_sess') || 'null');
+        } catch (e) {
+            SESS = null;
+        }
+    }
+    function saveSess(s) {
+        SESS = s;
+        try {
+            s ? localStorage.setItem('sr_sess', JSON.stringify(s)) : localStorage.removeItem('sr_sess');
+        } catch (e) {}
+    }
+    function tok() {
+        return (SESS && SESS.access_token) || SB_KEY;
+    }
+    async function authFetch(path, body, method, token) {
+        const r = await fetch(SB_URL + '/auth/v1/' + path, {
+            method: method || 'POST',
+            headers: {
+                apikey: SB_KEY,
+                'Content-Type': 'application/json',
+                ...(token ? {
+                    Authorization: 'Bearer ' + token
+                } : {})
+            },
+            body: body ? JSON.stringify(body) : undefined
+        });
+        const t = await r.text();
+        let j = {};
+        try {
+            j = t ? JSON.parse(t) : {};
+        } catch (e) {}
+        if (!r.ok) {
+            const e = new Error(j.msg || j.error_description || j.message || j.error || ('Error ' + r.status));
+            e.code = j.error_code || j.code || r.status;
+            throw e;
+        }
+        return j;
+    }
+    function sessFrom(j) {
+        const u = j.user || {};
+        return {
+            access_token: j.access_token,
+            refresh_token: j.refresh_token,
+            expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600),
+            user: {
+                id: u.id,
+                email: (u.email || '').toLowerCase(),
+                meta: u.user_metadata || {}
+            }
+        };
+    }
+    async function authSignIn(e, p) {
+        saveSess(sessFrom(await authFetch('token?grant_type=password', {
+            email: e,
+            password: p
+        })));
+        return SESS;
+    }
+    async function authSignUp(e, p, meta) {
+        const j = await authFetch('signup', {
+            email: e,
+            password: p,
+            data: meta || {}
+        });
+        if (j.access_token) {
+            saveSess(sessFrom(j));
+            return SESS;
+        }
+        return null;
+    }
+    async function authRefresh() {
+        if (!SESS || !SESS.refresh_token) {
+            saveSess(null);
+            return null;
+        }
+        try {
+            saveSess(sessFrom(await authFetch('token?grant_type=refresh_token', {
+                refresh_token: SESS.refresh_token
+            })));
+            return SESS;
+        } catch (e) {
+            saveSess(null);
+            return null;
+        }
+    }
+    async function ensureFresh() {
+        if (SESS && SESS.expires_at && SESS.expires_at - 90 < Date.now() / 1000)
+            await authRefresh();
+    }
+    async function authSignOut() {
+        try {
+            if (SESS)
+                await authFetch('logout', null, 'POST', SESS.access_token);
+        } catch (e) {}
+        saveSess(null);
+    }
+    async function authRecover(email) {
+        await authFetch('recover?redirect_to=' + encodeURIComponent(LIVE_URL), {
+            email
+        });
+    }
+    async function authSetPassword(p) {
+        await authFetch('user', {
+            password: p
+        }, 'PUT', SESS.access_token);
+    }
+    async function rpc(fn, args) {
+        return sb('rpc/' + fn, {
+            method: 'POST',
+            body: JSON.stringify(args || {})
+        });
+    }
+    async function isStaffRPC() {
+        try {
+            return (await rpc('recruit_is_staff')) === true;
+        } catch (e) {
+            return false;
+        }
+    }
+    async function loadMe() {
+        if (!SESS || !SESS.user || !SESS.user.id) {
+            ME = null;
+            return;
+        }
+        const r = await sb('recruit_candidates?select=*&user_id=eq.' + SESS.user.id);
+        ME = r[0] || null;
+    }
+    // after a successful sign-in: staff → dashboard, crew → their profile
+    async function afterAuth(e, p) {
+        if (await isStaffRPC()) {
+            enterAdmin();
+            return show('admin');
+        }
+        await loadMe();
+        if (!ME && e && p) {
+            try {
+                if ((await rpc('recruit_legacy_link', {
+                    p_email: e,
+                    p_hash: await hash(e, p)
+                })) === true)
+                    await loadMe();
+            } catch (x) {
+                console.warn(x);
+            }
+        }
+        if (!ME) {
+            const m = (SESS.user && SESS.user.meta) || {};
+            if (m.first_name) {
+                ME = await db.addCand({
+                    first_name: m.first_name,
+                    last_name: m.last_name || '',
+                    dob: m.dob || null,
+                    phone: m.phone || '',
+                    dept_pref: m.dept_pref || null,
+                    popia_consent: m.popia_consent || new Date().toISOString(),
+                    email: SESS.user.email,
+                    user_id: SESS.user.id,
+                    yacht_refs: []
+                });
+            }
+        }
+        if (!ME) {
+            authMode = 'register';
+            renderMe();
+            setTimeout(() => {
+                if ($('rEmail')) {
+                    $('rEmail').value = SESS.user.email;
+                }
+                authMsg('You are logged in, but there is no crew profile yet — please fill in the form below to create it.');
+            }, 50);
+            return;
+        }
+        store('sr_last_email', ME.email);
+        try {
+            await db.myApps(ME.id);
+        } catch (x) {
+            console.warn(x);
+        }
+        setWho();
+        toast('Welcome, ' + (ME.first_name || ''));
+        afterLogin();
+    }
+    // links in emails (password reset / confirm email) come back with #access_token=…
+    async function handleAuthRedirect() {
+        const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+        if (h.get('error_description')) {
+            history.replaceState(null, '', location.pathname + location.search);
+            toast(h.get('error_description').replace(/\+/g, ' '));
+            return;
+        }
+        if (!h.get('access_token'))
+            return;
+        const type = h.get('type');
+        saveSess({
+            access_token: h.get('access_token'),
+            refresh_token: h.get('refresh_token'),
+            expires_at: Number(h.get('expires_at')) || Math.floor(Date.now() / 1000) + Number(h.get('expires_in') || 3600),
+            user: {}
+        });
+        history.replaceState(null, '', location.pathname + location.search);
+        try {
+            const u = await authFetch('user', null, 'GET', SESS.access_token);
+            SESS.user = {
+                id: u.id,
+                email: (u.email || '').toLowerCase(),
+                meta: u.user_metadata || {}
+            };
+            saveSess(SESS);
+        } catch (e) {
+            saveSess(null);
+            return toast('This link has expired — please request a new one.');
+        }
+        if (type === 'recovery')
+            return showSetPassword();
+        show('me');
+        await afterAuth();
+    }
+    function showSetPassword() {
+        openModal(`<div class="m-head"><h2>Choose a new password</h2></div><div class="m-body">
+            <form onsubmit="event.preventDefault();doSetPassword()"><div style="margin-bottom:12px"><label>New password (min 6 characters)</label><input id="npw1" type="password" autocomplete="new-password"></div>
+            <div style="margin-bottom:16px"><label>Confirm new password</label><input id="npw2" type="password" autocomplete="new-password"></div>
+            <button class="btn btn-g" id="npwBtn" style="width:100%">Save new password</button></form><div id="npwMsg" style="margin-top:10px;color:var(--bad);font-size:14px"></div></div>`);
+    }
+    async function doSetPassword() {
+        const a = $('npw1').value,
+            b = $('npw2').value;
+        if (a.length < 6)
+            return $('npwMsg').textContent = 'Password must be at least 6 characters.';
+        if (a !== b)
+            return $('npwMsg').textContent = 'Passwords do not match.';
+        $('npwBtn').disabled = true;
+        try {
+            await authSetPassword(a);
+            closeModal();
+            toast('Password updated ✓');
+            show('me');
+            await afterAuth();
+        }
+        catch (e) {
+            $('npwMsg').textContent = 'Could not save: ' + e.message;
+            $('npwBtn').disabled = false;
+        }
+    }
+
     // Shrinks photos before upload (iPhone photos are 3–5 MB). PDFs and Word files are uploaded as they are.
     async function shrinkImage(file, maxDim, quality) {
         if (!file || !/^image\/(jpeg|png|heic|heif|webp)$/i.test(file.type) && !/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name))
@@ -2181,12 +2447,13 @@
             throw new Error('File is too big (max 10 MB). Please upload a smaller PDF or photo.');
         if (DEMO)
             return URL.createObjectURL(file);
-        const name = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ext = (file.name.match(/\.[a-z0-9]{1,5}$/i) || [''])[0].toLowerCase();
+        const name = (window.crypto && crypto.randomUUID ? crypto.randomUUID() : uid() + uid()) + ext; // random, unguessable file name
         const r = await fetch(SB_URL + '/storage/v1/object/cvs/' + name, {
             method: 'POST',
             headers: {
                 apikey: SB_KEY,
-                Authorization: 'Bearer ' + SB_KEY,
+                Authorization: 'Bearer ' + tok(),
                 'Content-Type': file.type || 'application/octet-stream'
             },
             body: file
@@ -2662,21 +2929,54 @@
             return err('Please tick the box to agree to the Privacy Notice.');
         $('rBtn').disabled = true;
         try {
-            if (await db.findCand(e)) {
-                $('rBtn').disabled = false;
-                return authMsg('This email is already registered. <a href="#" onclick="authMode=\'login\';renderMe();return false" style="color:#991b1b;font-weight:700">Log in instead →</a>');
-            }
-            ME = await db.addCand({
+            const meta = {
                 first_name: f,
                 last_name: l,
-                email: e,
                 dob: d,
                 phone: $('rPhone').value.trim(),
-                pass_hash: await hash(e, p),
-                yacht_refs: [],
                 dept_pref: $('rDept').value,
                 popia_consent: new Date().toISOString()
-            });
+            };
+            const already = 'This email is already registered. <a href="#" onclick="authMode=\'login\';renderMe();return false" style="color:#991b1b;font-weight:700">Log in instead →</a>';
+            if (DEMO) {
+                if (await db.findCand(e)) {
+                    $('rBtn').disabled = false;
+                    return authMsg(already);
+                }
+                ME = await db.addCand({
+                    ...meta,
+                    email: e,
+                    pass_hash: await hash(e, p),
+                    yacht_refs: []
+                });
+            }
+            else {
+                let s0 = (SESS && SESS.user && SESS.user.email === e) ? SESS : null;
+                if (!s0) {
+                    try {
+                        s0 = await authSignUp(e, p, meta);
+                    } catch (x) {
+                        $('rBtn').disabled = false;
+                        if (/already|registered|exists/i.test(x.message))
+                            return authMsg(already);
+                        throw x;
+                    }
+                }
+                if (!s0) {
+                    $('rBtn').disabled = false;
+                    return authMsg('✓ Almost done — we sent a confirmation email to <b>' + esc(e) + '</b>. Click the link in it (check spam too), then log in.');
+                }
+                if (await isStaffRPC()) {
+                    enterAdmin();
+                    return show('admin');
+                }
+                ME = await db.addCand({
+                    ...meta,
+                    email: e,
+                    user_id: s0.user.id,
+                    yacht_refs: []
+                });
+            }
             store('sr_cand', ME.id);
             store('sr_last_email', e);
             setWho();
@@ -2705,9 +3005,35 @@
         btn.textContent = 'Logging in…';
         try {
             const h = await hash(e, p);
-            if (ADMINS.some(a => a.email === e && a.hash === h) || (DEMO && p === 'demo')) {
+            if (DEMO && p === 'demo') {
                 enterAdmin();
                 return show('admin');
+            }
+            if (!DEMO) {
+                try {
+                    await authSignIn(e, p);
+                }
+                catch (x) {
+                    if (/not confirmed/i.test(x.message))
+                        return authMsg('Please confirm your email first — click the link we emailed you (check spam), then log in.');
+                    if (!/invalid|credentials/i.test(x.message + ' ' + x.code))
+                        throw x;
+                    // older crew accounts (before the security upgrade) move to secure logins automatically
+                    if ((await rpc('recruit_legacy_check', {
+                        p_email: e,
+                        p_hash: h
+                    })) !== true)
+                        return authMsg('Incorrect email or password. Try again, or tap <b>Forgot your password?</b> below.<br><span style="font-weight:400">New here? <a href="#" onclick="authMode=\'register\';renderMe();return false" style="color:#991b1b;font-weight:700">Register your crew profile →</a></span>');
+                    let s1;
+                    try {
+                        s1 = await authSignUp(e, p, {});
+                    } catch (y) {
+                        return authMsg('Incorrect email or password. Try again, or tap <b>Forgot your password?</b> below.');
+                    }
+                    if (!s1)
+                        return authMsg('We upgraded our security 🔒 — we just emailed you a confirmation link. Click it (check spam), then log in with the same password.');
+                }
+                return await afterAuth(e, p);
             }
             const c = await db.findCand(e);
             if (!c)
@@ -2736,8 +3062,26 @@
             }
         }
     }
-    function forgotPw() {
-        const e = ($('lEmail') && $('lEmail').value.trim()) || '';
+    async function forgotPw() {
+        const e = ($('lEmail') && $('lEmail').value.trim().toLowerCase()) || '';
+        if (!DEMO && /^\S+@\S+\.\S+$/.test(e)) {
+            try {
+                await authRecover(e);
+                authMsg(`📧 If <b>${esc(e)}</b> is registered, we've sent a password reset link to it. Open the email on this device and tap the link (check spam too).<br><br>No email after 10 minutes? <a target="_blank" href="https://api.whatsapp.com/send?phone=${SUPPORT_WA}&text=${encodeURIComponent('Hi Seafarer, I did not get my password reset email for ' + e)}">WhatsApp us</a>`);
+                $('authErr').style.background = '#eff6ff';
+                $('authErr').style.color = 'var(--navy)';
+                return;
+            }
+            catch (x) {
+                console.warn(x);
+            }
+        }
+        if (!DEMO && !e) {
+            authMsg('Type your email address above first, then tap <b>Forgot your password?</b> again.');
+            $('authErr').style.background = '#eff6ff';
+            $('authErr').style.color = 'var(--navy)';
+            return;
+        }
         const txt = `Hi Seafarer, I forgot my crew portal password. My email is ${e || '…'}. Please reset it for me.`;
         authMsg(`No problem — send us a message and we'll reset it for you:<br><br>
             <a class="btn btn-sm" style="background:#25D366;color:#fff" target="_blank" href="https://api.whatsapp.com/send?phone=${SUPPORT_WA}&text=${encodeURIComponent(txt)}">WhatsApp Seafarer</a>
@@ -2754,10 +3098,12 @@
         } else
             renderProfile();
     }
-    function logoutMe() {
+    async function logoutMe() {
         ME = null;
         store('sr_cand', null);
         authMode = 'login';
+        if (!DEMO)
+            await authSignOut();
         setWho();
         renderMe();
     }
@@ -3010,9 +3356,19 @@
     async function adminLogin() {
         const em = $('aEmail').value.trim().toLowerCase(),
             pw = $('aPass').value;
-        const h = await hash(em, pw);
-        const adm = ADMINS.find(a => a.email === em && a.hash === h);
-        const ok = DEMO ? pw === 'demo' : !!adm;
+        let ok = false;
+        if (DEMO)
+            ok = pw === 'demo';
+        else {
+            try {
+                await authSignIn(em, pw);
+                ok = await isStaffRPC();
+                if (!ok)
+                    await authSignOut();
+            } catch (e) {
+                ok = false;
+            }
+        }
         if (!ok)
             return $('aErr').textContent = 'Incorrect email or password.';
         $('aErr').textContent = '';
@@ -3029,11 +3385,17 @@
         $('adminLogin').classList.add('hide');
         $('adminPanel').classList.remove('hide');
     }
-    function adminLogout() {
+    async function adminLogout() {
         isAdmin = false;
         try {
             sessionStorage.removeItem('sr_admin')
         } catch (e) {}
+        if (!DEMO)
+            await authSignOut();
+        CANDS = [];
+        APPS = [];
+        SLS = [];
+        NOTES = {};
         $('adminPanel').classList.add('hide');
         $('adminLogin').classList.remove('hide');
         $('nav-admin').classList.add('hide');
@@ -3049,7 +3411,7 @@
     }
     async function renderAdmin() {
         try {
-            await Promise.all([db.jobs(), db.apps(), db.cands(), db.shortlists().catch(e => console.warn('shortlists', e))]);
+            await Promise.all([db.jobs(), db.apps(), db.cands(), db.shortlists().catch(e => console.warn('shortlists', e)), db.notes().catch(e => console.warn('notes', e))]);
         } catch (e) {
             toast('Load error: ' + e.message);
         }
@@ -3246,15 +3608,23 @@
         $('view-sl').classList.remove('hide');
         $('slBox').innerHTML = '<p style="color:var(--muted)">Loading candidates…</p>';
         try {
-            SL = await db.getShortlist(id);
-            if (!SL)
-                throw new Error('This link is no longer available.');
-            const ids = (SL.items || []).map(i => i.candidate_id);
             if (DEMO) {
+                SL = await db.getShortlist(id);
+                if (!SL)
+                    throw new Error('This link is no longer available.');
+                const ids = (SL.items || []).map(i => i.candidate_id);
                 CAP_C = CANDS.filter(c => ids.includes(c.id));
                 CAP_J = JOBS.find(j => j.id === SL.job_id) || {};
             }
             else {
+                const res = await db.getShortlist(id);
+                if (!res || !res.shortlist)
+                    throw new Error('This link is no longer available.');
+                SL = res.shortlist;
+                CAP_J = res.job || {};
+                CAP_C = res.candidates || [];
+            }
+            if (false) {
                 CAP_C = ids.length ? await sb('recruit_candidates?select=id,first_name,last_name,nationality,gender,dob,position_sought,experience,certs,visas,cv_url,photo_url,documents,yacht_refs,bio,dept_pref,position_2,available_from,drivers_license,skills,oow_modules&id=in.(' + ids.join(',') + ')') : [];
                 CAP_J = (await sb('recruit_jobs?select=*&id=eq.' + SL.job_id))[0] || {};
             }
@@ -3300,9 +3670,17 @@
         if (dec)
             items[i].decision = dec;
         try {
-            await db.patchShortlist(SL.id, {
-                items
-            });
+            if (DEMO)
+                await db.patchShortlist(SL.id, {
+                    items
+                });
+            else
+                await rpc('recruit_captain_decide', {
+                    p_id: SL.id,
+                    p_idx: i,
+                    p_decision: dec || null,
+                    p_comment: $('capC' + i).value
+                });
             SL.items = items;
             toast('Saved — thank you');
             drawCaptain();
@@ -4026,12 +4404,21 @@
             fee_pct: FEE_PCT
         };
         try {
-            await db.patchShortlist(SL.id, {
-                terms
-            });
-            SL.terms = terms;
+            if (DEMO) {
+                await db.patchShortlist(SL.id, {
+                    terms
+                });
+                SL.terms = terms;
+                drawCaptain();
+            } else {
+                await rpc('recruit_accept_terms', {
+                    p_id: SL.id,
+                    p_name: terms.name,
+                    p_role: terms.role
+                });
+                await openCaptainView(SL.id);
+            }
             toast('Thank you');
-            drawCaptain();
         } catch (e) {
             toast('Error: ' + e.message);
         }
@@ -4091,37 +4478,34 @@
             <div class="hr"></div>
             ${a ? scoreHTML(a) : ''}
             ${a ? `<label>Interview notes for this application</label><textarea id="nApp">${esc(a.notes || '')}</textarea>` : ''}
-            <div style="margin:6px 0 12px"><button class="btn btn-o btn-sm" onclick="resetPw('${c.id}')">🔑 Reset password</button></div>
-            <label style="margin-top:12px">General notes on candidate (private)</label><textarea id="nCand">${esc(c.admin_notes || '')}</textarea>
+            <div style="margin:6px 0 12px"><button class="btn btn-o btn-sm" onclick="resetPw('${c.id}')">🔑 Send password reset email</button></div>
+            <label style="margin-top:12px">General notes on candidate (private)</label><textarea id="nCand">${esc(NOTES[c.id] ?? c.admin_notes ?? '')}</textarea>
             <button class="btn btn-p" style="margin-top:10px" onclick="saveNotes('${c.id}','${appId || ''}')">${a ? 'Save scorecard & notes' : 'Save notes'}</button>
           </div>`);
     }
     async function resetPw(cid) {
         const c = CANDS.find(x => x.id === cid);
-        const np = prompt('New temporary password for ' + fullName(c) + ' (min 6 characters):', 'Crew' + Math.floor(1000 + Math.random() * 9000));
-        if (!np)
+        if (!c)
             return;
-        if (np.length < 6)
-            return toast('Password must be at least 6 characters');
+        if (DEMO)
+            return toast('Demo mode');
+        if (!confirm('Send a password reset email to ' + c.email + '?'))
+            return;
         try {
-            await db.patchCand(cid, {
-                pass_hash: await hash(c.email, np)
-            });
+            await authRecover(c.email);
             const wa = (c.phone || '').replace(/\D/g, '').replace(/^0/, '27');
-            const msg = `Hi ${c.first_name}, your Seafarer crew portal password has been reset. Email: ${c.email} · Temporary password: ${np} · Log in here: ${LIVE_URL}`;
-            if (wa && confirm('Password reset. Send the new password to ' + c.first_name + ' on WhatsApp now?'))
+            const msg = `Hi ${c.first_name}, we've sent a password reset link to ${c.email} for your Seafarer crew portal. Please check your inbox (and spam) and tap the link to choose a new password.`;
+            if (wa && confirm('Reset email sent ✓  Let ' + c.first_name + ' know on WhatsApp?'))
                 window.open(waURL(wa, msg), '_blank');
             else
-                toast('Password reset to: ' + np);
+                toast('Reset email sent to ' + c.email);
         } catch (e) {
             toast('Error: ' + e.message);
         }
     }
     async function saveNotes(cid, aid) {
         try {
-            await db.patchCand(cid, {
-                admin_notes: $('nCand').value
-            });
+            await db.saveNote(cid, $('nCand').value);
             if (aid)
                 await db.patchApp(aid, {
                     notes: $('nApp').value,
@@ -4563,13 +4947,30 @@
                 status: 'open'
             });
         }
+        if (!DEMO) {
+            loadSess();
+            await ensureFresh();
+        }
         try {
             await db.jobs();
         } catch (e) {
             console.error(e);
             toast('Could not load jobs: ' + e.message);
         }
-        const cid = read('sr_cand');
+        if (!DEMO && SESS) {
+            try {
+                if (await isStaffRPC()) {
+                    enterAdmin();
+                } else {
+                    await loadMe();
+                    if (ME)
+                        await db.myApps(ME.id);
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+        const cid = DEMO ? read('sr_cand') : null;
         if (cid) {
             try {
                 if (DEMO) {
@@ -4589,7 +4990,7 @@
         setWho();
         renderJobs();
         try {
-            if (sessionStorage.getItem('sr_admin') === '1') {
+            if (DEMO && sessionStorage.getItem('sr_admin') === '1') {
                 isAdmin = true;
                 $('adminLogin').classList.add('hide');
                 $('adminPanel').classList.remove('hide');
@@ -4603,6 +5004,8 @@
         const p = new URLSearchParams(location.search);
         if (SLID)
             return openCaptainView(SLID);
+        if (!DEMO)
+            await handleAuthRedirect();
         if (p.get('view'))
             show(p.get('view'));
         if (p.get('job'))
